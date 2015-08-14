@@ -1,0 +1,4 @@
+#! /bin/sh
+
+xhost +localhost
+sudo java -jar /home/pi/tigerjython/tigerjython2.jar

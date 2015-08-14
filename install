@@ -1,0 +1,76 @@
+#! /bin/sh
+# Install script for RaspiBrick
+
+echo ------ Running RaspiBrick installation. Version 1.3 - Aug. 8, 2015
+
+# Display commands
+set -x
+
+sudo rm -rf /home/pi/raspibrick
+sudo rm -rf /home/pi/programs
+sudo rm -rf /home/pi/scripts
+
+echo ------ Creating directories ------ 
+mkdir /home/pi/raspibrick
+mkdir /home/pi/raspibrick/jars
+mkdir /home/pi/raspibrick/lib
+mkdir /home/pi/programs
+mkdir /home/pi/scripts
+
+echo ------ Patching OS for fast SSH login
+sudo sed -i 's|files mdns4_minimal \\[NOTFOUND=return\\] dns mdns4|files mdns4_minimal \\[NOTFOUND=return\\] dns|' /etc/nsswitch.conf
+
+echo ------ Installing Linux software ------ 
+sudo apt-get install i2c-tools
+sudo apt-get install python-smbus
+
+echo ------ Copying files ------ 
+sudo cp /home/pi/install/modules /etc/modules
+
+chmod +x /home/pi/install/jrun
+sudo cp /home/pi/install/jrun /usr/bin
+
+chmod +x /home/pi/install/jrun.sh
+cp /home/pi/install/jrun.sh /home/pi/raspibrick
+
+chmod +x /home/pi/install/startApp
+sudo cp /home/pi/install/startApp /usr/bin
+cp /home/pi/install/KillIdleProc.py /home/pi/raspibrick
+
+chmod +x /home/pi/install/pyrun
+sudo cp -f /home/pi/install/pyrun /usr/bin
+
+chmod +x /home/pi/install/rmon
+sudo cp /home/pi/install/rmon /usr/bin
+
+chmod +x /home/pi/install/update-raspibrick
+sudo cp /home/pi/install/update-raspibrick /usr/bin
+
+chmod +x /home/pi/install/rkill
+sudo cp /home/pi/install/rkill /usr/bin
+
+chmod +x /home/pi/install/RaspiBrickStart
+sudo cp /home/pi/install/RaspiBrickStart /etc/init.d
+
+chmod +x /home/pi/install/autostart.sh
+cp /home/pi/install/autostart.sh /home/pi/raspibrick
+
+cp -r /home/pi/install/programs/* /home/pi/programs
+cp -r /home/pi/install/scripts/* /home/pi/scripts
+cp /home/pi/install/jars/* /home/pi/raspibrick/jars
+cp /home/pi/install/lib/* /home/pi/raspibrick/lib
+cp /home/pi/install/*.py /home/pi/raspibrick
+
+echo ------ Installing autostart ------ 
+sudo update-rc.d RaspiBrickStart defaults
+
+echo ------ Mounting FAT partition ------ 
+sudo mkdir /mnt/recovery
+sudo mount /dev/mmcblk0p1 /mnt/recovery
+
+echo ------ Copying RaspiBrickConfig.jar ------ 
+chmod +x /home/pi/install/RaspiBrickConfig.jar
+sudo cp /home/pi/install/RaspiBrickConfig.jar  /mnt/recovery/RaspiBrickConfig.jar
+
+echo ------ Copying wpa_supplicant.conf ------ 
+sudo cp /etc/wpa_supplicant/wpa_supplicant.conf  /mnt/recovery/wpa_supplicant.conf

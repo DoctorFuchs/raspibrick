@@ -1,0 +1,8 @@
+RaspiBrick History
+
+V1.05 - Aug  7, 2015: First public release
+V1.06 - Aug 10, 2015: VNC server added, Port 5901, Pwd: 123456
+V1.07 - Aug 13, 2015: Updated: lib classes, ProcessMon.py, IdleProc.py
+                      due to irregular motor behavior 
+V1.08 - Aug 13, 2015: Led startup revisted
+

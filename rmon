@@ -1,0 +1,4 @@
+#! /bin/sh
+
+sudo pkill python
+pyrun /home/pi/raspibrick/ProcessMon.py

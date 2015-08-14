@@ -1,0 +1,20 @@
+#! /bin/sh
+
+set -x
+
+sudo apt-get install tightvncserver
+sudo apt-get install autocutsel
+
+chmod +x /home/pi/install/vncboot
+sudo cp /home/pi/install/vncboot /etc/init.d
+sudo update-rc.d vncboot defaults
+sudo cp /home/pi/install/desktop.png /usr/share/raspberrypi-artwork/raspberry-pi-logo-small.png
+
+tightvncserver
+
+cp /home/pi/install/xstartup /home/pi/.vnc
+
+
+
+
+

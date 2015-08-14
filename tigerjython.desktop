@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=TigerJython
+Comment=Integrated development environment for education
+Exec=tjstart
+Icon=/usr/share/pixmaps/tjlogo64.png
+Terminal=false
+MultipleArgs=false
+Type=Application
+Categories=Application;Development;
+StartupNotify=true

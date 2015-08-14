@@ -1,0 +1,12 @@
+#! /bin/sh
+
+echo ====== Removing install directory ======
+cd /home/pi
+sudo rm -rf /home/pi/install
+
+echo ====== Cloning GitHub distribution ======
+sudo -u pi bash -c "git clone https://github.com/raspibrick/install"
+
+echo ====== Executing install script as user 'pi' ======
+chmod +x /home/pi/install/install
+sudo -u pi bash -c /home/pi/install/install

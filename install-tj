@@ -1,0 +1,15 @@
+#! /bin/sh
+
+set -x
+
+echo ------ Installing tigerjython ------ 
+cd /home/pi
+rm -rf /home/pi/tjinstall
+git clone https://github.com/tigerjython/tjinstall.git
+chmod +x /home/pi/tjinstall/tigerjython/tigerjython2.jar
+mkdir /home/pi/tigerjython
+cp -r /home/pi/tjinstall/tigerjython/* /home/pi/tigerjython
+sudo cp /home/pi/tjinstall/tjlogo64.png /usr/share/pixmaps
+chmod +x /home/pi/tjinstall/tjstart
+sudo cp /home/pi/tjinstall/tjstart /usr/bin
+cp /home/pi/tjinstall/tigerjython.desktop /home/pi/Desktop

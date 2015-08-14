@@ -1,0 +1,45 @@
+##! /bin/sh
+### BEGIN INIT INFO
+# Provides:          Starting RaspiBrick initialization...
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Initialise RaspiBrick
+# Description:       Starts the RaspiBrick start script at boot time
+### END INIT INFO
+
+
+case "$1" in
+    start)
+        echo "Running RaspiBrick autostart script..."
+        /home/pi/raspibrick/autostart.sh > /dev/null &
+        echo $! > /var/run/autostart.pid
+        ;;
+    stop)
+        echo "autostart action stopped"
+        if [ -e /var/run/autostart.pid ]
+        then
+            if ( kill -TERM $(cat /var/run/autostart.pid) 2> /dev/null )
+            then
+                c=1
+                while [ "$c" -le 30 ]; do
+                  if ( kill -0 $(cat /var/run/autostart.pid) 2> /dev/null )
+                  then
+                      sleep 1
+                  else
+                      break
+                  fi
+                  c=$((++c))
+                done
+             fi
+             if ( kill -0 $(cat /var/run/autostart.pid) 2> /dev/null )
+             then
+                 kill -KILL $(cat /var/run/autostart.pid)
+             fi
+        fi
+        rm /var/run/autostart.pid
+        ;;
+esac
+
+exit 0
