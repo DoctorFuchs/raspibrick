@@ -19,6 +19,10 @@ then
   sudo cp /mnt/recovery/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
   sudo ifdown wlan0
   sudo ifup wlan0 
+  # normally this fails because of modified wpa_suppliciant.conf, try again
+  sleep 5
+  sudo ifdown wlan0
+  sudo ifup wlan0 
   sudo rm -f "$file1"
 else
   # copy wlan info to FAT partition (it may have been modified by raspi GUI user)
