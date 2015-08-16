@@ -17,20 +17,19 @@ if os.path.isfile(fname):
     robot = Robot()
     display = Display()
     led = Led(1)
-    led.setColor(10, 10, 0)
     display.setText("UPE ", [1, 0, 0])
     for i in range(3):
         led.setColor(0, 0, 0)
-        Tools.delay(100)
+        Tools.delay(500)
         led.setColor(10, 10, 10)
-        Tools.delay(100)
+        Tools.delay(500)
     subprocess.call("sudo update-raspibrick", shell = True)
     os.remove(fname)
     display.setText("8YE ", [1, 0, 0])
     Tools.delay(3000)
     display.clear()
     led.setColor(10, 0, 0)
-    print "Done"
+    print "Update done. Shutting down now"
     Tools.delay(2000)
     os.system("sudo shutdown -r now")
 else:
