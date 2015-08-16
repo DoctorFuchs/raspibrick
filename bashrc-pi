@@ -2,6 +2,7 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Inserted by RaspiBrick installation
 export PYTHONPATH=$PYTHONPATH:/home/pi/raspibrick/lib
 
 # If not running interactively, don't do anything
