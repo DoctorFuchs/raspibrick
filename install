@@ -3,7 +3,7 @@
 
 echo ------ Running RaspiBrick installation. Version 1.4 - Aug. 15, 2015
 
-if [ $1 = "update" ]
+if [ "$1" = "update" ]
   then
      echo "Update requested"
   else
@@ -26,7 +26,7 @@ mkdir /home/pi/programs
 mkdir /home/pi/scripts
 
 
-if [ $1 != "update" ]
+if [ "$1" != "update" ]
   then
     echo ------ Patching OS for fast SSH login
     sudo sed -i 's|files mdns4_minimal \\[NOTFOUND=return\\] dns mdns4|files mdns4_minimal \\[NOTFOUND=return\\] dns|' /etc/nsswitch.conf
