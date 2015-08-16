@@ -1,4 +1,4 @@
-# Display4.py
+# Display4c.py
 
 from raspibrick import *
 
@@ -7,12 +7,10 @@ n = 0
 
 display = Display()
 print "Starting ticker..."
-display.ticker("1234567890")
+display.ticker("1234567890", 2, 8, True)
 while  display.isTickerAlive():
     print n, "running"
     n += 1
     Tools.delay(100)
-print "finished"
-Tools.delay(2000)
 robot.exit()
 print "All done"

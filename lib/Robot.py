@@ -223,13 +223,16 @@ class MyRobot(object):
                 self._bus = smbus.SMBus(1) # For revision 2 Raspberry Pi
             else:
                 self._bus = smbus.SMBus(0) # For revision 1 Raspberry Pi
-            self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
-            self._bus.write_byte_data(addr, 0x01, 0x00) # Set all of bank 1 to outputs
-            self._bus.write_byte_data(addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
             Tools.debug("7-segment display found.")
         except:
             print "No 7-segment display found on this robot device."
             self._isDisplayAvailable = False
+
+        # Clear display, if available
+        if self._isDisplayAvailable:
+            self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
+            self._bus.write_byte_data(addr, 0x01, 0x00) # Set all of bank 1 to outputs
+            self._bus.write_byte_data(addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
 
         GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
         # Establish event recognition from button event
