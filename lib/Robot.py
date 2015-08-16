@@ -194,6 +194,12 @@ class MyRobot(object):
                 print "Failed to detect PCA9685 PCM chip on I2C bus"
                 sys.exit(1)
 
+        # clear all LEDs
+        for id in range(3):
+            self.ledPWM.setPWM(3 * id, 0, 0)
+            self.ledPWM.setPWM(3 * id + 1, 0, 0)
+            self.ledPWM.setPWM(3 * id + 2, 0, 0)
+
         # I2C analog extender chip
         Tools.debug("Trying to detect PCF8591 I2C analog extender on I2C bus 1...")
         try:
@@ -208,7 +214,7 @@ class MyRobot(object):
                 print "Failed to detect PCF8591 I2C analog extender on I2C bus"
                 sys.exit(1)
 
-        Tools.debug("Trying to detect 7-segment display...")
+        Tools.debug("Trying to detect 7-segment display and clear it")
         addr = 0x20
         self._isDisplayAvailable = True
         self._bus = None
