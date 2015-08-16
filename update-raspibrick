@@ -9,4 +9,4 @@ sudo -u pi bash -c "git clone https://github.com/raspibrick/install"
 
 echo ====== Executing install script as user 'pi' ======
 chmod +x /home/pi/install/install
-sudo -u pi bash -c /home/pi/install/install update
+sudo -u pi bash -c "/home/pi/install/install update"
