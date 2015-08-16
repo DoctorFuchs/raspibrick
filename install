@@ -1,7 +1,15 @@
 #! /bin/sh
 # Install script for RaspiBrick
 
-echo ------ Running RaspiBrick installation. Version 1.3 - Aug. 8, 2015
+echo ------ Running RaspiBrick installation. Version 1.4 - Aug. 15, 2015
+
+if [ $1 = "update" ]
+  then
+     echo "Update requested"
+  else
+     echo "Normal installation"
+fi  
+
 
 # Display commands
 set -x
@@ -17,12 +25,16 @@ mkdir /home/pi/raspibrick/lib
 mkdir /home/pi/programs
 mkdir /home/pi/scripts
 
-echo ------ Patching OS for fast SSH login
-sudo sed -i 's|files mdns4_minimal \\[NOTFOUND=return\\] dns mdns4|files mdns4_minimal \\[NOTFOUND=return\\] dns|' /etc/nsswitch.conf
 
-echo ------ Installing Linux software ------ 
-sudo apt-get install i2c-tools
-sudo apt-get install python-smbus
+if [ $1 != "update" ]
+  then
+    echo ------ Patching OS for fast SSH login
+    sudo sed -i 's|files mdns4_minimal \\[NOTFOUND=return\\] dns mdns4|files mdns4_minimal \\[NOTFOUND=return\\] dns|' /etc/nsswitch.conf
+
+    echo ------ Installing Linux software ------ 
+    sudo apt-get install i2c-tools
+    sudo apt-get install python-smbus
+fi
 
 echo ------ Copying files ------ 
 sudo cp /home/pi/install/modules /etc/modules
