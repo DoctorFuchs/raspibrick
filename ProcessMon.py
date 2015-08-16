@@ -32,7 +32,7 @@ if os.path.isfile(fname):
     led.setColor(10, 0, 0)
     print "Done"
     Tools.delay(2000)
-    os.system("sudo shutdown -h now")
+    os.system("sudo shutdown -r now")
 else:
     isRunning = True
     isFirst = True
