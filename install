@@ -39,6 +39,15 @@ fi
 echo ------ Copying files ------ 
 sudo cp /home/pi/install/modules /etc/modules
 
+chmod +x /home/pi/install/bashrc-root
+sudo cp /home/pi/install/bashrc-root /root/.bashrc
+
+chmod +x /home/pi/install/bashrc-pi
+sudo cp /home/pi/install/bashrc-pi /home/pi/.bashrc
+
+chmod +x /home/pi/install/sudoers
+sudo cp /home/pi/install/sudoers /etc
+
 chmod +x /home/pi/install/jrun
 sudo cp /home/pi/install/jrun /usr/bin
 
