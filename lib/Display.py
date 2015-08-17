@@ -127,7 +127,6 @@ class Display():
     '''
     _myInstance = None
     def __init__(self):
-        self.isAvailable = False
         self._checkRobot()
         robot = RobotInstance.getRobot()
         self.available = robot._isDisplayAvailable

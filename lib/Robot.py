@@ -230,9 +230,13 @@ class MyRobot(object):
 
         # Clear display, if available
         if self._isDisplayAvailable:
-            self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
-            self._bus.write_byte_data(addr, 0x01, 0x00) # Set all of bank 1 to outputs
-            self._bus.write_byte_data(addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
+            try:
+                self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
+                self._bus.write_byte_data(addr, 0x01, 0x00) # Set all of bank 1 to outputs
+                self._bus.write_byte_data(addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
+            except:
+                print "No 7-segment display found on this robot device."
+                self._isDisplayAvailable = False
 
         GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
         # Establish event recognition from button event
