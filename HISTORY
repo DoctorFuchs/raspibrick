@@ -5,4 +5,6 @@ V1.06 - Aug 10, 2015: VNC server added, Port 5901, Pwd: 123456
 V1.07 - Aug 13, 2015: Updated: lib classes, ProcessMon.py, IdleProc.py
                       due to irregular motor behavior 
 V1.08 - Aug 13, 2015: Led startup revisted
+V1.09 - Aug 15, 2015: PYTHONPATH included for pi, root and sudoer
+V1.10 - Aug 16, 2015: Fixed problem with startup without display
 
