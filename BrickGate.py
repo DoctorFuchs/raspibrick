@@ -102,7 +102,7 @@ class SocketHandler(Thread):
         debug("dispatchCommand: " + device + ", " + method + ", " + param1 + ", " + param2 + ", " + param3)
         reply = Reply.OK
         isExiting = False
-        # ------------------- device 'robot', class Robot ---------------
+        # ------------------- device 'robot'  ---------------
         if device == "robot":
             if method == "getBrickgateVersion":
                 reply = SharedConstants.VERSION
@@ -123,7 +123,7 @@ class SocketHandler(Thread):
             else:
                 reply = Reply.NO_SUCH_METHOD
 
-        # ------------------- device with not identifier ----------------
+        # ------------------- device 'gear' or 'uss' ---------------
         elif device == "gear" or  device == "uss":
             if method == "create":
                 print "creating...", devices
@@ -140,6 +140,24 @@ class SocketHandler(Thread):
                     reply = Reply.DEVICE_NOT_CREATED
                 else:
                     reply = evaluate(device, method, param1, param2, param3)
+
+        elif device == "display":
+            reply = dispatchDisplay(device, method, param1, param2, param3)
+
+        # ------------------- static device 'led'  -----------
+        elif device == "led":
+            if method == "setColorAll":
+                if param1 == "n" or param2 == "n" or param3 == "n":
+                    reply = Reply.ILLEGAL_PARAMETER
+                else:
+                    try:
+                        Led.setColorAll(int(param1), int(param2), int(param3))
+                    except ValueError:
+                        reply = Reply.ILLEGAL_PARAMETER
+            elif method == "clearAll":
+                Led.clearAll()
+            else:
+                reply = Reply.NO_SUCH_METHOD
 
         # ------------------- devices with identifier -----------
         elif len(device) > 3:
@@ -171,24 +189,6 @@ class SocketHandler(Thread):
                         else:
                             reply = evaluate(device, method, param1, param2, param3)
 
-        # ------------------- special device Display  -----------
-        elif device == "display":
-            reply = dispatchDisplay(device, method, param1, param2, param3)
-
-        # static methods -> no device creation
-        elif device == "led":
-            if method == "setColorAll":
-                if param1 == "n" or param2 == "n" or param3 == "n":
-                    reply = Reply.ILLEGAL_PARAMETER
-                else:
-                    try:
-                        Led.setColorAll(int(param1), int(param2), int(param3))
-                    except ValueError:
-                        reply = Reply.ILLEGAL_PARAMETER
-            elif method == "clearAll":
-                Led.clearAll()
-            else:
-                reply = Reply.NO_SUCH_METHOD
 
         # ------------------- illegal device ----------------------------
         else:

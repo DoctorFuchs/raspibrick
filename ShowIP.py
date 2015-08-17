@@ -7,10 +7,9 @@ robot = Robot()
 ipAddr = Robot.getIPAddresses()
 ip = ""
 for addr in ipAddr:
-    if addr != '127.0.0.1':
-        ip += "|"
-        ip += addr
-        ip += "    "
+    ip += "|"
+    ip += addr
+    ip += "    "
 
 display = Display()
 ip = ip.replace(".", "-")

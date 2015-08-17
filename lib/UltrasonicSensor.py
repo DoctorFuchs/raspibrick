@@ -30,7 +30,7 @@ class UltrasonicSensor():
     def getValue(self):
         '''
         Returns the distance.
-        @return: Distance from target in cm
+        @return: Distance from target in cm, or -1 if no object or error
         @rtype: float
         '''
         self._checkRobot()

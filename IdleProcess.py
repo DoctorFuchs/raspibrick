@@ -62,18 +62,21 @@ def firstDuty():
        count += 1
        Tools.delay(500)
     display.clear()
-    if ip != "":
-        led.setColor(0, 30, 0)
+    if ip == "":
+        led.setColor(10, 10, 0)
     else:
-        led.setColor(30, 0, 0)
-    if not isInterrupted:
-        if ip == "":
-            ip = "|0.0.0.0    "
-        ip = ip.replace(".", "-")
-        display.ticker(ip, 3, 1)
-        while not isInterrupted and display.isTickerAlive():
-            Tools.delay(1000)
-        display.stopTicker()
+        led.setColor(0, 20, 0)
+    if display.isAvailable():
+        if not isInterrupted and display.isAvailable():
+            if ip == "":
+                ip = "|0.0.0.0    "
+            ip = ip.replace(".", "-")
+            display.ticker(ip, 3, 1)
+            while not isInterrupted and display.isTickerAlive():
+                Tools.delay(1000)
+            display.stopTicker()
+    else:
+        Tools.delay(3000)
 
 print "IdleProcess starting"
 rc = 0
@@ -88,7 +91,7 @@ if sys.argv[1] == "isFirst":
     firstDuty()
 
 isAlive = True
-led.setColor(0, 0, 100) # Announce, we are running
+led.setColor(0, 0, 50) # Announce, we are running
 display.setText("1dLE")
 ir_center = InfraredSensor(IR_CENTER)
 isShutdownPending = False
