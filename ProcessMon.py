@@ -25,7 +25,7 @@ if os.path.isfile(fname):
         Tools.delay(500)
     subprocess.call("sudo update-raspibrick", shell = True)
     os.remove(fname)
-    display.setText("boot", [1, 0, 0])
+    display.setText("boot")
     Tools.delay(3000)
     display.clear()
     led.setColor(10, 0, 0)
