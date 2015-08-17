@@ -22,14 +22,12 @@ General remarks:
 '''
 History:
 
-V1.07 - July 2015: - First public release
-V1.08 - July 2015: - Fixed: Motor stops now after blocking forward/backward
-V1.09 - July 2015: - Modified: Display check in class Robot now
+V1.11 - Aug 2015: - First public release
 
 '''
 
-VERSION = "1.10 - Aug 2015"
-DISPLAYED_VERSION = "110" # dislayed n.nn
+VERSION = "1.11 - Aug 2015"
+DISPLAYED_VERSION = "111" # dislayed n.nn
 
 DEBUG = True
 
