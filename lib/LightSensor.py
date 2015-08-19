@@ -36,6 +36,7 @@ class LightSensor():
         @rtype: int
         '''
         self._checkRobot()
+        Tools.delay(1)
         nb = self.id
         if nb == 0:
             nb = 1

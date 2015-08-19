@@ -26,8 +26,8 @@ V1.11 - Aug 2015: - First public release
 
 '''
 
-VERSION = "1.11 - Aug 2015"
-DISPLAYED_VERSION = "111" # dislayed n.nn
+VERSION = "1.12 - Aug 2015"
+DISPLAYED_VERSION = "112" # dislayed n.nn
 
 DEBUG = True
 

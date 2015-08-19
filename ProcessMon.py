@@ -4,10 +4,11 @@
 from Tools import Tools
 from raspibrick import *
 import os, subprocess
+import Properties
 
 
 # ------------------------- main ------------------------------------
-print "ProcessMon starting"
+print "ProcessMon " + Properties.VERSION + " starting"
 Tools.delay(1000)  # Wait until raspi is up
 
 # Check if update requested
@@ -46,9 +47,14 @@ else:
         rc = subprocess.call(["pyrun", "/home/pi/raspibrick/IdleProcess.py", arg])
         print "Returning from IdleProc with exit code:", rc
         if rc == 1 or rc > 10:
-            print "Spawning user app MyApp.py..."
-            rc = subprocess.call(["pyrun", "/home/pi/scripts/MyApp.py"])
-            print "Returning from MyApp with exit code:", rc
+            pythonApp = "/home/pi/scripts/MyApp.py"
+            if os.path.isfile(pythonApp):
+               print "Spawning user app " +  pythonApp
+               rc = subprocess.call(["pyrun", pythonApp])
+               # return value not used yet
+               print "Returning from MyApp with exit code:", rc
+            else:
+               print "No Python app found to execute"
         elif rc == 2:
             print "Spawning BrickGate server..."
             rc = subprocess.call(["pyrun", "/home/pi/raspibrick/BrickGate.py"])

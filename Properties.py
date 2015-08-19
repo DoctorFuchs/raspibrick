@@ -21,7 +21,7 @@ V1.00 - July 2015: - First public release
 
 # Current version
 # Must be string
-VERSION = "1.02"
+VERSION = "1.12"
 
 # Enable/disable verbose output to system.out
 # Must be boolean

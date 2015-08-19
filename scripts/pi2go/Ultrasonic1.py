@@ -11,4 +11,3 @@ while not isEscapeHit():
     n += 1
     Tools.delay(1000)
 robot.exit()
-print "All done"

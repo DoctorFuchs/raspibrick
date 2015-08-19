@@ -1,5 +1,3 @@
-# Ultrasonic2.py
-
 from raspibrick import *
 
 robot = Robot()
@@ -12,4 +10,3 @@ while not isEscapeHit():
         gear.backward(3000)
         gear.forward()
 robot.exit()
-print "All done"

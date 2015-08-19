@@ -16,4 +16,3 @@ while not isEscapeHit():
         display.setToStart()
 Tools.delay(2000)
 robot.exit()
-print "All done"

@@ -2,8 +2,13 @@
 
 from raspibrick import *
 
-version = Robot.getVersion()
-print "BrickGate Version:", version
-ipAddresses = Robot.getIPAddresses()
-print "IP address:", ipAddresses
-print "All done"
+robot = Robot()
+version = robot.getBrickgateVersion()
+print "Brickgate Version:", version
+ipAddress = robot.getIPAddress()
+print "IP address:", ipAddress
+gear = Gear()
+devices = robot.getCurrentDevices()
+print "Current devices:", devices
+Tools.delay(4000)
+robot.exit()

@@ -4,6 +4,7 @@ from raspibrick import *
 from threading import Thread
 import Properties
 import socket
+import os, subprocess
 
 DEBUG = True
 
@@ -244,13 +245,8 @@ def dispatchDisplay(device, method, param1, param2, param3):
             elif method == "setText":
                 if param2 == "n":
                     display.setText(param1)
-                elif param3 == "n":
-                    stm = "display.setText(" + "\"" + param1 + "\", [" + param2 + "])"
-                    debug("Statement: " + stm)
-                    eval(stm)
                 else:
-                    stm = "display.setText(" + "\"" + param1 + \
-                                  "\", [" + param2 + "], " + param3 + ")"
+                    stm = "display.setText(" + "\"" + param1 + "\", [" + param2 + "])"
                     debug("Statement: " + stm)
                     eval(stm)
             elif method == "setScrollableText":
@@ -266,6 +262,11 @@ def dispatchDisplay(device, method, param1, param2, param3):
                 display.setToStart()
             elif method == "stopTicker":
                 display.stopTicker()
+            elif method == "isTickerAlive":
+                rc = display.isTickerAlive()
+                if rc:
+                    return "1"
+                return "0"
             elif method == "ticker":
                 if param2 == "n":
                     display.ticker(param1)
@@ -302,11 +303,25 @@ def evaluate(device, method, param1, param2, param3):
 
 # ---------------------- Button callback ----------------------------
 def onButtonEvent(event):
+    global isLongPressed
     if not isButtonEnabled:
         return
-    if event == BUTTON_LONGPRESSED:
-        disconnect()
 
+    if event == BUTTON_PRESSED:
+        isLongPressed = False
+    elif event == BUTTON_LONGPRESSED:
+        isLongPressed = True
+        disconnect()
+    elif event == BUTTON_RELEASED:
+        if not isLongPressed:
+            javaApp = "/home/pi/programs/MyApp.jar"
+            if os.path.isfile(javaApp):
+                print "Spawning user app " +  javaApp
+                rc = subprocess.call(["sudo", "java", "-jar", javaApp])
+                # return value not used yet
+                print "Returning from MyApp with exit code:", rc
+            else:
+                print "No Java app found to execute"
 # ---------------------- class Flasher ------------------------------
 class Flasher(Thread):
     def __init__(self, led, color):
@@ -400,7 +415,9 @@ while True:
     if isConnected:  # Accept only one connection
         continue
     flasher.stop()
-    display.setText("Conn", timeout = 1500)
+    display.setText("Conn")
+    Tools.delay(1500)
+    display.clear()
     isConnected = True
     devices.clear()
     socketHandler = SocketHandler(conn)

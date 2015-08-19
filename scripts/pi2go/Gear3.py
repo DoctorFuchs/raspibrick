@@ -15,4 +15,3 @@ while not isEscapeHit():
     elif isRightHit():
         gear.right()
 robot.exit()
-print "All done"

@@ -6,4 +6,3 @@ robot = Robot()
 display = Display()
 print display.getDisplayableChars()
 robot.exit()
-print "All done"

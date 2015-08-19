@@ -16,11 +16,9 @@ if [ $# -gt 2 ]
 fi
 
 lib1=/home/pi/raspibrick/jars/aplu5.jar
-lib2=/home/pi/raspibrick/jars/DidelJLibA.jar
-lib3=/home/pi/raspibrick/jars/RaspiJLibA.jar
-lib4=/home/pi/raspibrick/jars/RaspiJLibX.jar
-lib5=/home/pi/raspibrick/jars/raspi-gpio.jar
-lib6=/home/pi/raspibrick/jars/pi4j-core.jar
+lib2=/home/pi/raspibrick/jars/RaspiJLib.jar
+lib3=/home/pi/raspibrick/jars/raspi-gpio.jar
+lib4=/home/pi/raspibrick/jars/pi4j-core.jar
 
 fullfile=$1
 fname=$(basename $fullfile)
@@ -30,7 +28,7 @@ fbname=${fname%.*}
 if [ $# -eq 1 ]
   then
 #    set -x  # echo on console
-    sudo java -cp .:$lib1:$lib2:$lib3:$lib4:$lib5:$lib6:$fullfile $fbname
+    sudo java -cp .:$lib1:$lib2:$lib3:$lib4:$fullfile $fbname
 fi
 
 if [ $# -eq 2 ]

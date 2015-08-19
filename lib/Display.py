@@ -87,7 +87,6 @@ class DisplayThread(Thread):
         Tools.debug("DisplayThread started")
         self._isAlive = True
         self._isRunning = True
-        count = 0
         while self._isRunning:
             delays = 0
             for digit in range(4):
@@ -106,9 +105,6 @@ class DisplayThread(Thread):
                         self._display.clearDigit(2-i)
                         if not self._isRunning:
                             break
-            count += 1
-            if self._display._timeout > 0 and count > int(self._display._timeout / 2.0 / delays):
-                break
         self.isAlive = False
         Tools.debug("DisplayThread finished")
 
@@ -223,7 +219,7 @@ class Display():
             self._displayThread = None
         self._bus.write_byte_data(_addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
 
-    def setText(self, text, dp = [0, 0, 0], timeout = 0):
+    def setText(self, text, dp = [0, 0, 0]):
         '''
         Displays the given text using an display thread. If the text to display exceeds 4 digits,
         only the 4 leading digits are shown. Because only one digit can be used at the same time,
@@ -232,7 +228,6 @@ class Display():
         dp paramater [right bottom, middle bottom, middle top] and set the decimal point values to 1
         @param text: the text to display (list, string or integer)
         @param dp: a list with three 1 or 0, if the decimal point is shown or not
-        @param timeout: sets the display time (in ms) for a timed display (default: 0: not timed)
         '''
         if not self.available:
             return
@@ -240,9 +235,6 @@ class Display():
         if not (type(text) == int or type(text) == list or type(text) == str):
             return
         self._decimalPoint = dp
-        self._timeout = timeout
-        if timeout > 0:
-            self.clear()
         self._text = [' '] * 4  # blanks
         if type(text) == int:
             text = str(text)
@@ -250,7 +242,6 @@ class Display():
         offset = 4 - len(text)
         for i in range(len(text)):
             self._text[i + offset] = text[i]
-
         if self._displayThread == None:
             self._displayThread = DisplayThread(self)
             self._displayThread.start()
