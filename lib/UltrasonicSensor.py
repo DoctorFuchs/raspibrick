@@ -39,7 +39,7 @@ class UltrasonicSensor():
         GPIO.output(SharedConstants.P_TRIG_ECHO, GPIO.LOW)
 
         # Allow module to settle
-        time.sleep(0.5)
+        time.sleep(0.1)
 
         # Send max 10 us trigger pulse
         GPIO.output(SharedConstants.P_TRIG_ECHO, GPIO.HIGH)
@@ -73,6 +73,14 @@ class UltrasonicSensor():
         # round to 2 decimals
         distance = int(distance * 100 + 0.5) / 100.0
         return distance
+
+    def getDistance(self):
+        '''
+        Returns the distance.
+        @return: Distance from target in cm formatted to two decimals, or -1 if no object or error
+        @rtype: str
+        '''
+        return format(self.getValue(), ".2f")
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

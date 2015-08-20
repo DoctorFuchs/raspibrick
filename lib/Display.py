@@ -221,7 +221,7 @@ class Display():
 
     def setText(self, text, dp = [0, 0, 0]):
         '''
-        Displays the given text using an display thread. If the text to display exceeds 4 digits,
+        Displays the given text right justified using an display thread. If the text to display exceeds 4 digits,
         only the 4 leading digits are shown. Because only one digit can be used at the same time,
         an internal display thread is created that drives the digits repeatedly in a fast sequence.
         Call clear() to stop the thread when it is no longer used. To display decimal points, use the

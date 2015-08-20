@@ -90,11 +90,15 @@ class Robot(object):
     Class that creates or returns a single MyRobot instance.
     '''
     def __new__(cls, *args):
+        global _isBtnHit
         if RobotInstance.getRobot() == None:
             r = MyRobot(*args)
+            r.isEscapeHit()  # Dummy to clear button hit flag
             RobotInstance.setRobot(r)
             return r
         else:
+            r = RobotInstance.getRobot()
+            r.isEscapeHit()  # Dummy to clear button hit flag
             return RobotInstance.getRobot()
 
     @staticmethod

@@ -23,13 +23,14 @@ General remarks:
 History:
 
 V1.11 - Aug 2015: - First public release
+V1.12 - Aug 2015: - Java port finished
 
 '''
 
 VERSION = "1.12 - Aug 2015"
 DISPLAYED_VERSION = "112" # dislayed n.nn
 
-DEBUG = True
+DEBUG = False
 
 BLINK_CONNECT_DISCONNECT = True
 

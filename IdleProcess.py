@@ -48,6 +48,8 @@ def firstDuty():
     Tools.delay(4000)
     display.setText("AP--")
     count = 0
+    ip = ""
+    robot.setButtonEnabled(True)
     while not isInterrupted and count < 40:  # Try 20 s to get IP address
        ipAddr = Robot.getIPAddresses()
        print "Got IP addresses:", ipAddr
@@ -84,11 +86,14 @@ robot = Robot()
 display = Display()
 led = Led(LED_LEFT)
 led.setColor(10, 10, 10) # Announce, we are starting
+robot.setButtonEnabled(False)
 robot.addButtonListener(onButtonEvent)
 isInterrupted = False
 
 if sys.argv[1] == "isFirst":
     firstDuty()
+else:
+    robot.setButtonEnabled(True)
 
 isAlive = True
 led.setColor(0, 0, 50) # Announce, we are running

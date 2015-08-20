@@ -34,6 +34,21 @@ class Reply():
     ILLEGAL_DECIMAL_POINT = "ILLEGAL_DECIMAL_POINT"
     ILLEGAL_DIGIT = "ILLEGAL_DIGIT"
 
+
+# ---------------------- class JavaRunner ---------------------------
+class JavaRunner(Thread):
+    def __init__(self, app):
+        Thread.__init__(self)
+        self.app = app
+        self.start()
+
+    def run(self):
+        robot.isButtonHit()  # dummy call to reset buttonHit flag
+        print "Spawning user app " + self.app
+        rc = subprocess.call(["sudo", "java", "-jar", self.app])
+        # return value not used yet
+        print "Returning from MyApp with exit code:", rc
+
 # ---------------------- class SocketHandler ------------------------
 class SocketHandler(Thread):
     def __init__(self, conn):
@@ -72,12 +87,6 @@ class SocketHandler(Thread):
 
     def executeCommand(self, cmd):
         reply = Reply.OK
-        if cmd == "getBrickGateVersion":
-            self.sendReply(Properties.VERSION)
-            return
-        if cmd == "getIPAddress":
-            self.sendReply(robot.getIPAddress("wlan0"))
-            return
         parts =  cmd.split(".")  # Split on period
         if len(parts) < 2 or len(parts) > 5:
             self.showError(Error.CMD_ERROR, cmd)
@@ -105,10 +114,10 @@ class SocketHandler(Thread):
         isExiting = False
         # ------------------- device 'robot'  ---------------
         if device == "robot":
-            if method == "getBrickgateVersion":
+            if method == "getVersion":
                 reply = SharedConstants.VERSION
             elif method == "getIPAddress":
-                reply = robot.getIPAddress("wlan0")
+                reply = ", ".join(robot.getIPAddresses())
             elif method == "exit":
                 isExiting = True
             elif method == "getCurrentDevices": # show all current devices in devices dictionary
@@ -278,7 +287,6 @@ def dispatchDisplay(device, method, param1, param2, param3):
                 reply = Reply.NO_SUCH_METHOD
     return reply
 
-
 def evaluate(device, method, param1, param2, param3):
     dev = devices[device]  # Get device reference
     rc = None
@@ -306,7 +314,6 @@ def onButtonEvent(event):
     global isLongPressed
     if not isButtonEnabled:
         return
-
     if event == BUTTON_PRESSED:
         isLongPressed = False
     elif event == BUTTON_LONGPRESSED:
@@ -314,14 +321,14 @@ def onButtonEvent(event):
         disconnect()
     elif event == BUTTON_RELEASED:
         if not isLongPressed:
-            javaApp = "/home/pi/programs/MyApp.jar"
-            if os.path.isfile(javaApp):
-                print "Spawning user app " +  javaApp
-                rc = subprocess.call(["sudo", "java", "-jar", javaApp])
-                # return value not used yet
-                print "Returning from MyApp with exit code:", rc
+            if isConnected:
+                print "Button clicked while connected"
             else:
-                print "No Java app found to execute"
+                javaApp = "/home/pi/programs/MyApp.jar"
+                if os.path.isfile(javaApp):
+                    javaRunner = JavaRunner(javaApp)
+                else:
+                    print "No Java app found to execute"
 # ---------------------- class Flasher ------------------------------
 class Flasher(Thread):
     def __init__(self, led, color):
