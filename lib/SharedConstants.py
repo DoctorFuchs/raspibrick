@@ -24,11 +24,12 @@ History:
 
 V1.11 - Aug 2015: - First public release
 V1.12 - Aug 2015: - Java port finished
+V1.13 - Aug 2015: - Sound player added
 
 '''
 
-VERSION = "1.12 - Aug 2015"
-DISPLAYED_VERSION = "112" # dislayed n.nn
+VERSION = "1.13 - Aug 2015"
+DISPLAYED_VERSION = "113" # dislayed n.nn
 
 DEBUG = False
 
