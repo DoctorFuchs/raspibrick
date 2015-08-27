@@ -27,6 +27,7 @@ from threading import Thread
 from subprocess import Popen, PIPE
 import re
 import smbus
+import pygame
 import socket
 import fcntl
 import struct
@@ -136,6 +137,66 @@ class Robot(object):
         patt = re.compile(r'inet\s*\w*\S*:\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         resp = patt.findall(ifc_resp[0])
         return resp
+
+    @staticmethod
+    def initSound(soundFile, volume):
+        '''
+        Prepares the given wav or mp3 sound file for playing with given volume (0..100).
+        '''
+        pygame.mixer.init()
+        pygame.mixer.music.load(soundFile)
+        pygame.mixer.music.set_volume(volume)
+
+
+    @staticmethod
+    def playSound():
+        '''
+        Starts playing.
+        '''
+        pygame.mixer.music.play()
+
+    @staticmethod
+    def fadeoutSound(time):
+        '''
+        Decreases the volume slowly and stops playing.
+        @param time: the fade out time in ms
+        '''
+        pygame.mixer.music.fadeout(time)
+
+    @staticmethod
+    def stopSound():
+        '''
+        Stops playing sound.
+        '''
+        pygame.mixer.music.stop()
+
+    @staticmethod
+    def pauseSound():
+        '''
+        Temporarily stops playing at current position.
+        '''
+        pygame.mixer.music.pause()
+
+    @staticmethod
+    def resumeSound():
+        '''
+        Resumes playing from stopping position.
+        '''
+        pygame.mixer.music.unpause()
+
+    @staticmethod
+    def rewindSound():
+        '''
+        Resumes playing from the beginning.
+        '''
+        pygame.mixer.music.rewind()
+
+    @staticmethod
+    def isSoundPlaying():
+        '''
+        @return: True, if the sound is playing; otherwise False
+        '''
+        return pygame.mixer.music.get_busy()
 
 # ------------------------   Class MyRobot   -----------------------------------------------
 class MyRobot(object):
