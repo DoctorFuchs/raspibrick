@@ -1,10 +1,14 @@
 #! /bin/sh
 # Autostart script for RaspiBrick
+# Version Aug. 27, 2015
 
 set -x
 
 echo Running autostart.sh
 sleep 5 # Wait until system is up and running
+
+# Select audio output (not HDMI)
+amixer cset numid=3 1
 
 # Mount file system
 sudo mkdir /mnt/recovery
