@@ -1,7 +1,7 @@
 #! /bin/sh
 # Install script for RaspiBrick
 
-echo ------ Running RaspiBrick installation. Version 1.4 - Aug. 15, 2015
+echo ------ Running RaspiBrick installation. Version 1.5 - Aug. 27, 2015
 
 if [ "$1" = "update" ]
   then
@@ -22,6 +22,7 @@ echo ------ Creating directories ------
 mkdir /home/pi/raspibrick
 mkdir /home/pi/raspibrick/jars
 mkdir /home/pi/raspibrick/lib
+mkdir /home/pi/raspibrick/res
 mkdir /home/pi/programs
 mkdir /home/pi/scripts
 
@@ -74,6 +75,7 @@ cp -r /home/pi/install/programs/* /home/pi/programs
 cp -r /home/pi/install/scripts/* /home/pi/scripts
 cp /home/pi/install/jars/* /home/pi/raspibrick/jars
 cp /home/pi/install/lib/* /home/pi/raspibrick/lib
+cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
 
 echo ------ Installing autostart ------ 
