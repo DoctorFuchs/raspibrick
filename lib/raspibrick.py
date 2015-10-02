@@ -15,12 +15,14 @@ import SharedConstants
 from RobotInstance import RobotInstance
 from Robot import Robot
 from Motor import Motor
+from ServoMotor import ServoMotor
 from Gear import Gear
 from Led import Led
 from InfraredSensor import InfraredSensor
 from UltrasonicSensor import UltrasonicSensor
 from LightSensor import LightSensor
 from Display import Display
+from Camera import Camera
 from Tools import *
 import tty
 import termios

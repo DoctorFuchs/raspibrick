@@ -23,15 +23,13 @@ General remarks:
 History:
 
 V1.11 - Aug 2015: - First public release
-V1.12 - Aug 2015: - Java port finished
-V1.13 - Aug 2015: - Sound player added
 
 '''
 
-VERSION = "1.13 - Aug 2015"
-DISPLAYED_VERSION = "113" # dislayed n.nn
+VERSION = "1.15 - Oct 2015"
+DISPLAYED_VERSION = "115" # dislayed n.nn
 
-DEBUG = False
+DEBUG = True
 
 BLINK_CONNECT_DISCONNECT = True
 
@@ -81,14 +79,20 @@ LED_LEFT = 1
 LED_REAR = 2
 LED_RIGHT = 3
 
-# LED PWM frequency
-LED_PWM_FREQ = 50
+# LED and Servo PWM frequency
+PWM_FREQ = 50
 
 # Light sensor IDs
 LS_FRONT_LEFT = 0
 LS_FRONT_RIGHT = 1
 LS_REAR_LEFT = 2
 LS_REAR_RIGHT = 3
+
+# Servo constants
+SERVO_0 = 12  # PCA9685 port, S12 header
+SERVO_1 = 13  # PCA9685 port, S13 header
+SERVO_2 = 14  # PCA9685 port, S14 header
+SERVO_3 = 15  # PCA9685 port, S15 header
 
 # Default speed
 MOTOR_DEFAULT_SPEED = 40
@@ -111,7 +115,7 @@ BUTTON_LONGPRESS_DURATION = 10 # time (in 200 ms units) the button must be press
 PATTERN = {'A':119, 'b':124, 'C':57, 'd':94, 'E':121, 'F':113,
             '0':63, '1':6, '2':91, '3':79, '4':102, '5':109, '6':125, '7':7, '8':127, '9':111,
            '-':64, 'c':88, 'O':63, 'C':57, 'H':118,'I':48, 'J':30,'L':56, 't':120, 'U':62, 'u':28, 'r':80, 'P':115,
-           'n':84, 'o':92, 'i':16, 'Y':110, ' ':0, '|':73}
+           'n':84, 'o':92, 'i':16, 'Y':110, ' ':0, '|':73, '=':72, '%':54}
 
 ABOUT = "2003-2015 Aegidius Pluess\n" + \
          "OpenSource Free Software\n" + \

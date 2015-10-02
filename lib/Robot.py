@@ -20,6 +20,7 @@ import os, sys
 from Tools import Tools
 import SharedConstants
 from Display import Display
+from Camera import Camera
 from Led import Led
 from Adafruit_PWM_Servo_Driver import PWM
 from sgh_PCF8591P import sgh_PCF8591P
@@ -102,102 +103,6 @@ class Robot(object):
             r.isEscapeHit()  # Dummy to clear button hit flag
             return RobotInstance.getRobot()
 
-    @staticmethod
-    def getVersion():
-        '''
-        @return: the module library version
-        '''
-        return SharedConstants.VERSION
-
-    @staticmethod
-    def setSoundVolume(volume):
-        '''
-        Sets the sound volume. Value is kept when the program exits.
-        @param volume: the volume in percent
-        '''
-        os.system("amixer sset PCM,0 " + str(volume)+ "%  >/dev/null")
-
-    @staticmethod
-    def playTone(frequency, duration):
-        '''
-        Plays a single sine tone with given frequency and duration.
-        @param frequency: the frequency in Hz
-        @param duration:  the duration in ms
-        '''
-        os.system("speaker-test -t sine -f " + str(frequency)
-                  + " >/dev/null & pid=$! ; sleep " + str(duration / 1000.0) + "s ; kill -9 $pid")
-
-    @staticmethod
-    def getIPAddresses():
-        '''
-        @return:  List of all IP addresses of machine
-        '''
-        p = Popen(["ifconfig"], stdout = PIPE)
-        ifc_resp = p.communicate()
-        patt = re.compile(r'inet\s*\w*\S*:\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-        resp = patt.findall(ifc_resp[0])
-        return resp
-
-    @staticmethod
-    def initSound(soundFile, volume):
-        '''
-        Prepares the given wav or mp3 sound file for playing with given volume (0..100).
-        '''
-        pygame.mixer.init()
-        pygame.mixer.music.load(soundFile)
-        pygame.mixer.music.set_volume(volume)
-
-
-    @staticmethod
-    def playSound():
-        '''
-        Starts playing.
-        '''
-        pygame.mixer.music.play()
-
-    @staticmethod
-    def fadeoutSound(time):
-        '''
-        Decreases the volume slowly and stops playing.
-        @param time: the fade out time in ms
-        '''
-        pygame.mixer.music.fadeout(time)
-
-    @staticmethod
-    def stopSound():
-        '''
-        Stops playing sound.
-        '''
-        pygame.mixer.music.stop()
-
-    @staticmethod
-    def pauseSound():
-        '''
-        Temporarily stops playing at current position.
-        '''
-        pygame.mixer.music.pause()
-
-    @staticmethod
-    def resumeSound():
-        '''
-        Resumes playing from stopping position.
-        '''
-        pygame.mixer.music.unpause()
-
-    @staticmethod
-    def rewindSound():
-        '''
-        Resumes playing from the beginning.
-        '''
-        pygame.mixer.music.rewind()
-
-    @staticmethod
-    def isSoundPlaying():
-        '''
-        @return: True, if the sound is playing; otherwise False
-        '''
-        return pygame.mixer.music.get_busy()
-
 # ------------------------   Class MyRobot   -----------------------------------------------
 class MyRobot(object):
     '''
@@ -243,17 +148,17 @@ class MyRobot(object):
         GPIO.setup(SharedConstants.P_BATTERY_MONITOR, GPIO.IN, GPIO.PUD_UP)
         GPIO.add_event_detect(SharedConstants.P_BATTERY_MONITOR, GPIO.RISING, _onBatteryDown)
 
-        # I2C PWM chip for LEDs
+        # I2C PWM chip for LEDs and servos
         Tools.debug("Trying to detect PCA9685 PCM chip on I2C bus using bus number 1...")
         try:
-            self.ledPWM = PWM(0x40, busnumber = 1, debug = False)
-            self.ledPWM.setPWMFreq(SharedConstants.LED_PWM_FREQ)
+            self.pwm = PWM(0x40, busnumber = 1, debug = False)
+            self.pwm.setPWMFreq(SharedConstants.PWM_FREQ)
             Tools.debug("PCA9685 PCM chip on I2C bus detected")
         except:
             Tools.debug("Failed, trying with bus number 0...")
             try:
-                self.ledPWM = PWM(0x40, busnumber = 0, debug = False)
-                self.ledPWM.setPWMFreq(SharedConstants.LED_PWM_FREQ)
+                self.pwm = PWM(0x40, busnumber = 0, debug = False)
+                self.pwm.setPWMFreq(SharedConstants.PWM_FREQ)
                 Tools.debug("PCA9685 PCM chip on I2C bus detected")
             except:
                 print "Failed to detect PCA9685 PCM chip on I2C bus"
@@ -261,9 +166,10 @@ class MyRobot(object):
 
         # clear all LEDs
         for id in range(3):
-            self.ledPWM.setPWM(3 * id, 0, 0)
-            self.ledPWM.setPWM(3 * id + 1, 0, 0)
-            self.ledPWM.setPWM(3 * id + 2, 0, 0)
+            self.pwm.setPWM(3 * id, 0, 0)
+            self.pwm.setPWM(3 * id + 1, 0, 0)
+            self.pwm.setPWM(3 * id + 2, 0, 0)
+
 
         # I2C analog extender chip
         Tools.debug("Trying to detect PCF8591 I2C analog extender on I2C bus 1...")
@@ -307,7 +213,7 @@ class MyRobot(object):
         # Establish event recognition from button event
         GPIO.add_event_detect(SharedConstants.P_BUTTON, GPIO.BOTH, _onButtonEvent)
         _isButtonEnabled = True
-        Tools.debug("MyRobot instance created")
+        Tools.debug("MyRobot instance created. Lib Version: " + SharedConstants.VERSION)
         MyRobot._myInstance = self
 
     def exit(self):
@@ -423,4 +329,102 @@ class MyRobot(object):
         @param listener: the listener function (with no parameter) to register
         '''
         batteryListener = listener
+
+
+# ---------------------------------------------- static methods -----------------------------------
+    @staticmethod
+    def getVersion():
+        '''
+        @return: the module library version
+        '''
+        return SharedConstants.VERSION
+
+    @staticmethod
+    def setSoundVolume(volume):
+        '''
+        Sets the sound volume. Value is kept when the program exits.
+        @param volume: the volume in percent
+        '''
+        os.system("amixer sset PCM,0 " + str(volume)+ "%  >/dev/null")
+
+    @staticmethod
+    def playTone(frequency, duration):
+        '''
+        Plays a single sine tone with given frequency and duration.
+        @param frequency: the frequency in Hz
+        @param duration:  the duration in ms
+        '''
+        os.system("speaker-test -t sine -f " + str(frequency)
+                  + " >/dev/null & pid=$! ; sleep " + str(duration / 1000.0) + "s ; kill -9 $pid")
+
+    @staticmethod
+    def getIPAddresses():
+        '''
+        @return:  List of all IP addresses of machine
+        '''
+        p = Popen(["ifconfig"], stdout = PIPE)
+        ifc_resp = p.communicate()
+        patt = re.compile(r'inet\s*\w*\S*:\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        resp = patt.findall(ifc_resp[0])
+        return resp
+
+    @staticmethod
+    def initSound(soundFile, volume):
+        '''
+        Prepares the given wav or mp3 sound file for playing with given volume (0..100).
+        '''
+        pygame.mixer.init()
+        pygame.mixer.music.load(soundFile)
+        pygame.mixer.music.set_volume(volume)
+
+
+    @staticmethod
+    def playSound():
+        '''
+        Starts playing.
+        '''
+        pygame.mixer.music.play()
+
+    @staticmethod
+    def fadeoutSound(time):
+        '''
+        Decreases the volume slowly and stops playing.
+        @param time: the fade out time in ms
+        '''
+        pygame.mixer.music.fadeout(time)
+
+    @staticmethod
+    def stopSound():
+        '''
+        Stops playing sound.
+        '''
+        pygame.mixer.music.stop()
+
+    @staticmethod
+    def pauseSound():
+        '''
+        Temporarily stops playing at current position.
+        '''
+        pygame.mixer.music.pause()
+
+    @staticmethod
+    def resumeSound():
+        '''
+        Resumes playing from stop position.
+        '''
+        pygame.mixer.music.unpause()
+
+    @staticmethod
+    def rewindSound():
+        '''
+        Resumes playing from the beginning.
+        '''
+        pygame.mixer.music.rewind()
+
+    @staticmethod
+    def isSoundPlaying():
+        '''
+        @return: True, if the sound is playing; otherwise False
+        '''
+        return pygame.mixer.music.get_busy()
 

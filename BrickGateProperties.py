@@ -1,4 +1,4 @@
-# Properties.py
+# BrickGateProperties.py
 
 # For Py2Go (full model)
 
@@ -19,12 +19,7 @@ History:
 V1.00 - July 2015: - First public release
 '''
 
-# Current version
-# Must be string
-VERSION = "1.04"
-
-# Enable/disable verbose output to system.out
-# Must be boolean
+# Enable very verbose debugging infos to stdout
 DEBUG = True
 
 # Default sound level

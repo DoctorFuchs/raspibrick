@@ -27,6 +27,7 @@ class Led():
         @param id: the LED identifier
         '''
         self.id = id
+        self.robot = RobotInstance.getRobot()
         Tools.debug("Led instance with ID " + str(id) + " created")
 
     def setColor(self, *args):
@@ -47,10 +48,9 @@ class Led():
         else:
             raise ValueError("Illegal param in setColor()")
         id = (self.id + 3) % 4
-        robot = RobotInstance.getRobot()
-        robot.ledPWM.setPWM(3 * id, 0, blue)
-        robot.ledPWM.setPWM(3 * id + 1, 0, green)
-        robot.ledPWM.setPWM(3 * id + 2, 0, red)
+        self.robot.pwm.setPWM(3 * id, 0, blue)
+        self.robot.pwm.setPWM(3 * id + 1, 0, green)
+        self.robot.pwm.setPWM(3 * id + 2, 0, red)
 
     @staticmethod
     def setColorAll(*args):

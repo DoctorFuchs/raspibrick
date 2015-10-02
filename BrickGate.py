@@ -2,14 +2,12 @@
 
 from raspibrick import *
 from threading import Thread
-import Properties
+import BrickGateProperties
 import socket
 import os, subprocess
 
-DEBUG = True
-
 def debug(msg):
-    if DEBUG:
+    if BrickGateProperties.DEBUG:
         print msg
 
 # Response
@@ -25,14 +23,15 @@ class Reply():
     OK = "OK"
     ILLEGAL_DEVICE = "ILLEGAL DEVICE"
     ILLEGAL_IDENTIFIER = "ILLEGAL IDENTIFIER"
-    DEVICE_NOT_CREATED = "DEVICE_NOT_CREATED"
+    DEVICE_NOT_CREATED = "DEVICE NOT CREATED"
     ILLEGAL_COMMAND = "ILLEGAL COMMAND"
-    METHOD_EVAL_FAILED = "METHOD_EVAL_FAILED"
+    METHOD_EVAL_FAILED = "METHOD EVAL FAILED"
     ILLEGAL_PARAMETER = "ILLEGAL PARAMETER"
-    NO_SUCH_METHOD = "NO_SUCH_METHOD"
-    CHAR_NOT_DISPLAYABLE = "CHAR_NOT_DISPLAYABLE"
-    ILLEGAL_DECIMAL_POINT = "ILLEGAL_DECIMAL_POINT"
-    ILLEGAL_DIGIT = "ILLEGAL_DIGIT"
+    NO_SUCH_METHOD = "NO SUCH METHOD"
+    CHAR_NOT_DISPLAYABLE = "CHAR NOT DISPLAYABLE"
+    ILLEGAL_DECIMAL_POINT = "ILLEGAL DECIMAL POINT"
+    ILLEGAL_DIGIT = "ILLEGAL DIGIT"
+    IMAGE_CAPTURE_FAILED = "IMAGE CAPTURE FAILED"
 
 
 # ---------------------- class JavaRunner ---------------------------
@@ -68,7 +67,7 @@ class SocketHandler(Thread):
             except:
                 debug("exception in conn.recv()") # happens when connection is reset from the peer (Java Console closed)
                 break
-            Tools.debug("Received cmd: " + cmd + " len: " + str(len(cmd)))
+            debug("Received cmd: " + cmd + " len: " + str(len(cmd)))
             if len(cmd) == 0:
                 break
             rc = self.executeCommand(cmd)
@@ -86,6 +85,7 @@ class SocketHandler(Thread):
         Tools.debug("SocketHandler terminated")
 
     def executeCommand(self, cmd):
+        debug("Calling executeCommand() with  cmd: " + cmd)
         reply = Reply.OK
         parts =  cmd.split(".")  # Split on period
         if len(parts) < 2 or len(parts) > 5:
@@ -103,9 +103,9 @@ class SocketHandler(Thread):
             parts.append("n")
         device = parts[0]
         method = parts[1]
-        param1 = parts[2]
-        param2 = parts[3]
-        param3 = parts[4]
+        param1 = parts[2].replace("`", ".") # . is used as separator
+        param2 = parts[3].replace("`", ".")
+        param3 = parts[4].replace("`", ".")
         return self.dispatchCommand(device, method, param1, param2, param3)
 
     def dispatchCommand(self, device, method, param1, param2, param3):
@@ -116,8 +116,27 @@ class SocketHandler(Thread):
         if device == "robot":
             if method == "getVersion":
                 reply = SharedConstants.VERSION
-            elif method == "getIPAddress":
-                reply = ", ".join(robot.getIPAddresses())
+            elif method == "initSound":
+                Robot.initSound(param1, int(param2))
+            elif method == "playSound":
+                Robot.playSound()
+            elif method == "fadeoutSound":
+                Robot.playSound(int(param1))
+            elif method == "stopSound":
+                Robot.stopSound()
+            elif method == "pauseSound":
+                Robot.pauseSound()
+            elif method == "resumeSound":
+                Robot.resumeSound()
+            elif method == "rewindSound":
+                Robot.rewindSound()
+            elif method == "isSoundPlaying":
+                if Robot.isSoundPlaying():
+                    reply = "1"
+                else:
+                    reply = "0"
+            elif method == "getIPAddresses":
+                reply = ", ".join(Robot.getIPAddresses())
             elif method == "exit":
                 isExiting = True
             elif method == "getCurrentDevices": # show all current devices in devices dictionary
@@ -134,15 +153,15 @@ class SocketHandler(Thread):
                 reply = Reply.NO_SUCH_METHOD
 
         # ------------------- device 'gear' or 'uss' ---------------
-        elif device == "gear" or  device == "uss":
+        elif device == "gear" or  device == "uss" or device == "cam":
             if method == "create":
-                print "creating...", devices
                 if not device in devices:
                     if device == "gear":
-                        print "done"
                         devices[device] = Gear()
-                    if device == "uss":
+                    elif device == "uss":
                         devices[device] = UltrasonicSensor()
+                    elif device == "cam":
+                        devices[device] = Camera()
                 else:
                     pass # already created
             else:
@@ -175,6 +194,7 @@ class SocketHandler(Thread):
             if devName == "mot" or  \
                 devName == "irs" or   \
                 devName == "led" or   \
+                devName == "svo" or   \
                 devName == "lss":
                 try:
                     id = int(device[3:4])
@@ -191,6 +211,8 @@ class SocketHandler(Thread):
                                 devices[device] = Led(id)
                             elif devName == "lss":
                                 devices[device] = LightSensor(id)
+                            elif devName == "svo":
+                                devices[device] = ServoMotor(id,  int(param1), int(param2))
                         else:
                             pass # already created
                     else:
@@ -210,6 +232,10 @@ class SocketHandler(Thread):
     def sendReply(self, reply):
         Tools.debug("Reply: " + reply)
         self.conn.sendall(reply + "\n")
+
+    def sendImage(self, img):
+        Tools.debug("Send Image size " + str(len(img)))
+        self.conn.sendall(img)
 
     def showError(self, msg1, msg2):
         print "Error #" + msg1 + " : " + msg2
@@ -297,6 +323,8 @@ def evaluate(device, method, param1, param2, param3):
     elif param3 == "n":
         stm = "dev." + method + "(" + param1 + ", " + param2 + ")"
     else:
+        if method == "captureAndSave":
+            param3 = "'" + param3 + "'"   # String parameter
         stm = "dev." + method + "(" + param1 + ", " + param2 + ", " + param3 + ")"
     debug("Statement: " + stm)
     try:
@@ -305,7 +333,9 @@ def evaluate(device, method, param1, param2, param3):
         debug("eval() failed")
         return Reply.METHOD_EVAL_FAILED
     if rc == None:  # method with no return value
-        return "OK"
+        return Reply.OK
+    elif method == "captureJPEG" and rc == -1:
+        return Reply.IMAGE_CAPTURE_FAILED
     else:
         return str(rc)  # convert return value to string
 
@@ -378,10 +408,11 @@ def disconnect():
     terminateServer = True
     debug("Dummy connection...")
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', Properties.IP_PORT))  # dummy connection to get out of accept()
+    client_socket.connect(('localhost', BrickGateProperties.IP_PORT))  # dummy connection to get out of accept()
+
 
 # ====================== Main ======================================
-print "BrickGate V" + Properties.VERSION + " started"
+print "Brickgate server starting"
 isButtonEnabled = False
 SharedConstants.BLINK_CONNECT_DISCONNECT = False
 SharedConstants.PLAY_CONNECT_DISCONNECT = False
@@ -402,7 +433,7 @@ devices = {}
 
 HOSTNAME = "" # Symbolic name meaning all available interfaces
 try:
-    serverSocket.bind((HOSTNAME, Properties.IP_PORT))
+    serverSocket.bind((HOSTNAME, BrickGateProperties.IP_PORT))
 except socket.error as msg:
     print "Bind failed", msg[0], msg[1]
     sys.exit()

@@ -1,0 +1,12 @@
+#! /bin/sh
+
+set -x
+
+sudo cp /home/pi/install/mjpg_streamer/mjpg_streamer /usr/local/bin
+sudo cp /home/pi/install/mjpg_streamer/output_http.so input_file.so /usr/local/lib/
+sudo cp -r /home/pi/install/mjpg_streamer/www /usr/local/www
+
+
+
+
+

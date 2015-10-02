@@ -53,8 +53,6 @@ class Gear(object):
         if self.state != GearState.FORWARD:
             leftDuty = self.speedToDutyCycle(self.speed + SharedConstants.GEAR_FORWARD_SPEED_DIFF)
             rightDuty = self.speedToDutyCycle(self.speed)
-            print "leftDuty", leftDuty
-            print "rightDuty", rightDuty
             SharedConstants.LEFT_MOTOR_PWM[0].ChangeDutyCycle(leftDuty)
             SharedConstants.LEFT_MOTOR_PWM[1].ChangeDutyCycle(0)
             SharedConstants.RIGHT_MOTOR_PWM[0].ChangeDutyCycle(rightDuty)

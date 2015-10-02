@@ -1,0 +1,23 @@
+#! /bin/sh
+
+set -x
+sudo rm -r /tmp/stream
+mkdir /tmp/stream
+
+# nice local picture, fails to transmit
+#raspistill -w 640 -h 480 -o /tmp/stream/pic.jpg -t 999999 &
+
+# ok original
+#raspistill -w 1280 -h 720 -q 50 -ex backlight -mm backlit -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+
+# ok reduced resolution
+#raspistill -w 640 -h 480 -q 50 -ex backlight -mm backlit -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+
+# ok, no -ex -mm
+#raspistill -w 640 -h 480 -q 50 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+
+# ok, -tl 0 -> as fast as possible, keine Fehlermeldung mit Frames mehr
+#raspistill -w 640 -h 480 -q 50 -o /tmp/stream/pic.jpg -tl 0 -t 9999999 -th 0:0:0 &
+
+# ok, -n option -> no local image, non-blocking
+raspistill -n -w 640 -h 480 -q 50 -o /tmp/stream/pic.jpg -tl 0 -t 9999999 -th 0:0:0 &

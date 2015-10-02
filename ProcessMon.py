@@ -4,11 +4,11 @@
 from Tools import Tools
 from raspibrick import *
 import os, subprocess
-import Properties
+import BrickGateProperties
 
 
 # ------------------------- main ------------------------------------
-print "ProcessMon " + Properties.VERSION + " starting"
+print "ProcessMon " + SharedConstants.VERSION + " starting"
 Tools.delay(1000)  # Wait until raspi is up
 
 # Check if update requested
