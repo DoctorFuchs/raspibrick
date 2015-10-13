@@ -4,7 +4,7 @@ from raspibrick import *
 
 robot = Robot()
 
-ipAddr = Robot.getIPAddresses()
+ipAddr = robot.getIPAddresses()
 ip = ""
 for addr in ipAddr:
     ip += "|"

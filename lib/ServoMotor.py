@@ -1,4 +1,5 @@
 # ServoMotor.java
+# Remote mode
 
 '''
  This software is part of the raspibrick module.
@@ -11,13 +12,12 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
 from RobotInstance import RobotInstance
-import SharedConstants
+from Tools import Tools
 
 class ServoMotor():
     '''
-     Class that represents a servo motor.
+    Class that represents a servo motor.
     '''
     def __init__(self, id, home, inc):
         '''
@@ -27,12 +27,16 @@ class ServoMotor():
         @param home: the PWM duty cycle for the home position
         @param inc: the increment factor (inc_duty/inc_position)
         '''
-        self.robot = RobotInstance.getRobot()
         self.id = id
-        self.home = home
-        self.inc = inc
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, home)
-        Tools.debug("ServoMotor instance created")
+        self.device = "svo" + str(id)
+        robot = RobotInstance.getRobot()
+        if robot == None:  # deferred registering, because Robot not yet created
+            RobotInstance._partsToRegister.append(self)
+        else:
+            self._setup(robot)
+
+    def _setup(self, robot):
+        robot.sendCommand(self.device + ".create." + str(home) + "." + str(inc))
 
     def setPos(self, position):
         '''
@@ -41,8 +45,7 @@ class ServoMotor():
         For most servo motors in range -200 .. 200
         '''
         self._checkRobot()
-        pos = self.home + self.inc * position
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, pos)
+        RobotInstance.getRobot().sendCommand(self.device + ".setPos" + "." + str(position))
 
     def setPosAbs(self, position):
         '''
@@ -51,9 +54,8 @@ class ServoMotor():
         For most servo motors in range 100..500
         '''
         self._checkRobot()
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, position)
+        RobotInstance.getRobot().sendCommand(self.device + ".setPosAbs" + "." + str(position))
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
-

@@ -1,4 +1,5 @@
 # InfraredSensor.java
+# Remote mode
 
 '''
  This software is part of the raspibrick module.
@@ -11,16 +12,14 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
-import RPi.GPIO as GPIO
-import SharedConstants
 from RobotInstance import RobotInstance
+from Tools import Tools
 
 class InfraredSensor():
     '''
     Class that represents an infrared sensor.
     '''
-    def __init__(self, id):
+    def __init__(self, id, **kwargs):
         '''
         Creates an infrared sensor at given port.
         For the Pi2Go the following infrared sensors are used:
@@ -30,8 +29,27 @@ class InfraredSensor():
         @param id: sensor identifier
         '''
         self.id = id
+        self.device = "irs" + str(id)
+        self.sensorState = "DARK"
+        self.sensorType = "InfraredSensor"
+        self.brightCallback = None
+        self.darkCallback = None
+        for key in kwargs:
+            if key == "bright":
+                self.brightCallback = kwargs[key]
+            elif key == "dark":
+                self.darkCallback = kwargs[key]
+        robot = RobotInstance.getRobot()
+        if robot == None:  # deferred registering, because Robot not yet created
+            RobotInstance._partsToRegister.append(self)
+        else:
+            self._setup(robot)
         Tools.debug("InfraredSensor instance with ID " + str(id) + " created")
 
+    def _setup(self, robot):
+        robot.sendCommand(self.device + ".create")
+        if self.brightCallback != None or self.darkCallback != None:
+            robot.registerSensor(self)
 
     def getValue(self):
         '''
@@ -41,23 +59,24 @@ class InfraredSensor():
         '''
         Tools.delay(1)
         self._checkRobot()
-        if self.id == SharedConstants.IR_CENTER and \
-                    GPIO.input(SharedConstants.P_FRONT_CENTER) == GPIO.LOW:
-            return 1
-        elif self.id == SharedConstants.IR_LEFT and \
-                    GPIO.input(SharedConstants.P_FRONT_LEFT) == GPIO.LOW:
-            return 1
-        elif self.id == SharedConstants.IR_RIGHT and \
-                    GPIO.input(SharedConstants.P_FRONT_RIGHT) == GPIO.LOW:
-            return 1
-        elif self.id == SharedConstants.IR_LINE_LEFT and \
-                    GPIO.input(SharedConstants.P_LINE_LEFT) == GPIO.LOW:
-            return 1
-        elif self.id == SharedConstants.IR_LINE_RIGHT and \
-                    GPIO.input(SharedConstants.P_LINE_RIGHT) == GPIO.LOW:
-            return 1
-        else:
-            return 0
+        return int(RobotInstance.getRobot().sendCommand(self.device + ".getValue"))
+
+    def getSensorState(self):
+        return self.sensorState
+
+    def setSensorState(self, state):
+        self.sensorState = state
+
+    def getSensorType(self):
+        return self.sensorType
+
+    def onBright(self):
+        if self.brightCallback != None:
+            self.brightCallback(self.id)
+
+    def onDark(self):
+        if self.darkCallback != None:
+            self.darkCallback(self.id)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

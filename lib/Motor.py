@@ -1,4 +1,5 @@
 # Motor.java
+# Remote mode
 
 '''
  This software is part of the raspibrick module.
@@ -32,73 +33,53 @@ class Motor():
         Creates a motor instance with given id.
         @param id: 0 for left motor, 1 for right motor
         '''
-        self.id = id
-        self.speed = SharedConstants.MOTOR_DEFAULT_SPEED
         self.state = MotorState.UNDEFINED
-        self.pwm = [0] * 2
-        if self.id == SharedConstants.MOTOR_LEFT:
-            self.pwm[0] = SharedConstants.LEFT_MOTOR_PWM[0]
-            self.pwm[1] = SharedConstants.LEFT_MOTOR_PWM[1]
+        self.id = id
+        self.device = "mot" + str(id)
+        self.speed = SharedConstants.MOTOR_DEFAULT_SPEED
+        robot = RobotInstance.getRobot()
+        if robot == None:  # deferred registering, because Robot not yet created
+            RobotInstance._partsToRegister.append(self)
         else:
-            self.pwm[0] = SharedConstants.RIGHT_MOTOR_PWM[0]
-            self.pwm[1] = SharedConstants.RIGHT_MOTOR_PWM[1]
+            self._setup(robot)
+
+    def _setup(self, robot):
+        robot.sendCommand(self.device + ".create")
+        robot.sendCommand(self.device + ".setSpeed." + str(self.speed))
+        self.robot = robot
 
     def forward(self):
         '''
         Starts the forward rotation with preset speed.
         The method returns immediately, while the rotation continues.
           '''
-        Tools.debug("Calling Motor.forward()")
+        self._checkRobot()
         if self.state == MotorState.FORWARD:
             return
-        self._checkRobot()
-        duty = self.speedToDutyCycle(self.speed)
-        if self.id == SharedConstants.MOTOR_LEFT:
-            SharedConstants.LEFT_MOTOR_PWM[0].ChangeDutyCycle(duty)
-            SharedConstants.LEFT_MOTOR_PWM[1].ChangeDutyCycle(0)
-        else:
-            SharedConstants.RIGHT_MOTOR_PWM[0].ChangeDutyCycle(duty)
-            SharedConstants.RIGHT_MOTOR_PWM[1].ChangeDutyCycle(0)
-
+        self.robot.sendCommand(self.device + ".forward")
         self.state = MotorState.FORWARD
-        Tools.debug("Done Motor.forward()")
 
     def backward(self):
         '''
         Starts the backward rotation with preset speed.
         The method returns immediately, while the rotation continues.
         '''
-        Tools.debug("Calling Motor.backward(). MotorID: " + str(self.id))
+        self._checkRobot()
         if self.state == MotorState.BACKWARD:
             return
-        self._checkRobot()
-        duty = self.speedToDutyCycle(self.speed)
-        if self.id == SharedConstants.MOTOR_LEFT:
-            SharedConstants.LEFT_MOTOR_PWM[0].ChangeDutyCycle(0)
-            SharedConstants.LEFT_MOTOR_PWM[1].ChangeDutyCycle(duty)
-        else:
-            SharedConstants.RIGHT_MOTOR_PWM[0].ChangeDutyCycle(0)
-            SharedConstants.RIGHT_MOTOR_PWM[1].ChangeDutyCycle(duty)
+        self.robot.sendCommand(self.device + ".backward")
         self.state = MotorState.BACKWARD
-        Tools.debug("Done Motor.backward()")
 
     def stop(self):
         '''
         Stops the motor.
         (If motor is already stopped, returns immediately.)
         '''
-        Tools.debug("Calling Motor.stop(). MotorID: " + str(self.id))
+        self._checkRobot()
         if self.state == MotorState.STOPPED:
             return
-        self._checkRobot()
-        if self.id == SharedConstants.MOTOR_LEFT:
-            SharedConstants.LEFT_MOTOR_PWM[0].ChangeDutyCycle(0)
-            SharedConstants.LEFT_MOTOR_PWM[1].ChangeDutyCycle(0)
-        else:
-            SharedConstants.RIGHT_MOTOR_PWM[0].ChangeDutyCycle(0)
-            SharedConstants.RIGHT_MOTOR_PWM[1].ChangeDutyCycle(0)
+        self.robot.sendCommand(self.device + ".stop")
         self.state = MotorState.STOPPED
-        Tools.debug("Done Motor.stop()")
 
     def setSpeed(self, speed):
         '''
@@ -107,24 +88,14 @@ class Motor():
         The speed is limited to 0..100.
         @param speed: the new speed 0..100
         '''
-        if speed > 100:
-            speed = 100
-        if speed < 0:
-            speed = 0
+    def setSpeed(self, speed):
+        self._checkRobot()
+        speed = int(speed)
         if self.speed == speed:
             return
         self.speed = speed
+        self.robot.sendCommand(self.device + ".setSpeed." + str(speed))
         self.state = MotorState.UNDEFINED
-
-    def speedToDutyCycle(self, speed):
-        '''
-        Linear relationship for mapping speed 0..100 to duty cycle
-        '''
-        if speed < 0:
-            return 0
-        elif speed > 100:
-            return 100
-        return speed
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

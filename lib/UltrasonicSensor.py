@@ -1,88 +1,73 @@
-# UltrasonicSensor.java
+# UltrasonicSensor.py
+# Remote mode
 
-'''
- This software is part of the raspibrick module.
- It is Open Source Free Software, so you may
- - run the code for any purpose
- - study how the code works and adapt it to your needs
- - integrate all or parts of the code in your own programs
- - redistribute copies of the code777
- - improve the code and release your improvements to the public
- However the use of the code is entirely your responsibility.
- '''
-
-import SharedConstants
 from RobotInstance import RobotInstance
 from Tools import Tools
-import RPi.GPIO as GPIO
-import time
 
 class UltrasonicSensor():
     '''
-     Class that represents an ultrasonic sensor.
+    Class that represents an ultrasonic sensor.
     '''
-    def __init__(self):
+
+    def __init__(self, **kwargs):
         '''
-        Creates a sensor instance.
+        Creates a ultrasonic sensor.
         '''
-        Tools.debug("UltrasonicSensor instance created")
+        self.device = "uss"
+        self.sensorState = "FAR"
+        self.sensorType = "UltrasonicSensor"
+        self.triggerLevel = 20
+        self.nearCallback = None
+        self.farCallback = None
+        for key in kwargs:
+            if key == "near":
+                self.nearCallback = kwargs[key]
+            elif key == "far":
+                self.farCallback = kwargs[key]
+        robot = RobotInstance.getRobot()
+        if robot == None:  # deferred registering, because Robot not yet created
+            RobotInstance._partsToRegister.append(self)
+        else:
+            self._setup(robot)
+
+    def _setup(self, robot):
+        robot.sendCommand("uss.create")
+        if self.nearCallback != None or self.farCallback != None:
+            robot.registerSensor(self)
 
     def getValue(self):
         '''
-        Returns the distance.
-        @return: Distance from target in cm, or -1 if no object or error
+        Returns the current distance (in cm).
         @rtype: float
         '''
         self._checkRobot()
-        # Set pins as output and input
-        GPIO.setup(SharedConstants.P_TRIG_ECHO, GPIO.OUT)
-        GPIO.output(SharedConstants.P_TRIG_ECHO, GPIO.LOW)
+        return float(RobotInstance.getRobot().sendCommand(self.device + ".getValue"))
 
-        # Allow module to settle
-        time.sleep(0.1)
+    def getTriggerLevel(self):
+        return self.triggerLevel
 
-        # Send max 10 us trigger pulse
-        GPIO.output(SharedConstants.P_TRIG_ECHO, GPIO.HIGH)
-        time.sleep(0.00001)
-        GPIO.output(SharedConstants.P_TRIG_ECHO, GPIO.LOW)
+    def setTriggerLevel(self, level):
+        self.triggerLevel = level
 
-        # Prepare for echo
-        GPIO.setup(SharedConstants.P_TRIG_ECHO, GPIO.IN)
+    def getSensorState(self):
+        return self.sensorState
 
-        # Determine echo pulse length
-        start = time.time()
-        count = start
+    def setSensorState(self, state):
+        self.sensorState = state
 
-        # Wait max 1 s for HIGH signal
-        while GPIO.input(SharedConstants.P_TRIG_ECHO) == GPIO.LOW and count - start < 1:
-            count = time.time()
-        if count - start >= 1:
-            Tools.debug("Timeout while waiting for echo going HIGH")
-            return -1 # error
+    def getSensorType(self):
+        return self.sensorType
 
-        # Wait  for LOW signal
-        while GPIO.input(SharedConstants.P_TRIG_ECHO) == GPIO.HIGH:
-            continue
-        stop = time.time()
+    def onNear(self, v):
+        if self.nearCallback != None:
+            self.nearCallback(v)
 
-        # Calculate pulse length
-        elapsed = stop - start
-
-        # Distance = speed_of_sound * elapsed / 2
-        distance =  34300 * elapsed / 2.0
-        # round to 2 decimals
-        distance = int(distance * 100 + 0.5) / 100.0
-        return distance
-
-    def getDistance(self):
-        '''
-        Returns the distance.
-        @return: Distance from target in cm formatted to two decimals, or -1 if no object or error
-        @rtype: str
-        '''
-        return format(self.getValue(), ".2f")
+    def onFar(self, v):
+        if self.farCallback != None:
+            self.farCallback(v)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
 
+        

@@ -1,4 +1,5 @@
 # LightSensor.java
+# Remote mode
 
 '''
  This software is part of the raspibrick module.
@@ -11,14 +12,14 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
 from RobotInstance import RobotInstance
+from Tools import Tools
 
 class LightSensor():
     '''
-    Class that represents an ultrasonic sensor.
+    Class that represents an light sensor.
     '''
-    def __init__(self, id):
+    def __init__(self, id, **kwargs):
         '''
         Creates a light sensor instance with given id.
         IDs: 0: front left, 1: front right, 2: rear left, 3: rear right
@@ -27,26 +28,61 @@ class LightSensor():
         @param id: the LightSensor identifier
         '''
         self.id = id
-        Tools.debug("LightSensor instance with ID " + str(id) + " created")
+        self.device = "lss" + str(id)
+        self.sensorState = "DARK"
+        self.sensorType = "LightSensor"
+        self.triggerLevel = 500
+        self.brightCallback = None
+        self.darkCallback = None
+        for key in kwargs:
+            if key == "bright":
+                self.brightCallback = kwargs[key]
+            elif key == "dark":
+                self.darkCallback = kwargs[key]
+        robot = RobotInstance.getRobot()
+        if robot == None:  # deferred registering, because Robot not yet created
+            RobotInstance._partsToRegister.append(self)
+        else:
+            self._setup(robot)
+
+    def _setup(self, robot):
+        robot.sendCommand(self.device + ".create")
+        if self.brightCallback != None or self.darkCallback != None:
+            robot.registerSensor(self)
 
     def getValue(self):
         '''
-        Returns the current intensity value (0..255).
+        Returns the current intensity value (0..1000).
         @return: the measured light intensity
         @rtype: int
         '''
-        self._checkRobot()
         Tools.delay(1)
-        nb = self.id
-        if nb == 0:
-            nb = 1
-        elif nb == 1:
-            nb = 0
-        robot = RobotInstance.getRobot()
-        return robot.analogExtender.readADC(nb)
+        self._checkRobot()
+        return int(RobotInstance.getRobot().sendCommand(self.device + ".getValue"))
+
+    def getTriggerLevel(self):
+        return self.triggerLevel
+
+    def setTriggerLevel(self, level):
+        self.triggerLevel = level
+
+    def getSensorState(self):
+        return self.sensorState
+
+    def setSensorState(self, state):
+        self.sensorState = state
+
+    def getSensorType(self):
+        return self.sensorType
+
+    def onBright(self, v):
+        if self.brightCallback != None:
+            self.brightCallback(self.id, v)
+
+    def onDark(self, v):
+        if self.darkCallback != None:
+            self.darkCallback(self.id, v)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
-
-

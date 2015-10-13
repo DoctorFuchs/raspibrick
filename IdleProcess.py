@@ -51,7 +51,7 @@ def firstDuty():
     ip = ""
     robot.setButtonEnabled(True)
     while not isInterrupted and count < 40:  # Try 20 s to get IP address
-       ipAddr = Robot.getIPAddresses()
+       ipAddr = robot.getIPAddresses()
        print "Got IP addresses:", ipAddr
        ip = ""
        for addr in ipAddr:
