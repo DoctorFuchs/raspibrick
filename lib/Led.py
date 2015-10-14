@@ -1,7 +1,8 @@
 # Led.java
-# Remote mode
 
 '''
+Class that represents a LED pair.
+
  This software is part of the raspibrick module.
  It is Open Source Free Software, so you may
  - run the code for any purpose
@@ -12,8 +13,8 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from RobotInstance import RobotInstance
 from Tools import Tools
+from RobotInstance import RobotInstance
 
 class Led():
     '''
@@ -28,16 +29,8 @@ class Led():
         @param id: the LED identifier
         '''
         self.id = id
-        self.device = "led" + str(id)
-        robot = RobotInstance.getRobot()
-        if robot == None:  # deferred registering, because Robot not yet created
-            RobotInstance._partsToRegister.append(self)
-        else:
-            self._setup(robot)
-
-    def _setup(self, robot):
-        robot.sendCommand(self.device + ".create")
-        self.robot = robot
+        self.robot = RobotInstance.getRobot()
+        Tools.debug("Led instance with ID " + str(id) + " created")
 
     def setColor(self, *args):
         '''
@@ -47,17 +40,19 @@ class Led():
         '''
         self._checkRobot()
         if len(args) == 1 and type(args[0]) == list:
-            red = args[0][0]
-            green = args[0][1]
-            blue = args[0][2]
+            red = int(args[0][0] / 255.0 * 4095)
+            green = int(args[0][1] / 255.0 * 4095)
+            blue = int(args[0][2] / 255.0 * 4095)
         elif len(args) == 3:
-            red = args[0]
-            green = args[1]
-            blue = args[2]
+            red = int(args[0] / 255.0 * 4095)
+            green = int(args[1] / 255.0 * 4095)
+            blue = int(args[2] / 255.0 * 4095)
         else:
             raise ValueError("Illegal param in setColor()")
-        self.robot.sendCommand(self.device + ".setColor." +
-            str(red) + "." + str(green) + "." + str(blue))
+        id = (self.id + 3) % 4
+        self.robot.pwm.setPWM(3 * id, 0, blue)
+        self.robot.pwm.setPWM(3 * id + 1, 0, green)
+        self.robot.pwm.setPWM(3 * id + 2, 0, red)
 
     @staticmethod
     def setColorAll(*args):
@@ -66,29 +61,16 @@ class Led():
         @param color list of [red, green, blue] RGB color components 0..255
          or three color integers 0..255
         '''
-        if RobotInstance.getRobot() == None:
-            raise Exception("Create Robot instance first")
-        if len(args) == 1 and type(args[0]) == list:
-            red = args[0][0]
-            green = args[0][1]
-            blue = args[0][2]
-        elif len(args) == 3:
-            red = args[0]
-            green = args[1]
-            blue = args[2]
-        else:
-            raise ValueError("Illegal param in setColor()")
-        RobotInstance.getRobot().sendCommand("led.setColorAll." +
-            str(red) + "." + str(green) + "." + str(blue))
+        leds = [Led(0), Led(1), Led(2), Led(3)]
+        for led in leds:
+            led.setColor(*args)
 
     @staticmethod
     def clearAll():
         '''
         Turns off all 4 LED pairs.
         '''
-        if RobotInstance.getRobot() == None:
-            raise Exception("Create Robot instance first")
-        RobotInstance.getRobot().sendCommand("led.clearAll")
+        Led.setColorAll(0, 0, 0)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

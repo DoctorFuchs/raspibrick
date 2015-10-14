@@ -1,7 +1,8 @@
 # InfraredSensor.java
-# Remote mode
 
 '''
+Class that represents an infrared sensor.
+
  This software is part of the raspibrick module.
  It is Open Source Free Software, so you may
  - run the code for any purpose
@@ -12,8 +13,10 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from RobotInstance import RobotInstance
 from Tools import Tools
+import RPi.GPIO as GPIO
+import SharedConstants
+from RobotInstance import RobotInstance
 
 class InfraredSensor():
     '''
@@ -29,27 +32,22 @@ class InfraredSensor():
         @param id: sensor identifier
         '''
         self.id = id
-        self.device = "irs" + str(id)
-        self.sensorState = "DARK"
+        self.sensorState = "PASSIVATED"
         self.sensorType = "InfraredSensor"
-        self.brightCallback = None
-        self.darkCallback = None
+        self.activateCallback = None
+        self.passivateCallback = None
         for key in kwargs:
-            if key == "bright":
-                self.brightCallback = kwargs[key]
-            elif key == "dark":
-                self.darkCallback = kwargs[key]
+            if key == "activated":
+                self.activateCallback = kwargs[key]
+            elif key == "passivated":
+                self.passivateCallback = kwargs[key]
         robot = RobotInstance.getRobot()
         if robot == None:  # deferred registering, because Robot not yet created
-            RobotInstance._partsToRegister.append(self)
+            RobotInstance._sensorsToRegister.append(self)
         else:
-            self._setup(robot)
+            if self.activateCallback != None or self.passivateCallback != None:
+                robot.registerSensor(self)
         Tools.debug("InfraredSensor instance with ID " + str(id) + " created")
-
-    def _setup(self, robot):
-        robot.sendCommand(self.device + ".create")
-        if self.brightCallback != None or self.darkCallback != None:
-            robot.registerSensor(self)
 
     def getValue(self):
         '''
@@ -59,7 +57,23 @@ class InfraredSensor():
         '''
         Tools.delay(1)
         self._checkRobot()
-        return int(RobotInstance.getRobot().sendCommand(self.device + ".getValue"))
+        if self.id == SharedConstants.IR_CENTER and \
+                    GPIO.input(SharedConstants.P_FRONT_CENTER) == GPIO.LOW:
+            return 1
+        elif self.id == SharedConstants.IR_LEFT and \
+                    GPIO.input(SharedConstants.P_FRONT_LEFT) == GPIO.LOW:
+            return 1
+        elif self.id == SharedConstants.IR_RIGHT and \
+                    GPIO.input(SharedConstants.P_FRONT_RIGHT) == GPIO.LOW:
+            return 1
+        elif self.id == SharedConstants.IR_LINE_LEFT and \
+                    GPIO.input(SharedConstants.P_LINE_LEFT) == GPIO.LOW:
+            return 1
+        elif self.id == SharedConstants.IR_LINE_RIGHT and \
+                    GPIO.input(SharedConstants.P_LINE_RIGHT) == GPIO.LOW:
+            return 1
+        else:
+            return 0
 
     def getSensorState(self):
         return self.sensorState
@@ -70,13 +84,13 @@ class InfraredSensor():
     def getSensorType(self):
         return self.sensorType
 
-    def onBright(self):
-        if self.brightCallback != None:
-            self.brightCallback(self.id)
+    def onActivated(self):
+        if self.activateCallback != None:
+            self.activateCallback(self.id)
 
-    def onDark(self):
-        if self.darkCallback != None:
-            self.darkCallback(self.id)
+    def onPassivated(self):
+        if self.passivateCallback != None:
+            self.passivateCallback(self.id)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

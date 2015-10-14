@@ -1,12 +1,11 @@
 # RobotInstance.py
-# Remote mode
 
 '''
 Holder of global Robot instance
 '''
 class RobotInstance():
     _robot = None
-    _partsToRegister = []
+    _sensorsToRegister = []
 
     @staticmethod
     def setRobot(robot):

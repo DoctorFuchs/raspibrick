@@ -1,5 +1,9 @@
 # Shadow.py
 
+'''
+Dummy class to make RaspiBrick source compatible with RaspiSim. All methods are empty.
+'''
+
 class Shadow():
     '''
     Dummy class to make RaspiBrick source compatible with RaspiSim. All methods are empty.

@@ -11,7 +11,6 @@ class SensorThread(Thread):
         self.isSensorThreadRunning = True
 
     def run(self):
-        print "Sensor thread started"
         while self.isSensorThreadRunning:
             for sensor in self.sensors:
                 if sensor.getSensorType() == "LightSensor":
@@ -24,12 +23,12 @@ class SensorThread(Thread):
                         sensor.onDark(v)
                 if sensor.getSensorType() == "InfraredSensor":
                     v = sensor.getValue()
-                    if v == 1 and sensor.getSensorState() == "DARK":
-                        sensor.setSensorState("BRIGHT")
-                        sensor.onBright()
-                    if v == 0 and sensor.getSensorState() == "BRIGHT":
-                        sensor.setSensorState("DARK")
-                        sensor.onDark()
+                    if v == 1 and sensor.getSensorState() == "PASSIVATED":
+                        sensor.setSensorState("ACTIVATED")
+                        sensor.onActivated()
+                    if v == 0 and sensor.getSensorState() == "ACTIVATED":
+                        sensor.setSensorState("PASSIVATED")
+                        sensor.onPassivated()
                 if sensor.getSensorType() == "UltrasonicSensor":
                     v = sensor.getValue()
                     if v > sensor.getTriggerLevel() and sensor.getSensorState() == "NEAR":
@@ -39,7 +38,6 @@ class SensorThread(Thread):
                         sensor.setSensorState("NEAR")
                         sensor.onNear(v)
             Tools.delay(SharedConstants.POLL_DELAY)
-        print "Sensor thread terminated"
 
     def stop(self):
         self.isSensorThreadRunning = False

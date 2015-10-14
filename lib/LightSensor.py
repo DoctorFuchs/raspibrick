@@ -1,7 +1,8 @@
 # LightSensor.java
-# Remote mode
 
 '''
+Class that represents a light sensor.
+
  This software is part of the raspibrick module.
  It is Open Source Free Software, so you may
  - run the code for any purpose
@@ -12,8 +13,8 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from RobotInstance import RobotInstance
 from Tools import Tools
+from RobotInstance import RobotInstance
 
 class LightSensor():
     '''
@@ -28,12 +29,12 @@ class LightSensor():
         @param id: the LightSensor identifier
         '''
         self.id = id
-        self.device = "lss" + str(id)
         self.sensorState = "DARK"
         self.sensorType = "LightSensor"
         self.triggerLevel = 500
         self.brightCallback = None
         self.darkCallback = None
+        self.isRegistered = False
         for key in kwargs:
             if key == "bright":
                 self.brightCallback = kwargs[key]
@@ -41,14 +42,11 @@ class LightSensor():
                 self.darkCallback = kwargs[key]
         robot = RobotInstance.getRobot()
         if robot == None:  # deferred registering, because Robot not yet created
-            RobotInstance._partsToRegister.append(self)
+            RobotInstance._sensorsToRegister.append(self)
         else:
-            self._setup(robot)
-
-    def _setup(self, robot):
-        robot.sendCommand(self.device + ".create")
-        if self.brightCallback != None or self.darkCallback != None:
-            robot.registerSensor(self)
+            if self.brightCallback != None or self.darkCallback != None:
+                robot.registerSensor(self)
+        Tools.debug("LightSensor instance with ID " + str(id) + " created")
 
     def getValue(self):
         '''
@@ -56,9 +54,15 @@ class LightSensor():
         @return: the measured light intensity
         @rtype: int
         '''
-        Tools.delay(1)
         self._checkRobot()
-        return int(RobotInstance.getRobot().sendCommand(self.device + ".getValue"))
+        Tools.delay(1)
+        nb = self.id
+        if nb == 0:
+            nb = 1
+        elif nb == 1:
+            nb = 0
+        robot = RobotInstance.getRobot()
+        return int(robot.analogExtender.readADC(nb) / 255.0 * 1000 + 0.5)
 
     def getTriggerLevel(self):
         return self.triggerLevel
@@ -86,3 +90,5 @@ class LightSensor():
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
+
+

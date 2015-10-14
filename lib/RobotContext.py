@@ -1,8 +1,13 @@
 # RobotContext.py
 
-from raspibrick.Obstacle import Obstacle
-from raspibrick.Target import Target
-from raspibrick.Torch import Torch
+'''
+Dummy class to make RaspiBrick source compatible with RaspiSim. All methods are empty.
+'''
+
+
+from Obstacle import Obstacle
+from Target import Target
+from Torch import Torch
 
 class RobotContext():
     '''

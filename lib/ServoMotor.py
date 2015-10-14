@@ -1,7 +1,8 @@
 # ServoMotor.java
-# Remote mode
 
 '''
+Class that represents a servo motor.
+
  This software is part of the raspibrick module.
  It is Open Source Free Software, so you may
  - run the code for any purpose
@@ -12,8 +13,9 @@
  However the use of the code is entirely your responsibility.
  '''
 
-from RobotInstance import RobotInstance
 from Tools import Tools
+from RobotInstance import RobotInstance
+import SharedConstants
 
 class ServoMotor():
     '''
@@ -28,15 +30,12 @@ class ServoMotor():
         @param inc: the increment factor (inc_duty/inc_position)
         '''
         self.id = id
-        self.device = "svo" + str(id)
-        robot = RobotInstance.getRobot()
-        if robot == None:  # deferred registering, because Robot not yet created
-            RobotInstance._partsToRegister.append(self)
-        else:
-            self._setup(robot)
-
-    def _setup(self, robot):
-        robot.sendCommand(self.device + ".create." + str(home) + "." + str(inc))
+        self.home = home
+        self.inc = inc
+        self._checkRobot()
+        self.robot = RobotInstance.getRobot()
+        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, home)
+        Tools.debug("ServoMotor instance created")
 
     def setPos(self, position):
         '''
@@ -45,7 +44,8 @@ class ServoMotor():
         For most servo motors in range -200 .. 200
         '''
         self._checkRobot()
-        RobotInstance.getRobot().sendCommand(self.device + ".setPos" + "." + str(position))
+        pos = self.home + self.inc * position
+        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, pos)
 
     def setPosAbs(self, position):
         '''
@@ -54,8 +54,9 @@ class ServoMotor():
         For most servo motors in range 100..500
         '''
         self._checkRobot()
-        RobotInstance.getRobot().sendCommand(self.device + ".setPosAbs" + "." + str(position))
+        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, position)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
+
