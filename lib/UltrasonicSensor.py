@@ -79,12 +79,11 @@ class UltrasonicSensor():
             return -1 # error
 
         # Wait  for LOW signal
+        elapsed = 0
         while GPIO.input(SharedConstants.P_TRIG_ECHO) == GPIO.HIGH:
-            continue
-        stop = time.time()
-
-        # Calculate pulse length
-        elapsed = stop - start
+            elapsed = time.time() - start
+            if elapsed > 0.015:  # echo considered as failed (distance too big)
+                break
 
         # Distance = speed_of_sound * elapsed / 2
         distance =  34300 * elapsed / 2.0

@@ -114,29 +114,30 @@ class SocketHandler(Thread):
         isExiting = False
         # ------------------- device 'robot'  ---------------
         if device == "robot":
+            r = RobotInstance.getRobot()
             if method == "getVersion":
                 reply = SharedConstants.VERSION
             elif method == "initSound":
-                Robot.initSound(param1, int(param2))
+                r.initSound(param1, int(param2))
             elif method == "playSound":
-                Robot.playSound()
+                r.playSound()
             elif method == "fadeoutSound":
-                Robot.playSound(int(param1))
+                r.playSound(int(param1))
             elif method == "stopSound":
-                Robot.stopSound()
+                r.stopSound()
             elif method == "pauseSound":
-                Robot.pauseSound()
+                r.pauseSound()
             elif method == "resumeSound":
-                Robot.resumeSound()
+                r.resumeSound()
             elif method == "rewindSound":
-                Robot.rewindSound()
+                r.rewindSound()
             elif method == "isSoundPlaying":
-                if Robot.isSoundPlaying():
+                if r.isSoundPlaying():
                     reply = "1"
                 else:
                     reply = "0"
             elif method == "getIPAddresses":
-                reply = ", ".join(Robot.getIPAddresses())
+                reply = ", ".join(r.getIPAddresses())
             elif method == "exit":
                 isExiting = True
             elif method == "getCurrentDevices": # show all current devices in devices dictionary
@@ -239,7 +240,7 @@ class SocketHandler(Thread):
 
     def showError(self, msg1, msg2):
         print "Error #" + msg1 + " : " + msg2
-        display.setText("E" + msg1, [0, 1, 1], 3000)
+        display.setText("E" + msg1, [0, 1, 1])
 
 def dispatchDisplay(device, method, param1, param2, param3):
     reply = "OK"
@@ -412,7 +413,7 @@ def disconnect():
 
 
 # ====================== Main ======================================
-print "Brickgate server starting"
+print "Brickgate server V" + BrickGateProperties.BRICKGATE_VERSION + " starting"
 isButtonEnabled = False
 SharedConstants.BLINK_CONNECT_DISCONNECT = False
 SharedConstants.PLAY_CONNECT_DISCONNECT = False

@@ -41,6 +41,7 @@ class Gear(object):
         '''
         self.speed = SharedConstants.GEAR_DEFAULT_SPEED
         self.state = GearState.UNDEFINED
+        self.arcRadius = 0
         Tools.debug("Gear instance created")
 
     def forward(self, duration = 0):
@@ -143,7 +144,8 @@ class Gear(object):
         speed1 = \
             self.speed * (abs(radius) - SharedConstants.GEAR_AXE_LENGTH) / (abs(radius) + SharedConstants.GEAR_AXE_LENGTH)
         Tools.debug("Calling leftArc(). Left speed: " + str(speed1) + ". Right speed: " + str(self.speed))
-        if self.state != GearState.LEFTARC:
+        if self.state != GearState.LEFTARC or radius != self.arcRadius:
+            self.arcRadius = radius
             leftDuty = self.speedToDutyCycle(speed1)
             rightDuty = self.speedToDutyCycle(self.speed)
             if radius >= 0:
@@ -181,7 +183,8 @@ class Gear(object):
         speed1 = \
             self.speed * (abs(radius) - SharedConstants.GEAR_AXE_LENGTH) / (abs(radius) + SharedConstants.GEAR_AXE_LENGTH)
         Tools.debug("Calling rightArc(). Left speed: " + str(self.speed) + ". Right speed: " + str(speed1))
-        if self.state != GearState.RIGHTARC:
+        if self.state != GearState.RIGHTARC or self.arcRadius != radius:
+            self.arcRadius = radius
             leftDuty = self.speedToDutyCycle(self.speed)
             rightDuty = self.speedToDutyCycle(speed1)
             if radius >= 0:

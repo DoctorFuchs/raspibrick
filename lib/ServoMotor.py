@@ -26,7 +26,7 @@ class ServoMotor():
         Creates a servo motor instance and sets it at home position. For most servos:
         home = 300, inc = 2
         @param id: the id of the motor (0..3)
-        @param home: the PWM duty cycle for the home position
+        @param home: the PWM duty cycle for the home position (0..4095)
         @param inc: the increment factor (inc_duty/inc_position)
         '''
         self.id = id

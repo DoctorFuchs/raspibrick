@@ -16,11 +16,14 @@
 '''
 History:
 
-V1.00 - July 2015: - First public release
+V1.00 - Jul 2015: - First public release
+V1.01 - Oct 2015: - Fixed: Robot replaced by RobotInstance.getRobot()
 '''
 
+BRICKGATE_VERSION = "1.01 - Oct 2015"
+
 # Enable very verbose debugging infos to stdout
-DEBUG = True
+DEBUG = False
 
 # Default sound level
 # Must be int
