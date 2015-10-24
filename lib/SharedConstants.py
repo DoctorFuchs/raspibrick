@@ -26,10 +26,12 @@ V1.15 - Sep 2015: - First public release
 V1.16 - Oct 2015: - Added: Sensor events
 V1.17 - Oct 2015: - Modified: Timeout to receive echo in ultrasonic sensor
 V1.18 - Oct 2015: - Fixed: Gear.leftArc(), rightArc() now work with changing radius
+V1.19 - Oct 2015: - Added: Led.setColor(), setColorAll() with X11-color string
+V1.20 - Oct 2015: - Modifications to RaspiJLib
 '''
 
-VERSION = "1.18 - Oct 2015"
-DISPLAYED_VERSION = "118" # displayed n.nn
+VERSION = "1.20 - Oct 2015"
+DISPLAYED_VERSION = "120" # displayed n.nn
 
 DEBUG = False
 
