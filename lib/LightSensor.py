@@ -15,6 +15,7 @@ Class that represents a light sensor.
 
 from Tools import Tools
 from RobotInstance import RobotInstance
+import SharedConstants
 
 class LightSensor():
     '''
@@ -62,7 +63,7 @@ class LightSensor():
         elif nb == 1:
             nb = 0
         robot = RobotInstance.getRobot()
-        return int(robot.analogExtender.readADC(nb) / 255.0 * 1000 + 0.5)
+        return int(self._readADC(nb) / 255.0 * 1000 + 0.5)
 
     def getTriggerLevel(self):
         return self.triggerLevel
@@ -86,6 +87,17 @@ class LightSensor():
     def onDark(self, v):
         if self.darkCallback != None:
             self.darkCallback(self.id, v)
+
+    def _readADC(self, channel):
+        robot = RobotInstance.getRobot()
+        try:
+            robot._bus.write_byte(SharedConstants.ADC_I2C_ADDRESS, channel)
+            robot._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS) # ignore first byte
+            data = robot._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS)
+        except:
+            raise Exception("Exception while accessing PCF8591P I2C Expander. channel: " + str(channel))
+            data = 0
+        return data
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

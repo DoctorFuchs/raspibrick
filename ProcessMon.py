@@ -65,10 +65,8 @@ else:
     print "Shutdown process starting..."
     robot = Robot()
     display = Display()
+    display.showBlinker("8YE", count = 2, speed = 2, blocking = True)
     led = Led(1)
-    display.setText("8YE ", [1, 0, 0])
-    Tools.delay(3000)
-    display.clear()
     led.setColor(20, 0, 0)
     Tools.delay(2000)
     os.system("sudo shutdown -h now")

@@ -14,6 +14,7 @@
 import SharedConstants
 from RobotInstance import RobotInstance
 from Robot import Robot
+from Robot import MyRobot
 from Motor import Motor
 from ServoMotor import ServoMotor
 from Gear import Gear
@@ -27,6 +28,8 @@ from Target import Target
 from Torch import Torch
 from Shadow import Shadow
 from Display import Display
+from DgTell import DgTell
+from Disp4tronix import Disp4tronix
 from Camera import Camera
 from Tools import *
 import tty
@@ -52,6 +55,8 @@ LS_REAR_RIGHT = SharedConstants.LS_REAR_RIGHT
 BUTTON_LONGPRESSED = SharedConstants.BUTTON_LONGPRESSED
 BUTTON_PRESSED = SharedConstants.BUTTON_PRESSED
 BUTTON_RELEASED = SharedConstants.BUTTON_RELEASED
+BUTTON_CLICKED = SharedConstants.BUTTON_CLICKED
+BUTTON_DOUBLECLICKED = SharedConstants.BUTTON_DOUBLECLICKED
 
 
 def getKey():

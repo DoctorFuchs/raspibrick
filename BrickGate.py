@@ -8,7 +8,7 @@ import os, subprocess
 
 def debug(msg):
     if BrickGateProperties.DEBUG:
-        print msg
+        print "BG debug-> " + msg
 
 # Response
 class Error():
@@ -79,16 +79,17 @@ class SocketHandler(Thread):
         print "Client disconnected. Waiting for next client..."
         flasher = Flasher(led, [0, 100, 0])
         flasher.start()
-        display.setText("HOLd")
+        display.showText("HOLd")
         isConnected = False
         robot.setButtonEnabled(True)
         Tools.debug("SocketHandler terminated")
 
     def executeCommand(self, cmd):
         debug("Calling executeCommand() with  cmd: " + cmd)
+        # max command length: device, method, param1, param2, param3, param4, param5
         reply = Reply.OK
         parts =  cmd.split(".")  # Split on period
-        if len(parts) < 2 or len(parts) > 5:
+        if len(parts) < 2 or len(parts) > 7:
             self.showError(Error.CMD_ERROR, cmd)
             self.sendReply(Reply.ILLEGAL_COMMAND)
             return
@@ -96,20 +97,34 @@ class SocketHandler(Thread):
             parts.append("n")
             parts.append("n")
             parts.append("n")
+            parts.append("n")
+            parts.append("n")
         elif len(parts) == 3:
             parts.append("n")
             parts.append("n")
+            parts.append("n")
+            parts.append("n")
         elif len(parts) == 4:
+            parts.append("n")
+            parts.append("n")
+            parts.append("n")
+        elif len(parts) == 5:
+            parts.append("n")
+            parts.append("n")
+        elif len(parts) == 6:
             parts.append("n")
         device = parts[0]
         method = parts[1]
         param1 = parts[2].replace("`", ".") # . is used as separator
         param2 = parts[3].replace("`", ".")
         param3 = parts[4].replace("`", ".")
-        return self.dispatchCommand(device, method, param1, param2, param3)
+        param4 = parts[5].replace("`", ".")
+        param5 = parts[6].replace("`", ".")
+        return self.dispatchCommand(device, method, param1, param2, param3, param4, param5)
 
-    def dispatchCommand(self, device, method, param1, param2, param3):
-        debug("dispatchCommand: " + device + ", " + method + ", " + param1 + ", " + param2 + ", " + param3)
+    def dispatchCommand(self, device, method, param1, param2, param3, param4, param5):
+        debug("dispatchCommand: " + device + ", " + method + ", " + param1 + ", " + param2 + \
+              ", " + param3 + ", " + param4 + ", " + param5)
         reply = Reply.OK
         isExiting = False
         # ------------------- device 'robot'  ---------------
@@ -172,7 +187,7 @@ class SocketHandler(Thread):
                     reply = evaluate(device, method, param1, param2, param3)
 
         elif device == "display":
-            reply = dispatchDisplay(device, method, param1, param2, param3)
+            reply = dispatchDisplay(device, method, param1, param2, param3, param4, param5)
 
         # ------------------- static device 'led'  -----------
         elif device == "led":
@@ -240,9 +255,9 @@ class SocketHandler(Thread):
 
     def showError(self, msg1, msg2):
         print "Error #" + msg1 + " : " + msg2
-        display.setText("E" + msg1, [0, 1, 1])
+        display.showText("E" + msg1, [0, 1, 1])
 
-def dispatchDisplay(device, method, param1, param2, param3):
+def dispatchDisplay(device, method, param1, param2, param3, param4, param5):
     reply = "OK"
     if method == "create":
         if not device in devices:
@@ -254,42 +269,15 @@ def dispatchDisplay(device, method, param1, param2, param3):
             reply = Reply.DEVICE_NOT_CREATED
         else:
             display = devices[device]
-            if method == "getDisplayableChars":
-                return display.getDisplayableChars()
-            elif method == "setDigit":
-                try:
-                    rc = display.setDigit(param1, int(param2))
-                except:
-                    reply = Reply.CHAR_NOT_DISPLAYABLE
-                else:
-                    if not rc:
-                        reply = Reply.CHAR_NOT_DISPLAYABLE
-            elif method == "setBinary":
-                rc = display.setBinary(int(param1), int(param2))
-                if not rc:
-                    reply = Reply.CHAR_NOT_DISPLAYABLE
-            elif method == "setDecimalPoint":
-                rc = display.setDecimalPoint(int(param1))
-                if not rc:
-                    reply = Reply.ILLEGAL_DECIMAL_POINT
-            elif method == "clearDigit":
-                rc = display.clearDigit(int(param1))
-                if not rc:
-                    reply = Reply.ILLEGAL_DIGIT
-            elif method == "clear":
+            if method == "clear":
                 display.clear()
-            elif method == "setText":
+            elif method == "showText":
                 if param2 == "n":
-                    display.setText(param1)
+                    display.showText(param1)
                 else:
-                    stm = "display.setText(" + "\"" + param1 + "\", [" + param2 + "])"
-                    debug("Statement: " + stm)
+                    stm = "display.showText(" + "\"" + param1 + "\", " + param2 + ", [" + param3 + "])"
+                    debug("eval statement: " + stm)
                     eval(stm)
-            elif method == "setScrollableText":
-                if param2 == "n":
-                    display.setScrollableText(param1)
-                else:
-                    display.setScrollableText(param1, int(param2))
             elif method == "scrollToLeft":
                 return str(display.scrollToLeft())
             elif method == "scrollToRight":
@@ -303,13 +291,23 @@ def dispatchDisplay(device, method, param1, param2, param3):
                 if rc:
                     return "1"
                 return "0"
-            elif method == "ticker":
-                if param2 == "n":
-                    display.ticker(param1)
-                elif param3 == "n":
-                    display.ticker(param1, int(param2))
+            elif method == "isBlinkerAlive":
+                rc = display.isBlinkerAlive()
+                if rc:
+                    return "1"
+                return "0"
+            elif method == "showTicker":
+                if param4 == "0":
+                    display.showTicker(param1, int(param2), int(param3), False)
                 else:
-                    display.ticker(param1, int(param2), int(param3))
+                    display.showTicker(param1, int(param2), int(param3), True)
+            elif method == "showBlinker":
+                if param5 == "0":
+                    stm = "display.showBlinker(" + "\"" + param1 + "\"" + ", [" + param2 + "], " + str(param3)  + ", " + str(param4) + ", False)"
+                else:
+                    stm = "display.showBlinker(" + "\"" + param1 + "\"" + ", [" + param2 + "], " + str(param3)  + ", " + str(param4) + ", True)"
+                debug("eval statement: " + stm)
+                eval(stm)
             else:
                 reply = Reply.NO_SUCH_METHOD
     return reply
@@ -440,7 +438,7 @@ except socket.error as msg:
     sys.exit()
 serverSocket.listen(10)
 terminateServer = False
-display.setText("HOLd")
+display.showText("HOLd")
 flasher.start()
 isButtonEnabled = True
 print "Waiting for a connecting client..."
@@ -454,7 +452,7 @@ while True:
     if isConnected:  # Accept only one connection
         continue
     flasher.stop()
-    display.setText("Conn")
+    display.showText("Conn")
     Tools.delay(1500)
     display.clear()
     isConnected = True

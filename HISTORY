@@ -1,12 +1,13 @@
 RaspiBrick History
 
-V1.05 - Aug  7, 2015: First public release
-V1.06 - Aug 10, 2015: VNC server added, Port 5901, Pwd: 123456
-V1.07 - Aug 13, 2015: Updated: lib classes, ProcessMon.py, IdleProc.py
-                      due to irregular motor behavior 
-V1.08 - Aug 13, 2015: Led startup revisted
-V1.09 - Aug 15, 2015: PYTHONPATH included for pi, root and sudoer
-V1.10 - Aug 16, 2015: Fixed: problem with startup without display
-V1.11 - Aug 17, 2015: Updated: Python library
-V1.12 - Aug 18, 2015: Added: Java support
-
+V1.15 - Sep 2015: - First public release
+V1.16 - Oct 2015: - Added: Sensor events
+V1.17 - Oct 2015: - Modified: Timeout to receive echo in ultrasonic sensor
+V1.18 - Oct 2015: - Fixed: Gear.leftArc(), rightArc() now work with changing radius
+V1.19 - Oct 2015: - Added: Led.setColor(), setColorAll() with X11-color string
+V1.20 - Oct 2015: - Modifications to RaspiJLib
+V1.21 - Oct 2015: - Added: ButtonListener with long press event
+V1.22 - Nov 2015: - Added: Class DgTell, Button click and double-click events
+V1.23 - Dec 2015: - Added: Selecting up to 9 autonomous Python programs
+V1.24 - Dec 2015: - Modified: Shutdown confirmation with button press event
+V1.25 - Dec 2015: - Modified: Decimal point display for DgTell

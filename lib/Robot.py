@@ -17,59 +17,99 @@ Abstraction of a robot based on Pi2Go (full version) from 4tronix.
 from RobotInstance import RobotInstance
 import RPi.GPIO as GPIO
 import os, sys
+import time
 from Tools import Tools
 import SharedConstants
 from Display import Display
+from DgTell import DgTell
+from Disp4tronix import Disp4tronix
 from SensorThread import SensorThread
 from Led import Led
 from Adafruit_PWM_Servo_Driver import PWM
-from sgh_PCF8591P import sgh_PCF8591P
 from threading import Thread
 from subprocess import Popen, PIPE
 import re
 import smbus
 import pygame
-import socket
-import fcntl
-import struct
 
-class ButtonThread(Thread):
+# --------------------------- class ClickThread -------------
+class ClickThread(Thread):
     def __init__(self):
         Thread.__init__(self)
-        self.isRunning = True
+        self.start()
 
     def run(self):
-        count = 0
-        while self.isRunning and count < SharedConstants.BUTTON_LONGPRESS_DURATION:
-            Tools.delay(200)
-            count += 1
-        if self.isRunning:
-            if _buttonListener != None:
-                _buttonListener(SharedConstants.BUTTON_LONGPRESSED)
+        Tools.debug("===>ClickThread started")
+        global _clickThread
+        self.isRunning = True
+        startTime = time.time()
+        while self.isRunning and (time.time() - startTime < SharedConstants.BUTTON_DOUBLECLICK_TIME):
+            time.sleep(0.1)
+        if _clickCount == 1 and not _isLongPressEvent:
+            if _xButtonListener != None:
+                _xButtonListener(SharedConstants.BUTTON_CLICKED)
+        _clickThread = None
+        Tools.debug("===>ClickThread terminated")
 
     def stop(self):
-        global _buttonThread
         self.isRunning = False
-        _buttonThread = None
+
+
+# --------------------------- Global functions ------------------------
+def _onXButtonEvent(event):
+    global _clickThread, _clickCount, _isLongPressEvent
+    if event == SharedConstants.BUTTON_PRESSED:
+        if _xButtonListener != None:
+            _xButtonListener(SharedConstants.BUTTON_PRESSED)
+        _isLongPressEvent = False
+        if _clickThread == None:
+            _clickCount = 0
+            _clickThread = ClickThread()
+
+    elif event == SharedConstants.BUTTON_RELEASED:
+        if _xButtonListener != None:
+            _xButtonListener(SharedConstants.BUTTON_RELEASED)
+        if _isLongPressEvent:
+            _clickThread.stop()
+            _clickThread = None
+            return
+        _clickCount += 1
+        if _clickThread != None:
+            if _clickCount == 2:
+                _clickThread.stop()
+                _clickThread = None
+                if _xButtonListener != None:
+                    _xButtonListener(SharedConstants.BUTTON_DOUBLECLICKED)
+        else:
+                if _xButtonListener != None:
+                    _xButtonListener(SharedConstants.BUTTON_CLICKED)
+
+    elif event == SharedConstants.BUTTON_LONGPRESSED:
+        _isLongPressEvent = True
+        if _xButtonListener != None:
+            _xButtonListener(SharedConstants.BUTTON_LONGPRESSED)
 
 def _onButtonEvent(channel):
+    # switch may bounce: down-up-up, down-up-down, down-down-up etc. in fast sequence
     if not _isButtonEnabled:
         Tools.debug("Button event detected, but button disabled")
         return
-    global _isBtnHit
-    global _buttonThread
+    global _isBtnHit, _buttonThread
     try:
         if GPIO.input(SharedConstants.P_BUTTON) == GPIO.LOW:
-            Tools.debug("ButtonDown event on channel " + str(channel))
-            _isBtnHit = True
-            _buttonThread = ButtonThread()
-            _buttonThread.start()
-            if _buttonListener != None:
-                _buttonListener(SharedConstants.BUTTON_PRESSED)
+            if _buttonThread == None: # down-down is suppressed
+                Tools.debug("ButtonDown event on channel " + str(channel))
+                _isBtnHit = True
+                _buttonThread = ButtonThread()
+                _buttonThread.start()
+                if _buttonListener != None:
+                    _buttonListener(SharedConstants.BUTTON_PRESSED)
         else:
-            Tools.debug("ButtonUp event on channel " + str(channel))
-            if _buttonThread != None:
+            if _buttonThread != None:  # up-up is suppressed
+                Tools.debug("ButtonUp event on channel " + str(channel))
                 _buttonThread.stop()
+                _buttonThread.join(200) # wait until finished
+                _buttonThread = None
                 if _buttonListener != None:
                     _buttonListener(SharedConstants.BUTTON_RELEASED)
     except:  # NoneType error when program is already terminated
@@ -80,8 +120,12 @@ def _onBatteryDown(channel):
     if _batteryListener != None:
         _batteryListener()
 
+# --------------------------- Global variables ------------------------
 _buttonThread = None
+_clickThread = None
+_doubleClickTime = SharedConstants.BUTTON_DOUBLECLICK_TIME
 _buttonListener = None
+_xButtonListener = None
 _batteryListener = None
 _isBtnHit = False
 _isButtonEnabled = False
@@ -90,11 +134,15 @@ _isButtonEnabled = False
 class Robot(object):
     '''
     Class that creates or returns a single MyRobot instance.
+    Signature for the butten event callback: buttonEvent(int).
+    (BUTTON_PRESSED, BUTTON_RELEASED, BUTTON_LONGPRESSED defined in ShareConstants.)
+    @param ipAddress the IP address (default: None for autonomous mode)
+    @param buttonEvent the callback function for pushbutton events (default: None)
     '''
-    def __new__(cls, *args):
+    def __new__(cls, ipAddress = "", buttonEvent = None):
         global _isBtnHit
         if RobotInstance.getRobot() == None:
-            r = MyRobot(*args)
+            r = MyRobot(ipAddress, buttonEvent)
             r.isEscapeHit()  # Dummy to clear button hit flag
             RobotInstance.setRobot(r)
             for sensor in RobotInstance._sensorsToRegister:
@@ -109,15 +157,21 @@ class Robot(object):
 class MyRobot(object):
     '''
     Singleton class that represents a robot.
+    Signature for the butten event callback: buttonEvent(int).
+    (BUTTON_PRESSED, BUTTON_RELEASED, BUTTON_LONGPRESSED defined in ShareConstants.)
+    @param ipAddress the IP address (default: None for autonomous mode)
+    @param buttonEvent the callback function for pushbutton events (default: None)
     '''
     _myInstance = None
-    def __init__(self, *args):
+    def __init__(self, ipAddress = "", buttonEvent = None):
         '''
         Creates an instance of MyRobot and initalizes the GPIO.
         '''
         if MyRobot._myInstance != None:
             raise Exception("Only one instance of MyRobot allowed")
-        global _isButtonEnabled
+        global _isButtonEnabled, _buttonListener
+
+        _buttonListener = buttonEvent
 
         # Use physical pin numbers
         GPIO.setmode(GPIO.BOARD)
@@ -140,11 +194,11 @@ class MyRobot(object):
         SharedConstants.RIGHT_MOTOR_PWM[1].start(0)
 
         # IR sensors
-        GPIO.setup(SharedConstants.P_FRONT_LEFT, GPIO.IN)
-        GPIO.setup(SharedConstants.P_FRONT_CENTER, GPIO.IN)
-        GPIO.setup(SharedConstants.P_FRONT_RIGHT, GPIO.IN)
-        GPIO.setup(SharedConstants.P_LINE_LEFT, GPIO.IN)
-        GPIO.setup(SharedConstants.P_LINE_RIGHT, GPIO.IN)
+        GPIO.setup(SharedConstants.P_FRONT_LEFT, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(SharedConstants.P_FRONT_CENTER, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(SharedConstants.P_FRONT_RIGHT, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(SharedConstants.P_LINE_LEFT, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(SharedConstants.P_LINE_RIGHT, GPIO.IN, GPIO.PUD_UP)
 
         # Establish event recognition from battery monitor
         GPIO.setup(SharedConstants.P_BATTERY_MONITOR, GPIO.IN, GPIO.PUD_UP)
@@ -172,44 +226,57 @@ class MyRobot(object):
             self.pwm.setPWM(3 * id + 1, 0, 0)
             self.pwm.setPWM(3 * id + 2, 0, 0)
 
-
-        # I2C analog extender chip
-        Tools.debug("Trying to detect PCF8591 I2C analog extender on I2C bus 1...")
-        try:
-            self.analogExtender = sgh_PCF8591P(1) # i2c at address 0x48
-            Tools.debug("PCF8591 I2C analog extender on I2C bus # 1 detected")
-        except:
-            print "Failed, trying with bus number 0..."
-            try:
-                self.analogExtender = sgh_PCF8591P(0) # i2c at address 0x48
-                print "PCF8591 I2C analog extender on I2C bus # 0 detected"
-            except:
-                print "Failed to detect PCF8591 I2C analog extender on I2C bus"
-                sys.exit(1)
-
-        Tools.debug("Trying to detect 7-segment display and clear it")
-        addr = 0x20
-        self._isDisplayAvailable = True
+        isSMBusAvailable = True
         self._bus = None
         try:
             if GPIO.RPI_REVISION > 1:
                 self._bus = smbus.SMBus(1) # For revision 2 Raspberry Pi
+                Tools.debug("Found SMBus for revision 2")
             else:
                 self._bus = smbus.SMBus(0) # For revision 1 Raspberry Pi
-            Tools.debug("7-segment display found.")
+                Tools.debug("Found SMBus for revision 1")
         except:
-            print "No 7-segment display found on this robot device."
-            self._isDisplayAvailable = False
+            print "No SMBus found on this robot device."
+            isSMBusAvailable = False
 
-        # Clear display, if available
-        if self._isDisplayAvailable:
+        # I2C analog extender chip
+        if isSMBusAvailable:
+            Tools.debug("Trying to detect PCF8591P I2C expander")
+            channel = 0
             try:
-                self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
-                self._bus.write_byte_data(addr, 0x01, 0x00) # Set all of bank 1 to outputs
-                self._bus.write_byte_data(addr, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
+                self._bus.write_byte(SharedConstants.ADC_I2C_ADDRESS, channel)
+                self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS) # ignore reply
+                data = self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS)
+                Tools.debug("Found PCF8591P I2C expander")
             except:
-                print "No 7-segment display found on this robot device."
-                self._isDisplayAvailable = False
+                Tools.debug("PCF8591P I2C expander not found")
+
+        Tools.debug("Trying to detect 7-segment display")
+        if isSMBusAvailable:
+            self.displayType = "none"
+            try:
+                addr = 0x20
+                self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
+                Tools.delay(100)
+                self.displayType = "4tronix"
+            except:
+                Tools.debug("'4tronix' display not found")
+            if self.displayType == "none":
+                try:
+                    addr = 0x24
+                    data = [0] * 4
+                    self._bus.write_i2c_block_data(addr, data[0], data[1:])  # trying to clear display
+                    self.displayType = "didel"
+                except:
+                    Tools.debug("'didel' display not found")
+
+            Tools.debug("Display type '" + self.displayType + "'")
+
+            # Initializing (clear) display, if available
+            if self.displayType == "4tronix":
+                Disp4tronix().clear()
+            if self.displayType == "didel":
+                DgTell().clear()
 
         GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
         # Establish event recognition from button event
@@ -224,6 +291,7 @@ class MyRobot(object):
             self.sensorThread = SensorThread()
             self.sensorThread.start()
         self.sensorThread.add(sensor)
+
 
     def exit(self):
         """
@@ -250,6 +318,7 @@ class MyRobot(object):
             display.clear()
 
         Led.clearAll()
+        MyRobot.closeSound()
 
         if self.sensorThread != None:
             self.sensorThread.stop()
@@ -312,13 +381,31 @@ class MyRobot(object):
         '''
         pass
 
-    def addButtonListener(self, listener):
+    def addButtonListener(self, listener, enableClick = False,
+                          doubleClickTime = SharedConstants.BUTTON_DOUBLECLICK_TIME):
         '''
-        Registers a listener function to get notifications when the pushbutton is pressed or released.
-        @param listener: the listener function (with boolean parameter isPressed) to register.
+        Registers a listener function to get notifications when the pushbutton is pressed, released or long pressed.
+        If enableClick = True, in addition click and double-click events are reported. The click event not immediately
+        reported, but only if within the doubleClickTime no other click is gererated.
+        The value are defined as ShareConstants.BUTTON_PRESSED, ShareConstants.BUTTON_LONGPRESSED, ShareConstants.BUTTON_RELEASED,
+        ShareConstants.BUTTON_CLICKED, ShareConstants.BUTTON_DOUBLECLICKED.
+        With enableClick = False and the button is long pressed and released the sequence is: BUTTON_PRESSED, BUTTON_LONGPRESSED, BUTTON_RELEASED.
+        With enableClick = True the sequences are the following:
+        click: BUTTON_PRESSED, BUTTON_RELEASED, BUTTON_CLICKED
+        double-click: BUTTON_PRESSED, BUTTON_RELEASED, BUTTON_PRESSED, BUTTON_RELEASED, BUTTON_DOUBLECLICKED
+        long pressed: BUTTON_PRESSED, BUTTON_LONGPRESSED,  BUTTON_RELEASED
+        @param listener: the listener function (with boolean parameter event) to register.
+        @param enableClick: if True, the click/double-click is also registered (default: False)
+        @param doubleClickTime: the time (in seconds) to wait for a double click (default: set in SharedContants)
         '''
-        global _buttonListener
-        _buttonListener = listener
+        if enableClick:
+            global _xButtonListener, _doubleClickTime
+            _doubleClickTime = doubleClickTime
+            self.addButtonListener(_onXButtonEvent)
+            _xButtonListener = listener
+        else:
+            global _buttonListener
+            _buttonListener = listener
 
     def setButtonEnabled(self, enable):
         '''
@@ -357,7 +444,7 @@ class MyRobot(object):
     def setSoundVolume(volume):
         '''
         Sets the sound volume. Value is kept when the program exits.
-        @param volume: the volume in percent
+        @param volume: the sound volume (0..100)
         '''
         os.system("amixer sset PCM,0 " + str(volume)+ "%  >/dev/null")
 
@@ -385,19 +472,50 @@ class MyRobot(object):
     @staticmethod
     def initSound(soundFile, volume):
         '''
-        Prepares the given wav or mp3 sound file for playing with given volume (0..100).
+        Prepares the given wav or mp3 sound file for playing with given volume (0..100). The sound
+        sound channel is opened and a background noise is emitted.
+        @param soundFile: the sound file in the local file system
+        @volume: the sound volume (0..100)
+        @returns: True, if successful; False if the sound system is not available or the sound file
+        cannot be loaded
         '''
-        pygame.mixer.init()
-        pygame.mixer.music.load(soundFile)
-        pygame.mixer.music.set_volume(volume)
+        try:
+            pygame.mixer.init()
+        except:
+            # print "Error while initializing sound system"
+            return False
+        try:
+            pygame.mixer.music.load(soundFile)
+        except:
+            pygame.mixer.quit()
+            # print "Error while loading sound file", soundFile
+            return False
+        try:
+            pygame.mixer.music.set_volume(volume / 100.0)
+        except:
+            return False
+        return True
 
+    @staticmethod
+    def closeSound():
+        '''
+        Stops any playing sound and closes the sound channel.
+        '''
+        try:
+            pygame.mixer.stop()
+            pygame.mixer.quit()
+        except:
+            pass
 
     @staticmethod
     def playSound():
         '''
         Starts playing.
         '''
-        pygame.mixer.music.play()
+        try:
+            pygame.mixer.music.play()
+        except:
+            pass
 
     @staticmethod
     def fadeoutSound(time):
@@ -405,40 +523,88 @@ class MyRobot(object):
         Decreases the volume slowly and stops playing.
         @param time: the fade out time in ms
         '''
-        pygame.mixer.music.fadeout(time)
+        try:
+            pygame.mixer.music.fadeout(time)
+        except:
+            pass
+
+    @staticmethod
+    def setSoundVolume(volume):
+        '''
+        Sets the volume while the sound is playing.
+        @param volume: the sound volume (0..100)
+        '''
+        try:
+            pygame.mixer.music.set_volume(volume / 100.0)
+        except:
+            pass
 
     @staticmethod
     def stopSound():
         '''
         Stops playing sound.
         '''
-        pygame.mixer.music.stop()
+        try:
+            pygame.mixer.music.stop()
+        except:
+            pass
 
     @staticmethod
     def pauseSound():
         '''
         Temporarily stops playing at current position.
         '''
-        pygame.mixer.music.pause()
+        try:
+            pygame.mixer.music.pause()
+        except:
+            pass
 
     @staticmethod
     def resumeSound():
         '''
         Resumes playing from stop position.
         '''
-        pygame.mixer.music.unpause()
+        try:
+            pygame.mixer.music.unpause()
+        except:
+            pass
 
     @staticmethod
     def rewindSound():
         '''
         Resumes playing from the beginning.
         '''
-        pygame.mixer.music.rewind()
+        try:
+            pygame.mixer.music.rewind()
+        except:
+            pass
 
     @staticmethod
     def isSoundPlaying():
         '''
         @return: True, if the sound is playing; otherwise False
         '''
-        return pygame.mixer.music.get_busy()
+        try:
+            return pygame.mixer.music.get_busy()
+        except:
+            return False
 
+# --------------------------- class ButtonThread ------------
+class ButtonThread(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.isRunning = False
+
+    def run(self):
+        Tools.debug("===>ButtonThread started")
+        self.isRunning = True
+        startTime = time.time()
+        while self.isRunning and (time.time() - startTime < SharedConstants.BUTTON_LONGPRESS_DURATION):
+            time.sleep(0.1)
+        if self.isRunning:
+            if _buttonListener != None:
+                _buttonListener(SharedConstants.BUTTON_LONGPRESSED)
+        Tools.debug("===>ButtonThread terminated")
+
+    def stop(self):
+        self.isRunning = False

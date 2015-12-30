@@ -28,10 +28,15 @@ V1.17 - Oct 2015: - Modified: Timeout to receive echo in ultrasonic sensor
 V1.18 - Oct 2015: - Fixed: Gear.leftArc(), rightArc() now work with changing radius
 V1.19 - Oct 2015: - Added: Led.setColor(), setColorAll() with X11-color string
 V1.20 - Oct 2015: - Modifications to RaspiJLib
+V1.21 - Oct 2015: - Added: ButtonListener with long press event
+V1.22 - Nov 2015: - Added: Class DgTell, Button click and double-click events
+V1.23 - Dec 2015: - Added: Selecting up to 9 autonomous Python programs
+V1.24 - Dec 2015: - Modified: Shutdown confirmation with button press event
+V1.25 - Dec 2015: - Modified: Decimal point display for DgTell
 '''
 
-VERSION = "1.20 - Oct 2015"
-DISPLAYED_VERSION = "120" # displayed n.nn
+VERSION = "1.25 - Dec 2015"
+DISPLAYED_VERSION = "125"  # displayed n.nn
 
 DEBUG = False
 
@@ -86,6 +91,9 @@ LED_RIGHT = 3
 # LED and Servo PWM frequency
 PWM_FREQ = 50
 
+# ADC I2C address
+ADC_I2C_ADDRESS = 0x48
+
 # Light sensor IDs
 LS_FRONT_LEFT = 0
 LS_FRONT_RIGHT = 1
@@ -110,16 +118,31 @@ GEAR_DEFAULT_SPEED = 30
 GEAR_FORWARD_SPEED_DIFF = 0.5
 GEAR_BACKWARD_SPEED_DIFF = 0.5
 
+# Button event constants
 BUTTON_PRESSED = 1
 BUTTON_RELEASED = 2
 BUTTON_LONGPRESSED = 3
-BUTTON_LONGPRESS_DURATION = 10 # time (in 200 ms units) the button must be pressed to be a long press
+BUTTON_CLICKED = 4
+BUTTON_DOUBLECLICKED = 5
+BUTTON_LONGPRESS_DURATION = 2 # time (in s) the button must be pressed to be a long press
+BUTTON_DOUBLECLICK_TIME = 1 # default time (in s) to wait for a double click event
 
 # Character to binary value mapping for 4 digit 7 segment display
-PATTERN = {'A':119, 'b':124, 'C':57, 'd':94, 'E':121, 'F':113,
-            '0':63, '1':6, '2':91, '3':79, '4':102, '5':109, '6':125, '7':7, '8':127, '9':111,
-           '-':64, 'c':88, 'O':63, 'C':57, 'H':118,'I':48, 'J':30,'L':56, 't':120, 'U':62, 'u':28, 'r':80, 'P':115,
-           'n':84, 'o':92, 'i':16, 'Y':110, ' ':0, '|':73, '=':72, '%':54}
+PATTERN = {' ': 0, '!': 134, '"': 34, '#': 0, '$': 0, '%': 0, '&': 0, '\'':  2, '(': 0, ')': 0,
+           '*': 0, '+': 0, ',': 4, '-': 64, '.': 128, '/': 82, '0': 63, '1': 6, '2': 91, '3': 79,
+           '4': 102, '5': 109, '6': 125, '7': 7, '8': 127, '9': 111, ':': 0, ';': 0, '<': 0,
+           '=': 72, '>': 0, '?': 0, '@': 93, 'A': 119, 'B': 124, 'C': 88, 'D': 94, 'E': 121,
+           'F': 113, 'G': 61, 'H': 118, 'I': 48, 'J': 14, 'K': 112, 'L': 56, 'M': 85, 'N': 84,
+           'O': 63, 'P': 115, 'Q': 103, 'R': 80, 'S': 45, 'T': 120, 'U': 62, 'V': 54, 'W': 106,
+           'X': 73, 'Y': 110, 'Z': 27, '[': 57, '\\':  100, ']': 15, '^': 35, '_': 8, '`': 32,
+           'a': 119, 'b': 124, 'c': 88, 'd': 94, 'e': 121, 'f': 113, 'g': 61, 'h': 116, 'i': 16,
+           'j': 12, 'k': 112, 'l': 48, 'm': 85, 'n': 84, 'o': 92, 'p': 115, 'q': 103, 'r': 80, 's': 45,
+           't': 120, 'u': 28, 'v': 54, 'w': 106, 'x': 73, 'y': 110, 'z': 27, '{': 0, '|': 48, '}': 0, '~': 65}
+
+# Config file to store last program name
+CONFIG_FILE = "/home/pi/scripts/raspibrick.cfg"
+# Path of execution app
+APP_PATH = "/home/pi/scripts/MyApp"
 
 # Event poll delay (ms)
 POLL_DELAY = 50

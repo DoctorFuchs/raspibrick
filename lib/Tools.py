@@ -23,7 +23,7 @@ class Tools():
     @staticmethod
     def debug(text):
         if SharedConstants.DEBUG:
-            print text
+            print "Tools debug->", text
 
     @staticmethod
     def delay(interval):
