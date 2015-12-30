@@ -2,14 +2,20 @@
 
 from raspibrick import *
 
-robot = Robot("192.168.0.2")
+print "Displayable:", Disp4tronix.getDisplayableChars()
+robot = Robot()
 display = Display()
-display.setText("1234")
-Tools.delay(4000)
-display.setText("1133", [0, 1, 1])
-Tools.delay(3000)
-display.setText(2244, [0, 1, 1])
-Tools.delay(3000)
-display.setText("0123456", [0, 0, 0])
-Tools.delay(5000)
+k = 32
+
+while k < 128:
+    print "<cr> or x<cr> to terminate",
+    text = raw_input()	# Fetch the input from the terminal
+    if text == "x":
+        break
+    s = chr(k) + chr(k+1) + chr(k+2) + chr(k+3)
+    print k, s
+    display.showText(s)
+    k += 4
+
 robot.exit()
+print "All done"

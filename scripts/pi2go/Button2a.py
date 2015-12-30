@@ -16,3 +16,4 @@ while not isEscapeHit():
     elif isRightHit():
         print "right"
 robot.exit()
+print "All done"

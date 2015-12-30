@@ -12,3 +12,4 @@ Tools.delay(3000)
 Led.setColorAll(128, 128, 128)
 Tools.delay(3000)
 robot.exit()
+print "All done"

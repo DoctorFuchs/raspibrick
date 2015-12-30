@@ -4,5 +4,7 @@ from raspibrick import *
 
 robot = Robot()
 mot = Motor(MOTOR_RIGHT)
-mot.forward(3000)
+mot.forward()
+Tools.delay(3000)
 robot.exit()
+print "All done"

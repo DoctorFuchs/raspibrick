@@ -1,18 +1,21 @@
 # Display3.py
+# Scroll text to left
 
 from raspibrick import *
+import time
 
 robot = Robot()
-display = Display()
-display.setScrollableText("123-456-789-AbC")
-while not isEscapeHit():
-    Tools.delay(700)
-    rc = display.scrollToLeft()
-    print rc
-    if rc == 4:
-        Tools.delay(1500)
-        display.setText("")
-        Tools.delay(1500)
-        display.setToStart()
-Tools.delay(2000)
+dp = Display()
+text = "0123456789"
+print "show text with", text
+#rc = dT.showText(text)
+#rc = dT.showText(text, 2)
+rc = dp.showText(text, pos = -2)
+time.sleep(3)
+for i in range(10):
+    nb = dp.scrollToLeft()
+    print "remaining:", nb
+    time.sleep(2)
 robot.exit()
+print "done"
+

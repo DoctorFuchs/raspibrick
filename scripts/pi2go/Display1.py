@@ -2,9 +2,19 @@
 
 from raspibrick import *
 
-robot = Robot("192.168.0.2")
+robot = Robot()
 display = Display()
-for digit in range(4):
-    display.setDigit("A", digit)
-    Tools.delay(1000)
+display.showText("1234")
+Tools.delay(3000)
+display.showText("1234567890")
+Tools.delay(3000)
+display.showText("1234567890", pos = 2)
+Tools.delay(3000)
+display.showText("1234567890", pos = -2)
+Tools.delay(3000)
+display.showText("1234567890", pos = 1, dp = [1, 1, 0, 0])
+Tools.delay(3000)
+display.showText("1234567890", pos = 1, dp = [0, 1])
+Tools.delay(3000)
 robot.exit()
+print "All done"

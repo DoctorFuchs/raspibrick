@@ -8,3 +8,4 @@ gear.forward()
 while not isEscapeHit():
     continue
 robot.exit()
+print "All done"

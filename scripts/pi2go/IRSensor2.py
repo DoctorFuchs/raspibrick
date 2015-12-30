@@ -13,3 +13,4 @@ while not isEscapeHit():
         gear.backward(2000)
         gear.forward()
 robot.exit()
+print "All done"
