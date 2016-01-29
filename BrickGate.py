@@ -184,7 +184,7 @@ class SocketHandler(Thread):
                 if not device in devices:
                     reply = Reply.DEVICE_NOT_CREATED
                 else:
-                    reply = evaluate(device, method, param1, param2, param3)
+                    reply = evaluate(device, method, param1, param2, param3, param4, param5)
 
         elif device == "display":
             reply = dispatchDisplay(device, method, param1, param2, param3, param4, param5)
@@ -235,7 +235,7 @@ class SocketHandler(Thread):
                         if not device in devices:
                             reply = Reply.DEVICE_NOT_CREATED
                         else:
-                            reply = evaluate(device, method, param1, param2, param3)
+                            reply = evaluate(device, method, param1, param2, param3, param4, param5)
 
 
         # ------------------- illegal device ----------------------------
@@ -312,7 +312,7 @@ def dispatchDisplay(device, method, param1, param2, param3, param4, param5):
                 reply = Reply.NO_SUCH_METHOD
     return reply
 
-def evaluate(device, method, param1, param2, param3):
+def evaluate(device, method, param1, param2, param3, param4, param5):
     dev = devices[device]  # Get device reference
     rc = None
     if param1 == "n":
@@ -321,13 +321,21 @@ def evaluate(device, method, param1, param2, param3):
         stm = "dev." + method + "(" + param1 + ")"
     elif param3 == "n":
         stm = "dev." + method + "(" + param1 + ", " + param2 + ")"
-    else:
+    elif param4 == "n":
         if method == "captureAndSave":
             param3 = "'" + param3 + "'"   # String parameter
         stm = "dev." + method + "(" + param1 + ", " + param2 + ", " + param3 + ")"
+    elif param5 == "n":
+        stm = "dev." + method + "(" + param1 + ", " + param2 + ", " + param3 + ", " + param4 + ")"
+    else:
+        if method == "startBlinker":
+            param1 = "'" + param1 + "'"   # String parameter
+            param2 = "'" + param2 + "'"   # String parameter
+        stm = "dev." + method + "(" + param1 + ", " + param2 + ", " + param3 + ", " + param4 + ", " + param5 + ")"
     debug("Statement: " + stm)
     try:
         rc = eval(stm)
+        debug("eval() returned: " +  str(rc))
     except:
         debug("eval() failed")
         return Reply.METHOD_EVAL_FAILED

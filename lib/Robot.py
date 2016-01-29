@@ -22,6 +22,7 @@ from Tools import Tools
 import SharedConstants
 from Display import Display
 from DgTell import DgTell
+from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
 from SensorThread import SensorThread
 from Led import Led
@@ -31,6 +32,26 @@ from subprocess import Popen, PIPE
 import re
 import smbus
 import pygame
+
+# --------------------------- class ButtonThread ------------
+class ButtonThread(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.isRunning = False
+
+    def run(self):
+        Tools.debug("===>ButtonThread started")
+        self.isRunning = True
+        startTime = time.time()
+        while self.isRunning and (time.time() - startTime < SharedConstants.BUTTON_LONGPRESS_DURATION):
+            time.sleep(0.1)
+        if self.isRunning:
+            if _buttonListener != None:
+                _buttonListener(SharedConstants.BUTTON_LONGPRESSED)
+        Tools.debug("===>ButtonThread terminated")
+
+    def stop(self):
+        self.isRunning = False
 
 # --------------------------- class ClickThread -------------
 class ClickThread(Thread):
@@ -256,19 +277,29 @@ class MyRobot(object):
             self.displayType = "none"
             try:
                 addr = 0x20
-                self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
+                rc = self._bus.read_byte_data(addr, 0)
+                if rc != 0xA0:   # returns 255 for 4tronix
+                    raise Exception()
                 Tools.delay(100)
-                self.displayType = "4tronix"
+                self.displayType = "didel1"
             except:
-                Tools.debug("'4tronix' display not found")
+                Tools.debug("'didel1' display not found")
             if self.displayType == "none":
                 try:
-                    addr = 0x24
-                    data = [0] * 4
-                    self._bus.write_i2c_block_data(addr, data[0], data[1:])  # trying to clear display
-                    self.displayType = "didel"
+                    addr = 0x20
+                    self._bus.write_byte_data(addr, 0x00, 0x00) # Set all of bank 0 to outputs
+                    Tools.delay(100)
+                    self.displayType = "4tronix"
                 except:
-                    Tools.debug("'didel' display not found")
+                    Tools.debug("'4tronix' display not found")
+                if self.displayType == "none":
+                    try:
+                        addr = 0x24
+                        data = [0] * 4
+                        self._bus.write_i2c_block_data(addr, data[0], data[1:])  # trying to clear display
+                        self.displayType = "didel"
+                    except:
+                        Tools.debug("'didel' display not found")
 
             Tools.debug("Display type '" + self.displayType + "'")
 
@@ -277,6 +308,8 @@ class MyRobot(object):
                 Disp4tronix().clear()
             if self.displayType == "didel":
                 DgTell().clear()
+            if self.displayType == "didel1":
+                DgTell1().clear()
 
         GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
         # Establish event recognition from button event
@@ -589,22 +622,3 @@ class MyRobot(object):
         except:
             return False
 
-# --------------------------- class ButtonThread ------------
-class ButtonThread(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.isRunning = False
-
-    def run(self):
-        Tools.debug("===>ButtonThread started")
-        self.isRunning = True
-        startTime = time.time()
-        while self.isRunning and (time.time() - startTime < SharedConstants.BUTTON_LONGPRESS_DURATION):
-            time.sleep(0.1)
-        if self.isRunning:
-            if _buttonListener != None:
-                _buttonListener(SharedConstants.BUTTON_LONGPRESSED)
-        Tools.debug("===>ButtonThread terminated")
-
-    def stop(self):
-        self.isRunning = False

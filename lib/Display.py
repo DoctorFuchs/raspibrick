@@ -30,6 +30,7 @@ The decimal points use value 128 with digit 1, 2 or 3
 
 from Disp4tronix import Disp4tronix
 from DgTell import DgTell
+from DgTell1 import DgTell1
 from RobotInstance import RobotInstance
 from Tools import *
 
@@ -49,16 +50,21 @@ class Display():
         '''
         self._checkRobot()
         robot = RobotInstance.getRobot()
+        self.text = ""
+        self.pos = 0
+        self.dp = [0, 0, 0, 0]
         if robot.displayType == "4tronix":
             Display._myInstance = Disp4tronix()
             self.available = True
         elif robot.displayType == "didel":
             Display._myInstance = DgTell()
             self.available = True
+        elif robot.displayType == "didel1":
+            Display._myInstance = DgTell1()
+            self.available = True
         else:
             self.available = False
-        if not self.available:
-            return
+
 
     def clear(self):
         '''
@@ -78,10 +84,10 @@ class Display():
         showText("AbCdEF", 1) -> bCdE
         showText("AbCdEF", -1) ->_AbC
         showText("AbCdEF", 4) -> EF__
-        To display a character and its decimal point, use the dp parameter [most right dp,...,most left dp] and
-        set the decimal point values to 1. Because the 4tronix display is multiplexed (one digit shown after
-        the other, a display thread is started now to display all 4 digits in a rapid succession
-        (if it is not yet started).
+        Because the 4tronix display is multiplexed (one digit shown after the other),
+        a display thread is started now to display all 4 digits in a rapid succession (if it is not yet started).
+        The parameters are saved and compared to the values at the next invocation. If all are identical, the function returns
+        immediately.
         @param text: the text to display (list, tuple, string or integer)
         @param pos: the start value of the text pointer (character index positioned a leftmost digit)
         @param dp: a list with one to four 1 or 0, if the decimal point is shown or not.
@@ -95,6 +101,11 @@ class Display():
         '''
         if not self.available:
             return
+        if text == self.text and pos == self.pos and cmp(dp, self.dp) == 0:
+            return
+        self.text = text
+        self.pos = pos
+        self.dp = dp
         self._checkRobot()
         if type(pos) != int:
             pos = 0

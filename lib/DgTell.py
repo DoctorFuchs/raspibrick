@@ -201,7 +201,7 @@ class DgTell():
     def writeData(self, data):
         '''
         Sends data bytes to the display (without using any register).
-        @param data list or tutple of integers whose lower byte are used (higer bytes
+        @param data list or tuple of integers whose lower byte are used (higher bytes
         are ignored).
         '''
         if not self._isReady:
@@ -272,12 +272,10 @@ class DgTell():
         showText("AbCdEF", 1) -> bCdE
         showText("AbCdEF", -1) ->_AbC
         showText("AbCdEF", 4) -> EF__
-        To display a character and its decimal point, use the dp parameter [most right dp,...,most left dp] and
-        set the decimal point values to 1.
         @param text: the text to display (list, tuple, string or integer)
         @param pos: the start value of the text pointer (character index positioned a leftmost digit)
         @param dp: a list with one to four 1 or 0, if the decimal point is shown or not. For compatibility with
-        the 4tronix display the following mapping is used:
+        the 4tronix display, the following mapping is used:
         The first element in list corresponds to dp at second digit from the right, the second element to dp
         at third digit from the right, the third element to dp at leftmost digit, the forth element to the dp at
         rightmost digit.  More than 4 elements are ignored
@@ -296,7 +294,6 @@ class DgTell():
         dpList = [0] * 4
         for i in range(min(4, len(dp))):
               dpList[i] = dp[i]
-        print dpList
         self._decimalPoint = [0] * 4
         self._decimalPoint[0] = dpList[2]
         self._decimalPoint[1] = dpList[1]
@@ -559,13 +556,13 @@ class BlinkerThread(Thread):
             startTime = time.time()
             while time.time() - startTime < self._period / 1000.0 and self._isRunning:
                 DgTell.delay(1)
-            if self._isRunning == False:
+            if not self._isRunning:
                 break
             self._display.clear()
             startTime = time.time()
             while time.time() - startTime < self._period / 1000.0 and self._isRunning:
                 DgTell.delay(1)
-            if self._isRunning == False:
+            if not self._isRunning:
                 break
             nb += 1
             if nb == self._count:

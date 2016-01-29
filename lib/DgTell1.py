@@ -1,10 +1,8 @@
-# Disp4tronix.py
-# Inspired from ipd03.py from 4tronix, with thanks to the author
+# DgTell1.py
 
 '''
-Class that represents a 7-segment display from 4tronix attached to the I2C port.
+Class that represents VERSION 1 of 4 digit 7-segment display DgTelli2C from Didel (http://www.didel.com)
 
- 
  This software is part of the raspibrick module.
  It is Open Source Free Software, so you may
  - run the code for any purpose
@@ -13,9 +11,23 @@ Class that represents a 7-segment display from 4tronix attached to the I2C port.
  - redistribute copies of the code777
  - improve the code and release your improvements to the public
  However the use of the code is entirely your responsibility.
+ '''
 
+from smbus import *
+import RPi.GPIO as GPIO
+from threading import Thread
+import time
 
-The 7 segments have the following binary values
+# ------------------- class DgTell1 ----------------------
+class DgTell1():
+    '''
+    Abstraction of the 4 digit 7-segment display DgTelli2C from Didel (http://www.didel.com) attached to the I2C port.
+    If no display is found, all display methods return immediately. The static variable SharedConstants.PATTERN defines a dictionary
+    that maps ASCII characters to display patterns and can be modified by the user program.
+
+    Default:
+
+    The 7 segments have the following binary weights
            1
            -
      32 |     |2
@@ -26,32 +38,15 @@ The 7 segments have the following binary values
            -
            8
 
-The decimal points use value 128 with digit 1, 2 or 3
+   The decimal points has weight 128.
 
-The digigs are multiplexed (refreshed one after the other). So some flickering
-may happen when the CPU is highly loaded.
-'''
-
-from smbus import *
-import RPi.GPIO as GPIO
-from Tools import *
-from threading import Thread
-
-# ------------------------   Class Display  -------------------------------------------
-class Disp4tronix():
     '''
-    Abstraction of the 4 digit 7-segment display from 4tronix attached to the I2C port.
-    If no display is found, all methods return immediately. Be aware that the display
-    is multiplexed by an internal display thread. So while a text is displayed the thread is
-    running and the program will not terminate. Call clear() to terminate the display thread.
-    '''
+
     DEBUG = False
     VERSION = "1.00"
-    i2c_address = 0x20
     _myInstance = None
 
-    '''pi
-
+    '''
     Character to binary value mapping for 4 digit 7 segment display
     '''
     PATTERN = {' ': 0, '!': 134, '"': 34, '#': 0, '$': 0, '%': 0, '&': 0, '\'':  2, '(': 0, ')': 0,
@@ -65,7 +60,31 @@ class Disp4tronix():
            'j': 12, 'k': 112, 'l': 48, 'm': 85, 'n': 84, 'o': 92, 'p': 115, 'q': 103, 'r': 80, 's': 45,
            't': 120, 'u': 28, 'v': 54, 'w': 106, 'x': 73, 'y': 110, 'z': 27, '{': 0, '|': 48, '}': 0, '~': 65}
 
-# -------------------- Static methods ---------------------
+    # ----------------------- static methods ---------------------
+    @staticmethod
+    def debug(msg):
+        if DgTell1.DEBUG:
+            print "DgTell1 debug->", msg
+
+    @staticmethod
+    def getVersion():
+        return DgTell1.VERSION
+
+    @staticmethod
+    def getDisplayableChars():
+        '''
+        Returns a string with all displayable characters taken from PATTERN dictionary.
+        @return: The character set that can be displayed
+        '''
+        s = "<SPACE>"
+        k = 33
+        while k < 127:
+            ch = chr(k)
+            if DgTell1.PATTERN[ch] != 0:
+                s = s + ch
+            k += 1
+        return  s
+
     @staticmethod
     def toHex(intValue):
         '''
@@ -98,139 +117,84 @@ class Disp4tronix():
         return int(hexValue, 16)
 
     @staticmethod
-    def debug(msg):
-        if Disp4tronix.DEBUG:
-            print "Disp4tronix debug->", msg
+    def delay(timeout):
+        time.sleep(timeout / 1000.0)
 
-    @staticmethod
-    def getVersion():
-        return Disp4tronix.VERSION
-
-    @staticmethod
-    def getDisplayableChars():
+    # ----------------------- Constructor ------------------------
+    def __init__(self, i2c_address = 0x20):
         '''
-        Returns a string with all displayable characters taken from PATTERN dictionary.
-        @return: The character set that can be displayed
+        Creates a display instance with display set to given i2c address (default: 0x20).
+        Then the display is cleared.
+        @param i2c_address: the i2c address (default: 0x20)
         '''
-        s = "<SPACE>"
-        k = 33
-        while k < 127:
-            ch = chr(k)
-            if Disp4tronix.PATTERN[ch] != 0:
-                s = s + ch
-            k += 1
-        return  s
-
-    @staticmethod
-    def delay(interval):
-        time.sleep(interval / 1000.0)
-
-    # -------------------- Ctor --------------------------------
-    def __init__(self):
+        self.i2c_address = i2c_address
         self._bus = None
-        self._displayThread = None
+        self._isReady = True
         self._tickerThread = None
         self._blinkerThread = None
+
         try:
             if GPIO.RPI_REVISION > 1:
                 self._bus = SMBus(1) # For revision 2 Raspberry Pi
-                Disp4tronix.debug("I2C at bus 1 detected")
+                DgTell1.debug("I2C at bus 1 detected")
             else:
                 self._bus = SMBus(0) # For revision 1 Raspberry Pi
-                Disp4tronix.debug("I2C at bus 0 detected")
+                DgTell1.debug("I2C at bus 0 detected")
         except:
-            Disp4tronix.debug("Failed to detect I2C bus.")
+            DgTell1.debug("Failed to detect I2C bus.")
 
-        if self._bus != None:
-            self._bus.write_byte_data(Disp4tronix.i2c_address, 0x00, 0x00) # Set all of bank 0 to outputs
-            self._bus.write_byte_data(Disp4tronix.i2c_address, 0x01, 0x00) # Set all of bank 1 to outputs
-            self._bus.write_byte_data(Disp4tronix.i2c_address, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
+        if self._isReady:
             self._startPos = -1  # no text yet
-        Disp4tronix._myInstance = self
-        Disp4tronix.debug("Disp4tronix instance created")
+            self.clear()
+        DgTell1._myInstance = self
 
-    def setDigit(self, char, digit):
+    # ----------------------- Methods ----------------------
+
+    def writeData(self, data):
         '''
-        Shows the given character at one of the 4 7-segment digits. The character is mapped to
-        its binary value using the PATTERN dictionary defined in PATTERN dictonary.
-        Only one digit can be used at the same time. This method has much less overhead than calling
-        setValue(), because no internal display thread is started. The display remains active even when the program
-        terminates.
-        @param char: the character to display, can be an int 0..9
-        @param digit: the display ID (0 is leftmost, 3 is rightmost)
-        @return: True, if successful; False, if the character is not displayable
-            or digit not in 0..3
+        Sends 4 data bytes to the display
+        @param data list or tuple of integers whose lower byte are used (higher bytes
+        are ignored).
         '''
-        if self._bus == None:
-            return False
-        if digit < 0 or digit > 3:
-            return False
+        if not self._isReady:
+            return
+        if not (type(data) == list or type(data) == tuple)  or len(data) != 4:
+            raise Exception("Error in DgTell1.writeData():\nWrong parameter type.")
+        for v in data:
+            if not (type(v) == int):
+                raise Exception("Error in DgTell1.writeData():\nWrong parameter type.")
         try:
-            if type(char) == int:
-                v = Disp4tronix.PATTERN[str(char)]
-            else:
-                v = Disp4tronix.PATTERN[char]
-        except:
-            v = 0
-        return self.setBinary(v, digit)
-
-    def setBinary(self, value, digit):
-        '''
-        Shows the pattern of the binary value 0..255.
-        @param value: the byte value
-        @param digit: the display ID (0 is leftmost, 3 is rightmost)
-        @return: True, if successful; False, if value not in 0..255 or digit not in 0..3
-        '''
-        if self._bus == None:
-            return False
-        if value < 0 or value > 255:
-            return False
-        if digit < 0 or digit > 3:
-            return False
-        t = (1 << (3 - digit)) ^ 255
-        self._bus.write_byte_data(Disp4tronix.i2c_address, 0x13, t) # Set bank 1 pos to low
-        self._bus.write_byte_data(Disp4tronix.i2c_address, 0x12, value) # Set bank 0 to digit
-        return True
-
-    def setDecimalPoint(self, id):
-        '''
-        Shows one of the 3 decimal points.
-        @param id: select the DP to show: 0: right bottom, 1: middle bottom, 2: middle top
-        @return: True, if successful; False, if id not in 0..2
-        '''
-        if self._bus == None:
-            return False
-        if id < 0 or id > 2:
-            return False
-        self.setBinary(128, 2 - id)
-        return True
-
-    def clearDigit(self, digit):
-        '''
-        Clears the given digit.
-        @param digit: the display ID (0 is right most, 3 is left most)
-        @return: True, if successful; False, if digit not in 0..3
-        '''
-        if self._bus == None:
-            return False
-        if digit < 0 or digit > 3:
-            return False
-        self.setDigit(' ', digit)
-        return True
+            cmd = 1 # Segment mode
+            DgTell1.debug("bus.write_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(data) + ")")
+            self._bus.write_block_data(self.i2c_address, cmd, data)
+        except IOError, err:
+            raise Exception("DgTell1.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
 
     def clear(self):
         '''
-        Turns all digits off. Stops a running display thread. To clear all digits
-        without terminating the display thread, call showText("    ").
+        Clears the display (all digits are turned off).
         '''
-        if self._bus == None:
+        DgTell1.debug("Calling clear()")
+        if not self._isReady:
             return
-        if self._displayThread != None:
-            self._displayThread.stop()
-            self._displayThread = None
-        self._bus.write_byte_data(Disp4tronix.i2c_address, 0x13, 0xff) # Set all of bank 1 to high (all digits off)
+        self.writeData([0, 0, 0, 0])
 
-    def showText(self, text, pos = 0, dp = [0, 0, 0]):
+    def showTwoBytes(self, high, low):
+        '''
+        Displays the two bytes (0..255) at low and high position.
+        @param low: integer 0..255 shown at right position
+        @param high: integer 0..255 shown at left position
+        '''
+        if not self._isReady:
+            return
+        try:
+            cmd = 3 # Hex mode
+            DgTell1.debug("bus.write_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(high) + "," + str(low) + ")")
+            self._bus.write_block_data(self.i2c_address, cmd, [high, low])
+        except IOError, err:
+            raise Exception("DgTell1.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
+
+    def showText(self, text, pos = 0, dp = [0, 0, 0, 0]):
         '''
         Displays 4 characters of the given text. The text is considered to be prefixed and postfixed by spaces
         and the 4 character window is selected by the text pointer pos that determines the character displayed at the
@@ -239,17 +203,18 @@ class Disp4tronix():
         showText("AbCdEF", 1) -> bCdE
         showText("AbCdEF", -1) ->_AbC
         showText("AbCdEF", 4) -> EF__
-        If the display thread is not yet running, it is started now.
         @param text: the text to display (list, tuple, string or integer)
         @param pos: the start value of the text pointer (character index positioned a leftmost digit)
-        @param dp: a list with one to three 1 or 0, if the decimal point is shown or not. First element in list
-        corresponds to right dp, second to center floor dp, third to center ceil dp. More than 3 elements are
-        ignored
+        @param dp: a list with one to four 1 or 0, if the decimal point is shown or not. For compatibility with
+        the 4tronix display, the following mapping is used:
+        The first element in list corresponds to dp at second digit from the right, the second element to dp
+        at third digit from the right, the third element to dp at leftmost digit, the forth element to the dp at
+        rightmost digit.  More than 4 elements are ignored
         @return: True, if successful; False, if the display is not available,
         text or dp has illegal type or one of the characters can't be displayed
         '''
-        Disp4tronix.debug("showText(" + str(text) + "," + str(pos) + "," + str(dp) + ")")
-        if self._bus == None:
+        DgTell1.debug("showText(" + str(text) + "," + str(pos) + "," + str(dp) + ")")
+        if not self._isReady:
             return False
         if not (type(text) == int or type(text) == list or type(text) == tuple or type(text) == str):
             return False
@@ -257,17 +222,23 @@ class Disp4tronix():
             return False
         self._startPos = pos
         self._pos = pos
-        self._decimalPoint = [0] * 3
-        for i in range(len(dp)):
-            if i < 3:
-                self._decimalPoint[i] = dp[i]
-        self._text = str(text)  # convert digits to chars
-        self._data = self._getData(self._pos)
-        if self._displayThread == None:
-            self._displayThread = DisplayThread(self)
-            self._displayThread.start()
-            while not self._displayThread._isAlive:
-                Tools.delay(10)
+        dpList = [0] * 4
+        for i in range(min(4, len(dp))):
+              dpList[i] = dp[i]
+        self._decimalPoint = [0] * 4
+        self._decimalPoint[0] = dpList[2]
+        self._decimalPoint[1] = dpList[1]
+        self._decimalPoint[2] = dpList[0]
+        self._decimalPoint[3] = dpList[3]
+        text = str(text)  # convert digits to chars
+        self._text = [' '] * len(text)
+        for i in range(len(text)):
+            try:
+                self._text[i] = DgTell1.PATTERN[text[i]]
+            except:
+                self._text[i] = 0  # empty
+        data = self._getData(self._pos)
+        self.writeData(data)
         return True
 
     def scrollToLeft(self):
@@ -275,12 +246,13 @@ class Disp4tronix():
         Scrolls the current text one step to the left by increasing the text pointer.
         @return: the number of characters hidden, but remaining to be displayed at the right (>=0); -1, if error
         '''
-        if self._bus == None:
+        if not self._isReady:
             return -1
         if self._startPos == -1:  # no text yet
             return -1
         self._pos += 1
-        self._data = self._getData(self._pos)
+        data = self._getData(self._pos)
+        self.writeData(data)
         nb = len(self._text) - self._pos
         return max(0, nb)
 
@@ -289,14 +261,14 @@ class Disp4tronix():
         Scrolls the current text one step to the left by decreasing the text pointer.
         @return: the number of characters hidden, but remaining to be displayed at the left (>=0); -1, if error
         '''
-        if self._bus == None:
+        if not self._isReady:
             return -1
         if self._startPos == -1:  # no text yet
             return -1
         self._pos -= 1
         pos = self._pos
-        self._data = self._getData(self._pos)
-        nb = len(self._text) - self._pos
+        data = self._getData(self._pos)
+        self.writeData(data)
         return max(0, self._pos)
 
     def setToStart(self):
@@ -304,18 +276,18 @@ class Disp4tronix():
         Shows the scrollable text at the start position by setting the text pointer to its start value.
         @return: 0, if successful; -1, if error
         '''
-        if self._bus == None:
+        if not self._isReady:
             return -1
         if self._startPos == -1:  # no text yet
             return -1
         self._pos = self._startPos
-        self._data = self._getData(self._pos)
-        nb = len(self._text) - self._pos
+        data = self._getData(self._pos)
+        self.writeData(data)
         return 0
 
     def showTicker(self, text, count = 1, speed = 2, blocking = False):
         '''
-        Shows a ticker text that scroll to left until the last 4 characters are displayed. The method blocks
+        Shows a ticker text that scroll to the left until the last 4 characters are displayed. The method blocks
         until the ticker thread is successfully started and isTickerAlive() returns True.
         @param text: the text to display, if short than 4 characters, scrolling is disabled
         @param count: the number of repetitions (default: 1). For count = 0, infinite duration,
@@ -324,11 +296,13 @@ class Disp4tronix():
         @param blocking: if True, the method blocks until the ticker has finished; otherwise
          it returns immediately (default: False)
         '''
-        if self._bus == None:
+        if not self._isReady:
             return
         self.clear();
         if self._tickerThread != None:
             self.stopTicker()
+        if self._blinkerThread != None:
+            self.stopBlinker()
         self._tickerThread = TickerThread(self, text, count, speed)
         if blocking:
             while self.isTickerAlive():
@@ -339,7 +313,7 @@ class Disp4tronix():
         Stops a running ticker.
         The method blocks until the ticker thread is finished and isTickerAlive() returns False.
         '''
-        if self._bus == None:
+        if not self._isReady:
             return
         if self._tickerThread != None:
             self._tickerThread.stop()
@@ -349,9 +323,9 @@ class Disp4tronix():
         '''
         @return: True, if the ticker is displaying; otherwise False
         '''
-        if self._bus == None:
-            return
-        Tools.delay(1)
+        if not self._isReady:
+            return False
+        DgTell1.delay(1)
         if self._tickerThread == None:
             return False
         return self._tickerThread._isAlive
@@ -367,7 +341,7 @@ class Disp4tronix():
         @param blocking: if True, the method blocks until the blinker has finished; otherwise
          it returns immediately (default: False)
         '''
-        if self._bus == None:
+        if not self._isReady:
             return
         self.clear();
         if self._tickerThread != None:
@@ -384,7 +358,7 @@ class Disp4tronix():
         Stops a running blinker.
         The method blocks until the blinker thread is finished and isBlinkerAlive() returns False.
         '''
-        if self._bus == None:
+        if not self._isReady:
             return
         if self._blinerThread != None:
             self._blinkerThread.stop()
@@ -394,9 +368,9 @@ class Disp4tronix():
         '''
         @return: True, if the blinker is displaying; otherwise False
         '''
-        if self._bus == None:
+        if not self._isReady:
             return False
-        Disp4tronix.delay(1)
+        DgTell1.delay(1)
         if self._blinkerThread == None:
             return False
         return self._blinkerThread._isAlive
@@ -405,76 +379,36 @@ class Disp4tronix():
         '''
         Displays current version. Format X (three horz bars) + n.nn
         '''
-        v = "X" + Disp4tronix.VERSION.replace(".", "")
+        v = "X" + DgTell1.VERSION.replace(".", "")
         self.showText(v, pos = 0, dp = [0, 1])
 
     def isAvailable(self):
-        if self._bus != None:
-            return True
-        return False
+        '''
+        Check if device is available.
+        @return: True, if device can be accessed
+        '''
+        return self._isReady
 
-    # -------------------- private methods ----------------------------
+# -------------------- private methods ----------------------------
     def _getData(self, pos):
-        li = [0] * len(self._text)
-        for i in range(len(li)):
-            li[i] = self._text[i]
         if pos >= 0:
-            data = li[pos:pos + 4]
+            data = self._text[pos:pos + 4]
             for i in range(4 - len(data)):
-                data.append(' ') # spaces
+                data.append(0) # spaces
         else:
             if 4 + pos >= 0:
-                data = li[0:4 + pos]
+                data = self._text[0:4 + pos]
             else:
                 data = []
             data.reverse()
             for i in range(4 - len(data)):
-                data.append(' ') # spaces
+                data.append(0) # spaces
             data.reverse()
-        r = ''.join(data)
-        return r
+        for i in range(4):
+            data[i] = data[i] + 128 * self._decimalPoint[i]  # add decimal points
+        return data
 
-
-# --------------- class DisplayThread ----------------
-class DisplayThread(Thread):
-    def __init__(self, display):
-        Thread.__init__(self)
-        self._display = display
-        self._isRunning = False
-        self._isAlive = False
-
-    def run(self):
-        Disp4tronix.debug("DisplayThread started")
-        self._isAlive = True
-        self._isRunning = True
-        while self._isRunning:
-            delays = 0
-            for digit in range(4):
-                self._display.setDigit(self._display._data[digit], digit)
-                Disp4tronix.delay(2)
-                delays += 1
-                self._display.clearDigit(digit)
-                if not self._isRunning:
-                    break
-            if 1 in self._display._decimalPoint:
-                for i in range(3):
-                    if self._display._decimalPoint[i] == 1:
-                        self._display.setDecimalPoint(i)
-                        Disp4tronix.delay(2)
-                        delays += 1
-                        self._display.clearDigit(2-i)
-                        if not self._isRunning:
-                            break
-        self._isAlive = False
-        self._isRunning = False
-        Disp4tronix.debug("DisplayThread terminated")
-
-    def stop(self):
-        self._isRunning = False
-        while self._isAlive:
-            continue
-
-# --------------- class TickerThread ----------------
+# ------------------- class TickerThread ----------------------
 class TickerThread(Thread):
     def __init__(self, display, text, count, speed):
         Thread.__init__(self)
@@ -491,40 +425,41 @@ class TickerThread(Thread):
             continue
 
     def run(self):
-        Disp4tronix.debug("TickerThread started")
+        DgTell1.debug("TickerThread started")
         self._display.showText(self._text)
         nb = 0
         self._isRunning = True
         while self._isRunning:
             startTime = time.time()
             while time.time() - startTime < self._period / 1000.0 and self._isRunning:
-                Disp4tronix.delay(10)
+                DgTell1.delay(1)
             if not self._isRunning:
                 break
             rc = self._display.scrollToLeft()
             if rc == 4 and self._isRunning:
                 startTime = time.time()
                 while time.time() - startTime < 2 and self._isRunning:
-                    Disp4tronix.delay(10)
+                    DgTell1.delay(10)
                 if not self._isRunning:
                     break
                 nb += 1
                 if nb == self._count:
                     break
                 self._display.setToStart()
-        if self._isRunning:  # terminated by number of count
+        if self._isRunning: # terminated by number of count
             while time.time() - startTime < 2 and self._isRunning:
-                Disp4tronix.delay(10)
+                DgTell1.delay(10)
             self._display.clear()
-        Disp4tronix.debug("TickerThread terminated")
+        DgTell1.debug("TickerThread terminated")
         self._isAlive = False
 
     def stop(self):
         self._isRunning = False
-        while self._isAlive: # Wait until thread is finished
+        while self._isAlive:  # Wait until thread is finished
             continue
-        Tools.debug("Clearing display")
+        DgTell1.debug("Clearing display")
         self._display.clear()
+
 
 # ------------------- class BlinkerThread ----------------------
 class BlinkerThread(Thread):
@@ -544,21 +479,21 @@ class BlinkerThread(Thread):
             continue
 
     def run(self):
-        Disp4tronix.debug("BlinkerThread started")
+        DgTell1.debug("BlinkerThread started")
         nb = 0
         self._isRunning = True
         while self._isRunning:
             self._display.showText(self._text, dp = self._dp)
             startTime = time.time()
             while time.time() - startTime < self._period / 1000.0 and self._isRunning:
-                Disp4tronix.delay(1)
-            if not self._isRunning:
+                DgTell1.delay(1)
+            if self._isRunning == False:
                 break
-            self._display.showText("    ", dp = [0, 0, 0])
+            self._display.clear()
             startTime = time.time()
             while time.time() - startTime < self._period / 1000.0 and self._isRunning:
-                Disp4tronix.delay(1)
-            if not self._isRunning:
+                DgTell1.delay(1)
+            if self._isRunning == False:
                 break
             nb += 1
             if nb == self._count:
@@ -566,9 +501,8 @@ class BlinkerThread(Thread):
 
         startTime = time.time()
         while time.time() - startTime < 1:
-            Disp4tronix.delay(1)
-        self._display.clear() # Terminate display thread
-        Disp4tronix.debug("BlinkerThread terminated")
+            DgTell1.delay(1)
+        DgTell1.debug("BlinkerThread terminated")
         self._isAlive = False
 
     def stop(self):

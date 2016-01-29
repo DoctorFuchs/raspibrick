@@ -21,7 +21,7 @@ V1.01 - Oct 2015: - Fixed: Robot replaced by RobotInstance.getRobot()
 V1.02 - Dec 2015: - Adapted to new Display class API
 '''
 
-BRICKGATE_VERSION = "1.02 - Dec 2015"
+BRICKGATE_VERSION = "1.03 - Jan 2016"
 
 # Enable very verbose debugging infos to stdout
 DEBUG = False

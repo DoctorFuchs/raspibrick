@@ -33,10 +33,11 @@ V1.22 - Nov 2015: - Added: Class DgTell, Button click and double-click events
 V1.23 - Dec 2015: - Added: Selecting up to 9 autonomous Python programs
 V1.24 - Dec 2015: - Modified: Shutdown confirmation with button press event
 V1.25 - Dec 2015: - Modified: Decimal point display for DgTell
+V1.26 - Jan 2015: - Added: tcpcom.py Event driven socket library
 '''
 
-VERSION = "1.25 - Dec 2015"
-DISPLAYED_VERSION = "125"  # displayed n.nn
+VERSION = "1.27 - Jan 2016"
+DISPLAYED_VERSION = "127"  # displayed n.nn
 
 DEBUG = False
 

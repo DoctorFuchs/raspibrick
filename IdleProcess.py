@@ -56,7 +56,7 @@ def updateAppFiles():
 #    print "updatAppFiles()"
     global nbProg, progID
     if inCallback:
-        print "updateAppFiles() returned because inCallback = True"
+ #       print "updateAppFiles() returned because inCallback = True"
         return
 
     # Check if MyApp.py has changed using time stamp
@@ -69,7 +69,7 @@ def updateAppFiles():
         return
 
     if os.path.isfile(file0) and int(os.path.getmtime(file0)) != 0:
-        print "Update needed"
+#        print "Update needed"
         for i in reversed(range(1, 9)):
             file_old = SharedConstants.APP_PATH + "_" + str(i) + ".py"
             file_new = SharedConstants.APP_PATH + "_" + str(i + 1) + ".py"
@@ -87,16 +87,16 @@ def copyFile(src, dst, attr = False):
         if attr:
             shutil.copystat(src, dst)
     except:
-       print "Error copying", src, " to", dst
+#       print "Error copying", src, " to", dst
        return False
-    print "Successfully copied", src, " to", dst
+#    print "Successfully copied", src, " to", dst
     return True
 
 def getNbProg():
     for i in range(1, 11):
       if not os.path.isfile(SharedConstants.APP_PATH + "_" + str(i) + ".py"):
           break
-    print "getNbProg() returns", i - 1
+#    print "getNbProg() returns", i - 1
     return i - 1
 
 def onButtonEvent(event):
@@ -108,7 +108,7 @@ def onButtonEvent(event):
     inCallback = True
     if event == BUTTON_PRESSED:
         if isShutdownPending:
-            print "shutdown is pending"
+#            print "shutdown is pending"
             if ir_center.getValue() == 1:
                rc = 3
                isAlive = False
@@ -117,7 +117,7 @@ def onButtonEvent(event):
     elif event == BUTTON_CLICKED:
         if isShutdownPending and ir_center.getValue() == 0:
             isShutdownPending = False
-            print "shutdown pending released"
+#            print "shutdown pending released"
             led.setColor(0, 0, 100)
             showAppInfo(True)
             inCallback = False
@@ -127,7 +127,8 @@ def onButtonEvent(event):
             inCallback = False
             return
         if progID == 0: # no app
-            print "no program"
+            pass
+#            print "no program"
         else:
             rc = 1
             isAlive = False
@@ -137,7 +138,7 @@ def onButtonEvent(event):
             inCallback = False
             return
         if nbProg > 0 and ir_center.getValue() == 1:
-            print "delete all"
+#            print "delete all"
             display.showText("dEL")
             time.sleep(1)
             try:
@@ -156,7 +157,7 @@ def onButtonEvent(event):
             progID = 1
         else:
             progID += 1
-        print "progID", progID
+#        print "progID", progID
         file0 = SharedConstants.APP_PATH + ".py"
         file1 = SharedConstants.APP_PATH + "_" + str(progID) + ".py"
         copyFile(file1, file0)
@@ -165,7 +166,7 @@ def onButtonEvent(event):
         setConfigEntry("Programs", "LastProgram", "MyApp_" + str(progID) + ".py")
         ledBlink(progID)
     elif event == BUTTON_LONGPRESSED:
-        print "Button long pressed"
+#        print "Button long pressed"
         if ir_center.getValue() == 1:
             if not isShutdownPending:
                 isShutdownPending = True
@@ -186,7 +187,7 @@ def firstDuty():
     robot.setButtonEnabled(True)
     while not isInterrupted and count < 40:  # Try 20 s to get IP address
        ipAddr = robot.getIPAddresses()
-       print "Got IP addresses:", ipAddr
+#       print "Got IP addresses:", ipAddr
        ip = ""
        for addr in ipAddr:
            if addr != '127.0.0.1':
@@ -198,7 +199,7 @@ def firstDuty():
        Tools.delay(500)
     display.clear()
     if ip == "":
-        print "No IP address received"
+#        print "No IP address received"
         led.setColor(10, 10, 0)
     else:
         led.setColor(0, 20, 0)
@@ -256,16 +257,16 @@ nbProg = getNbProg()
 progID = 0
 oldText = ""
 if sys.argv[1] == "isFirst":
-    print "isFirst = True"
+#    print "isFirst = True"
     firstDuty()
     if nbProg > 0:
         setConfigEntry("Programs", "LastProgram", "MyApp_1.py")
         progID = 1
 else:
-    print "isFirst = False"
+#    print "isFirst = False"
     robot.setButtonEnabled(True)
     pgm = getConfigEntry("Programs", "LastProgram")
-    print "last program:", pgm
+#    print "last program:", pgm
     if pgm == None:
         progID = 0
     else:

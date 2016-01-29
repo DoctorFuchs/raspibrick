@@ -1,3 +1,3 @@
 #! /bin/sh
 
-sudo PYTHONPATH=/home/pi/raspibrick/lib python2.7 $*
+sudo PYTHONPATH=/home/pi/raspibrick/lib python2.7 -Qnew $*

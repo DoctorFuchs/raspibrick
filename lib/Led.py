@@ -15,6 +15,8 @@ Class that represents a LED pair.
 
 from Tools import Tools
 from RobotInstance import RobotInstance
+import time
+from threading import Thread
 '''
 Dictionary "color":[RGB list] of X11 colors.
 '''
@@ -782,6 +784,8 @@ x11Colors = {"aqua":[0, 255, 255],
 
 
 class Led():
+    blinkerThreads = []
+
     '''
     Class that represents a LED pair.
     '''
@@ -795,6 +799,7 @@ class Led():
         '''
         self.id = id
         self.robot = RobotInstance.getRobot()
+        self._blinkerThread = None
         Tools.debug("Led instance with ID " + str(id) + " created")
 
     def setColor(self, *args):
@@ -825,6 +830,45 @@ class Led():
         self.robot.pwm.setPWM(3 * id + 1, 0, green)
         self.robot.pwm.setPWM(3 * id + 2, 0, red)
 
+
+    def startBlinker(self, onColor, offColor, onTime, offTime, count = 0, blocking = False):
+        '''
+        Starts blinking with given onColor and offColor. The blinking period
+        is offTime + onTime. May be stopped by calling stopBlinker(). If blocking is False, the
+        function returns immediately while the blinking goes on. The blinking is stopped by setColor().
+        @param onColor: color in on state. Must be X11 color string
+        @param offColor: color in off state. Must be X11 color string
+        @param onTime: the time in ms in on state
+        @param offTime: the time in ms in off state
+        @param count: total number of on states; 0 for endlessly (default)
+        @param blocking: if True, the method blocks until the blinker has finished; otherwise
+         it returns immediately (default: False)
+        '''
+        self._checkRobot()
+        if self._blinkerThread != None:
+            self.stopBlinker()
+        self._blinkerThread = BlinkerThread(self, onColor, offColor, onTime, offTime, count)
+        Led.blinkerThreads.append(self._blinkerThread)
+        if blocking:
+            while self.isBlinkerAlive():
+                continue
+
+    def stopBlinker(self):
+        '''
+        Stops blinking and turns the led off.
+        '''
+        self._checkRobot()
+        if self._blinkerThread != None:
+            self._blinkerThread.stop()
+
+    def isBlinkerAlive(self):
+        '''
+        @return: True, if the blinker is displaying; otherwise False
+        '''
+        self._checkRobot()
+        time.sleep(0.001)
+        return self._blinkerThread != None
+
     @staticmethod
     def setColorAll(*args):
         '''
@@ -832,6 +876,8 @@ class Led():
         @param color list of [red, green, blue] RGB color components 0..255
          or three color integers 0..255 or X11-color string
         '''
+        for blinkerThread in Led.blinkerThreads:
+            blinkerThread.stop()
         leds = [Led(0), Led(1), Led(2), Led(3)]
         for led in leds:
             led.setColor(*args)
@@ -846,4 +892,51 @@ class Led():
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:
             raise Exception("Create Robot instance first")
+
+
+
+# ------------------- class BlinkerThread ----------------------
+class BlinkerThread(Thread):
+    def __init__(self, led, onColor, offColor, onTime, offTime, count):
+        Thread.__init__(self)
+        self.led = led
+        self._onColor = onColor
+        self._offColor = offColor
+        self._onTime = onTime
+        self._offTime = offTime
+        self._count = count
+        self._isAlive = True
+        self.start()
+
+    def run(self):
+        Tools.debug("Led blinker thread starting")
+        nb = 0
+        self._isRunning = True
+        while self._isRunning:
+            self.led.setColor(self._onColor)
+            startTime = time.time()
+            while time.time() - startTime < self._onTime / 1000.0 and self._isRunning:
+                time.sleep(0.001)
+            if not self._isRunning:
+                break
+
+            self.led.setColor(self._offColor)
+            startTime = time.time()
+            while time.time() - startTime < self._offTime  / 1000.0 and self._isRunning:
+                time.sleep(0.001)
+            if not self._isRunning:
+                break
+
+            nb += 1
+            if nb == self._count:
+                self._isRunning = False
+        self.led.setColor(0, 0, 0)
+        self.led._blinkerThread = None
+        self._isAlive = False
+        Tools.debug("Led blinker thread finished")
+
+    def stop(self):
+        self._isRunning = False
+        while self._isAlive: # Wait until thread is finished
+            continue
 
