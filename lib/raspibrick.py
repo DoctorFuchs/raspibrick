@@ -29,7 +29,9 @@ from Torch import Torch
 from Shadow import Shadow
 from Display import Display
 from DgTell import DgTell
+from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
+from tcpcom import *
 from Camera import Camera
 from Tools import *
 import tty
@@ -138,6 +140,7 @@ def isRightHit():
     if robot != None:
        return robot.isRightHit()
     return False
+
 
 
 
