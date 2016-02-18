@@ -429,7 +429,7 @@ class DgTell():
         '''
         if not self._isReady:
             return
-        if self._blinerThread != None:
+        if self._blinkerThread != None:
             self._blinkerThread.stop()
             self._blinkerThread = None
 
