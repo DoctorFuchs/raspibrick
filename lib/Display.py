@@ -73,6 +73,7 @@ class Display():
         if not self.available:
             return
         self._checkRobot()
+        self.text = ""
         return Display._myInstance.clear()
 
     def showText(self, text, pos = 0, dp = [0, 0, 0, 0]):
@@ -121,6 +122,7 @@ class Display():
         if not self.available:
             return
         self._checkRobot()
+        self.text = ""
         return Display._myInstance.scrollToLeft()
 
     def scrollToRight(self):
@@ -130,6 +132,7 @@ class Display():
         '''
         if not self.available:
             return
+        self.text = ""
         return Display._myInstance.scrollToRight()
 
     def setToStart(self):
@@ -140,6 +143,7 @@ class Display():
         if not self.available:
             return
         self._checkRobot()
+        self.text = ""
         return Display._myInstance.setToStart()
 
     def showTicker(self, text, count = 1, speed = 2, blocking = False):
@@ -155,6 +159,7 @@ class Display():
         if not self.available:
             return
         self._checkRobot()
+        self.text = ""
         Display._myInstance.showTicker(text, count, speed, blocking)
 
     def stopTicker(self):
@@ -190,6 +195,7 @@ class Display():
         if not self.available:
             return
         self._checkRobot()
+        self.text = ""
         Display._myInstance.showBlinker(text, dp, count, speed, blocking)
 
     def stopBlinker(self):
