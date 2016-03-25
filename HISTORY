@@ -9,4 +9,8 @@ V1.09 - Aug 15, 2015: PYTHONPATH included for pi, root and sudoer
 V1.10 - Aug 16, 2015: Fixed: problem with startup without display
 V1.11 - Aug 17, 2015: Updated: Python library
 V1.12 - Aug 18, 2015: Added: Java support
+.......... History interrupted ..............
+V1.26 - Jan 2016: - Added: tcpcom.py Event driven socket library
+V1.28 - Feb 2016: - Fixed: Inhibit repeat same text in Display
+V1.29 - Mar 2016: - Added: Escape into SELF/APLU mode
 

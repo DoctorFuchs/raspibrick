@@ -15,6 +15,7 @@ Abstraction of a robot based on Pi2Go (full version) from 4tronix.
 
 
 from RobotInstance import RobotInstance
+from smbus import SMBus
 import RPi.GPIO as GPIO
 import os, sys
 import time
@@ -26,7 +27,7 @@ from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
 from SensorThread import SensorThread
 from Led import Led
-from Adafruit_PWM_Servo_Driver import PWM
+from PCA9685Lib import PWM
 from threading import Thread
 from subprocess import Popen, PIPE
 import re
@@ -225,28 +226,7 @@ class MyRobot(object):
         GPIO.setup(SharedConstants.P_BATTERY_MONITOR, GPIO.IN, GPIO.PUD_UP)
         GPIO.add_event_detect(SharedConstants.P_BATTERY_MONITOR, GPIO.RISING, _onBatteryDown)
 
-        # I2C PWM chip for LEDs and servos
-        Tools.debug("Trying to detect PCA9685 PCM chip on I2C bus using bus number 1...")
-        try:
-            self.pwm = PWM(0x40, busnumber = 1, debug = False)
-            self.pwm.setPWMFreq(SharedConstants.PWM_FREQ)
-            Tools.debug("PCA9685 PCM chip on I2C bus detected")
-        except:
-            Tools.debug("Failed, trying with bus number 0...")
-            try:
-                self.pwm = PWM(0x40, busnumber = 0, debug = False)
-                self.pwm.setPWMFreq(SharedConstants.PWM_FREQ)
-                Tools.debug("PCA9685 PCM chip on I2C bus detected")
-            except:
-                print "Failed to detect PCA9685 PCM chip on I2C bus"
-                sys.exit(1)
-
-        # clear all LEDs
-        for id in range(3):
-            self.pwm.setPWM(3 * id, 0, 0)
-            self.pwm.setPWM(3 * id + 1, 0, 0)
-            self.pwm.setPWM(3 * id + 2, 0, 0)
-
+        Tools.debug("Trying to detect I2C bus")
         isSMBusAvailable = True
         self._bus = None
         try:
@@ -259,6 +239,16 @@ class MyRobot(object):
         except:
             print "No SMBus found on this robot device."
             isSMBusAvailable = False
+
+        # I2C PWM chip PCM9685 for LEDs and servos
+        if isSMBusAvailable:
+            self.pwm = PWM(self._bus, SharedConstants.PWM_I2C_ADDRESS)
+            self.pwm.setFreq(SharedConstants.PWM_FREQ)
+            # clear all LEDs
+            for id in range(3):
+                self.pwm.setDuty(3 * id, 0)
+                self.pwm.setDuty(3 * id + 1, 0)
+                self.pwm.setDuty(3 * id + 2, 0)
 
         # I2C analog extender chip
         if isSMBusAvailable:

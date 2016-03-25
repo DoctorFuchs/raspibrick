@@ -826,9 +826,9 @@ class Led():
         else:
             raise ValueError("Illegal param in setColor()")
         id = (self.id + 3) % 4
-        self.robot.pwm.setPWM(3 * id, 0, blue)
-        self.robot.pwm.setPWM(3 * id + 1, 0, green)
-        self.robot.pwm.setPWM(3 * id + 2, 0, red)
+        self.robot.pwm.setDuty(3 * id, blue)
+        self.robot.pwm.setDuty(3 * id + 1, green)
+        self.robot.pwm.setDuty(3 * id + 2, red)
 
 
     def startBlinker(self, onColor, offColor, onTime, offTime, count = 0, blocking = False):

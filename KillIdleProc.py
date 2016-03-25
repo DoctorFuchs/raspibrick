@@ -1,9 +1,12 @@
 # KillIdleProc.py
 
-import os
+import SharedConstants
+import os, subprocess, sys
+import ConfigParser
 
+print "Starting KillIdleProc"
 num = ['0','1','2','3','4','5','6','7','8','9']
-cmd = 'ps -ef | grep "sudo PYTHONPATH=/home/pi/raspibrick/lib python2.7 /home/pi/raspibrick/IdleProcess.py"'
+cmd = 'ps -ef | grep "sudo PYTHONPATH=/home/pi/raspibrick/lib python2.7 -Qnew /home/pi/raspibrick/IdleProcess.py"'
 f = os.popen(cmd)
 out = f.read()
 line = out.splitlines()[0]

@@ -35,10 +35,11 @@ V1.24 - Dec 2015: - Modified: Shutdown confirmation with button press event
 V1.25 - Dec 2015: - Modified: Decimal point display for DgTell
 V1.26 - Jan 2015: - Added: tcpcom.py Event driven socket library
 V1.28 - Feb 2015: - Fixed: Inhibit repeat same text in Display
+V1.29 - Mar 2015: - Added: Escape into SELF/APLU mode
 '''
 
-VERSION = "1.28 - Feb 2016"
-DISPLAYED_VERSION = "128"  # displayed n.nn
+VERSION = "1.29 - Mar 2016"
+DISPLAYED_VERSION = "129"  # displayed n.nn
 
 DEBUG = False
 
@@ -90,6 +91,8 @@ LED_LEFT = 1
 LED_REAR = 2
 LED_RIGHT = 3
 
+# LED and Servo PWM frequency
+PWM_I2C_ADDRESS = 0x40
 # LED and Servo PWM frequency
 PWM_FREQ = 50
 
@@ -149,7 +152,7 @@ APP_PATH = "/home/pi/scripts/MyApp"
 # Event poll delay (ms)
 POLL_DELAY = 50
 
-ABOUT = "2003-2015 Aegidius Pluess\n" + \
+ABOUT = "2003-2016 Aegidius Pluess\n" + \
          "OpenSource Free Software\n" + \
          "http://www.aplu.ch\n" + \
          "All rights reserved"

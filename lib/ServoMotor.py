@@ -34,7 +34,7 @@ class ServoMotor():
         self.inc = inc
         self._checkRobot()
         self.robot = RobotInstance.getRobot()
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, home)
+        self.robot.pwm.setDuty(SharedConstants.SERVO_0 + self.id, home)
         Tools.debug("ServoMotor instance created")
 
     def setPos(self, position):
@@ -45,7 +45,7 @@ class ServoMotor():
         '''
         self._checkRobot()
         pos = self.home + self.inc * position
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, pos)
+        self.robot.pwm.setDuty(SharedConstants.SERVO_0 + self.id, pos)
 
     def setPosAbs(self, position):
         '''
@@ -54,7 +54,7 @@ class ServoMotor():
         For most servo motors in range 100..500
         '''
         self._checkRobot()
-        self.robot.pwm.setPWM(SharedConstants.SERVO_0 + self.id, 0, position)
+        self.robot.pwm.setDuty(SharedConstants.SERVO_0 + self.id, position)
 
     def _checkRobot(self):
         if RobotInstance.getRobot() == None:

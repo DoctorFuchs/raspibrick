@@ -1,22 +1,30 @@
 # Display1.py
 
-from Disp4tronix import Disp4tronix
+from smbus import SMBus
 import time
 
-dp = Disp4tronix()
-dp.setDigit('A', 0)
-time.sleep(3)
-dp.showText("1234")
-time.sleep(3)
-dp.showText("1234567890")
-time.sleep(3)
-dp.showText("1234567890", pos = 2)
-time.sleep(3)
-dp.showText("1234567890", pos = -2)
-time.sleep(3)
-dp.showText("1234567890", pos = 1, dp = [1, 1, 0])
-time.sleep(3)
-dp.showText("1234567890", pos = 1, dp = [0, 1])
-time.sleep(3)
-dp.clear()
-print "All done"
+def setup():
+    bus.write_byte_data(i2c_address, 0x00, 0x00) # Set all of bank 0 to outputs
+    bus.write_byte_data(i2c_address, 0x01, 0x00) # Set all of bank 1 to outputs
+
+def setValue(val, digit):
+    '''
+    @param digit: 0: leftmost digit
+    @param val: 0..255: segment value
+    '''
+    n = (1 << (3 - digit)) ^ 255
+    bus.write_byte_data(i2c_address, 0x13, n)
+    bus.write_byte_data(i2c_address, 0x12, val)
+
+i2c_address = 0x20
+
+print "starting"
+bus = SMBus(1) # For revision 2 Raspberry Pi
+setup()
+word = [118, 119, 56, 63]  # HALO
+for i in range(4):
+    setValue(word[i], i)
+    time.sleep(2)
+
+
+

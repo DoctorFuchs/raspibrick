@@ -1,3 +1,10 @@
 #! /bin/sh
 
-pyrun /home/pi/raspibrick/KillIdleProc.py
+
+if grep -Fxq "Mode = self" /home/pi/scripts/raspibrick.cfg
+then
+    pyrun /home/pi/scripts/MyApp.py 2>&1
+else
+    pyrun /home/pi/raspibrick/KillIdleProc.py
+fi
+

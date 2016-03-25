@@ -242,6 +242,13 @@ def setConfigEntry(section, key, value):
         with open(SharedConstants.CONFIG_FILE, 'wb') as configFile:
             config.write(configFile)
 
+def blinkLed():
+    for i in range(3):
+        led.setColor(0, 0, 0)
+        Tools.delay(200)
+        led.setColor(0, 50, 0)
+        Tools.delay(200)
+
 print "IdleProcess starting"
 
 rc = 0
@@ -259,6 +266,16 @@ oldText = ""
 if sys.argv[1] == "isFirst":
 #    print "isFirst = True"
     firstDuty()
+    mode = getConfigEntry("Firmware", "Mode")
+    print "Checking mode...Got:", mode
+    if mode == "self":
+        print "Escaping to SELF mode"
+        display.showText("5ELF")
+        blinkLed()
+        time.sleep(2)
+        Led.clearAll()
+        display.clear()
+        sys.exit(4) # returning to ProcessMon with exit code 4
     if nbProg > 0:
         setConfigEntry("Programs", "LastProgram", "MyApp_1.py")
         progID = 1
