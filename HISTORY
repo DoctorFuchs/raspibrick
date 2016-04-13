@@ -13,4 +13,5 @@ V1.12 - Aug 18, 2015: Added: Java support
 V1.26 - Jan 2016: - Added: tcpcom.py Event driven socket library
 V1.28 - Feb 2016: - Fixed: Inhibit repeat same text in Display
 V1.29 - Mar 2016: - Added: Escape into SELF/APLU mode
+V1.30 - Apr 2016: - Added: Bluetooth Support (RFComm server)
 
