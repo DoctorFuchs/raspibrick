@@ -22,7 +22,7 @@ class PWM:
         '''
         self.bus = bus
         self.address = address
-        _isAvailable = True
+        self._isAvailable = True
         self._writeByte(self._mode_adr, 0x00)
 
     def setFreq(self, freq):
