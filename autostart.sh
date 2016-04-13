@@ -1,6 +1,6 @@
 #! /bin/sh
 # Autostart script for RaspiBrick
-# Version Aug. 27, 2015
+# Version April 13, 2016
 
 set -x
 
@@ -36,5 +36,17 @@ then
 fi
 
 sleep 5 # Wait until system is up and running
-echo "Running ProcessMon.py"
-pyrun /home/pi/raspibrick/ProcessMon.py
+
+# check if autostart script is present
+file2="/home/pi/scripts/autostart.py"
+if [ -f "$file2" ]
+then
+  echo "Running autostart.py"
+  pyrun /home/pi/scripts/autostart.py
+else
+  echo "Running ProcessMon.py"
+  pyrun /home/pi/raspibrick/ProcessMon.py
+fi
+
+
+

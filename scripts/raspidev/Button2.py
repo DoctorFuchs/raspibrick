@@ -18,6 +18,7 @@ def myXButtonListener(event):
         isExiting = True
 
 print "starting"
+setButtonPin(12)
 addXButtonListener(myXButtonListener)
 isExiting = False
 while not isExiting:

@@ -70,6 +70,8 @@ def updateAppFiles():
 
     if os.path.isfile(file0) and int(os.path.getmtime(file0)) != 0:
 #        print "Update needed"
+        display.showText("P---")
+        Tools.delay(2000)
         for i in reversed(range(1, 9)):
             file_old = SharedConstants.APP_PATH + "_" + str(i) + ".py"
             file_new = SharedConstants.APP_PATH + "_" + str(i + 1) + ".py"
@@ -266,16 +268,6 @@ oldText = ""
 if sys.argv[1] == "isFirst":
 #    print "isFirst = True"
     firstDuty()
-    mode = getConfigEntry("Firmware", "Mode")
-    print "Checking mode...Got:", mode
-    if mode == "self":
-        print "Escaping to SELF mode"
-        display.showText("5ELF")
-        blinkLed()
-        time.sleep(2)
-        Led.clearAll()
-        display.clear()
-        sys.exit(4) # returning to ProcessMon with exit code 4
     if nbProg > 0:
         setConfigEntry("Programs", "LastProgram", "MyApp_1.py")
         progID = 1

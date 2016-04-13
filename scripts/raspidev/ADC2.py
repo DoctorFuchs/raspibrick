@@ -21,6 +21,7 @@ print "starting"
 channel = 0
 bus = SMBus(1) # For revision 2 Raspberry Pi
 bus.write_byte(i2c_address, channel) # set control register
+setButtonPin(12)
 addButtonListener(myButtonListener)
 data_old = -1
 isRunning = True

@@ -33,6 +33,7 @@ from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
 from tcpcom import *
 from Camera import Camera
+from PCF8591 import ADC
 from Tools import *
 import tty
 import termios

@@ -27,7 +27,7 @@ from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
 from SensorThread import SensorThread
 from Led import Led
-from PCA9685Lib import PWM
+from PCA9685 import PWM
 from threading import Thread
 from subprocess import Popen, PIPE
 import re
@@ -347,6 +347,7 @@ class MyRobot(object):
             self.sensorThread.stop()
             self.sensorThread.join(2000)
 
+        GPIO.cleanup()
         Tools.delay(2000)  # avoid "sys.excepthook is missing"
 
     def isButtonDown(self):

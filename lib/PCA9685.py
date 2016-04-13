@@ -1,6 +1,7 @@
-# PCA9685Lib.py
+# PCA9685.py
 # ============================================================================
-# Most code from Adafruit PCA9685 16-Channel PWM Servo Driver, with thanks to the author
+# Most code from Adafruit PCA9685 16-Channel PWM Servo Driver
+# with thanks to the author
 # ============================================================================
 
 import time
@@ -21,13 +22,16 @@ class PWM:
         '''
         self.bus = bus
         self.address = address
+        _isAvailable = True
         self._writeByte(self._mode_adr, 0x00)
 
     def setFreq(self, freq):
         '''
         Sets the PWM frequency. The value is stored in the device.
-        @param freq: the frequency in Hz (approx.)
+        @param freq: the frequency in Hz (approx. in range 16 - 1500 Hz)
         '''
+        if not self._isAvailable:
+            return
         prescaleValue = 25000000.0    # 25MHz
         prescaleValue /= 4096.0       # 12-bit
         prescaleValue /= float(freq)
@@ -36,8 +40,8 @@ class PWM:
         oldmode = self._readByte(self._mode_adr)
         if oldmode == None:
             return
-        newmode = (oldmode & 0x7F) | 0x10
-        self._writeByte(self._mode_adr, newmode)
+        newmode = (oldmode & 0x7F) | 0x10  # sleep
+        self._writeByte(self._mode_adr, newmode)  # goto sleep
         self._writeByte(self._prescale_adr, int(math.floor(prescale)))
         self._writeByte(self._mode_adr, oldmode)
         time.sleep(0.005)
@@ -49,6 +53,8 @@ class PWM:
         @param channel: one of the channels 0..15
         @param duty: the duty cycle 0..4096 (included)
         '''
+        if not self._isAvailable:
+            return
         self._writeByte(self._base_adr_low + 4 * channel, duty & 0xFF)
         self._writeByte(self._base_adr_high + 4 * channel, duty >> 8)
 
@@ -57,6 +63,7 @@ class PWM:
             self.bus.write_byte_data(self.address, reg, value)
         except:
             Tools.debug("Error while writing to I2C device at address: " + str(self.address))
+            self._isAvailable = False
 
     def _readByte(self, reg):
         try:
