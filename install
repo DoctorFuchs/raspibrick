@@ -25,6 +25,7 @@ mkdir /home/pi/raspibrick/lib
 mkdir /home/pi/raspibrick/res
 mkdir /home/pi/programs
 mkdir /home/pi/scripts
+mkdir /home/pi/bluetooth-server
 
 
 if [ "$1" != "update" ]
@@ -80,6 +81,12 @@ cp /home/pi/install/jars/* /home/pi/raspibrick/jars
 cp /home/pi/install/lib/* /home/pi/raspibrick/lib
 cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
+
+echo ------- Bluetooth server ------------------
+cp /home/pi/install/bluetooth-server/* /home/pi/bluetooth-server
+chmod +x /home/pi/bluetooth-server/start-server
+chmod +x /home/pi/bluetooth-server/stop-server
+chmod +x /home/pi/bluetooth-server/bluepy2.7
 
 echo ------ Installing autostart ------ 
 sudo update-rc.d RaspiBrickStart defaults

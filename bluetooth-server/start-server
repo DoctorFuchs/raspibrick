@@ -1,0 +1,4 @@
+#! /bin/sh
+# start server
+
+sudo /home/pi/bluetooth-server/bluepy2.7 /home/pi/bluetooth-server/rfcomm-server.py &
