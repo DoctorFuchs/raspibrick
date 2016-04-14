@@ -36,6 +36,13 @@ if [ "$1" != "update" ]
     echo ------ Installing Linux software ------ 
     sudo apt-get install i2c-tools
     sudo apt-get install python-smbus
+
+    echo ------ Installing Bluetooth software ------ 
+    sudo apt-get install bluetooth
+    sudo apt-get install bluez-tools
+    sudo apt-get install python-bluez    
+    sudo sdptool add SP
+
 fi
 
 echo ------ Copying files ------ 
@@ -43,6 +50,7 @@ sudo cp /home/pi/install/modules /etc/modules
 sudo cp /home/pi/install/bashrc-root /root/.bashrc
 sudo cp /home/pi/install/bashrc-pi /home/pi/.bashrc
 sudo cp /home/pi/install/sudoers /etc
+sudo cp /home/pi/install/bluetooth.service /lib/systemd/system
 
 chmod +x /home/pi/install/jrun
 sudo cp /home/pi/install/jrun /usr/bin
