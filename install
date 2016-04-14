@@ -71,6 +71,9 @@ sudo cp /home/pi/install/RaspiBrickStart /etc/init.d
 chmod +x /home/pi/install/autostart.sh
 cp /home/pi/install/autostart.sh /home/pi/raspibrick
 
+chmod +x /home/pi/install/rename-host
+cp /home/pi/install/rename-host /home/pi/raspibrick
+
 cp -r /home/pi/install/programs/* /home/pi/programs
 cp -r /home/pi/install/scripts/* /home/pi/scripts
 cp /home/pi/install/jars/* /home/pi/raspibrick/jars

@@ -1,6 +1,6 @@
 #! /bin/sh
 # Autostart script for RaspiBrick
-# Version April 13, 2016
+# Version Aug. 27, 2015
 
 set -x
 
@@ -27,6 +27,11 @@ else
   # copy wlan info to FAT partition (it may have been modified by raspi GUI user)
   sudo cp /etc/wpa_supplicant/wpa_supplicant.conf /mnt/recovery/wpa_supplicant.conf 
 fi
+
+# make Bluetooth discoverable
+sudo hciconfig hci0 piscan
+# start Bluetooth RFComm server
+/home/pi/bluetooth-server/start-server &
 
 # check if data file is present
 file2="/mnt/recovery/brickgate.data"

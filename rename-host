@@ -1,0 +1,17 @@
+#! /bin/sh
+# Install script for RaspiBrick
+
+echo ------ Changing hostname -------------
+
+THISHOST=$(hostname)
+echo old host name: $THISHOST
+echo new host name: "$1"
+
+
+# Display commands
+#set -x
+
+sudo sed -i "s/$THISHOST/$1/g" /etc/hostname
+sudo sed -i "s/$THISHOST/$1/g" /etc/hosts
+
+echo "Please reboot now using 'sudo reboot' (ignore error message)"
