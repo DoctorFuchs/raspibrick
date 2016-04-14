@@ -28,6 +28,13 @@ else
   sudo cp /etc/wpa_supplicant/wpa_supplicant.conf /mnt/recovery/wpa_supplicant.conf 
 fi
 
+file11="/mnt/recovery/raspibrick-rename.requested"
+if [ -f "$file11" ]
+then
+  pyrun /home/pi/raspibrick/RenameHost.py
+fi
+
+
 # make Bluetooth discoverable
 sudo hciconfig hci0 piscan
 # start Bluetooth RFComm server

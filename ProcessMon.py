@@ -103,7 +103,7 @@ if os.path.isfile(fname):
     robot = Robot()
     display = Display()
     led = Led(1)
-    display.setText("UPE ", [1, 0, 0])
+    display.showText("UPE ")
     for i in range(3):
         led.setColor(0, 0, 0)
         Tools.delay(500)
@@ -111,7 +111,7 @@ if os.path.isfile(fname):
         Tools.delay(500)
     subprocess.call("sudo update-raspibrick", shell = True)
     os.remove(fname)
-    display.setText("boot")
+    display.showText("boot")
     Tools.delay(3000)
     display.clear()
     led.setColor(10, 0, 0)

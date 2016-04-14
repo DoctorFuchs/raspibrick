@@ -1,7 +1,7 @@
 #! /bin/sh
 # Install script for RaspiBrick
 
-echo ------ Running RaspiBrick installation. Version 1.5 - Aug. 27, 2015
+echo ------ Running RaspiBrick installation. Version 2.0 - April 14, 2016
 
 if [ "$1" = "update" ]
   then
