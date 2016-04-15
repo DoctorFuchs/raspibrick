@@ -37,10 +37,11 @@ V1.26 - Jan 2016: - Added: tcpcom.py Event driven socket library
 V1.28 - Feb 2016: - Fixed: Inhibit repeat same text in Display
 V1.29 - Mar 2016: - Added: Escape into SELF/AUTO mode
 V1.30 - Mar 2016: - Changed SELF mode to use buzzer/led to show IP
+V1.31 - Apr 2016: - Fixed: startApp now checks stanalone or Pi2Go mode
 '''
 
-VERSION = "1.30 - Mar 2016"
-DISPLAYED_VERSION = "130"  # displayed n.nn
+VERSION = "1.31 - Apri 2016"
+DISPLAYED_VERSION = "131"  # displayed n.nn
 
 DEBUG = False
 
