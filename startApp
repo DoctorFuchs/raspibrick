@@ -1,10 +1,19 @@
 #! /bin/sh
 
+case "$(pidof python2.7 | wc -w)" in
 
-if grep -Fxq "Mode = self" /home/pi/scripts/raspibrick.cfg
-then
+0)  echo "Standalone mode. Starting program..."
     pyrun /home/pi/scripts/MyApp.py 2>&1
-else
+    ;;
+1)  echo "Standalone mode. Other program running. Killing..."
+    rkill
+    echo "Starting program..."
+    pyrun /home/pi/scripts/MyApp.py 2>&1
+    ;;
+*)  echo "Pi2Go mode. Starting program by firmware..."
     pyrun /home/pi/raspibrick/KillIdleProc.py
-fi
+    ;;
+esac
+
+
 
