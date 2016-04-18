@@ -347,7 +347,8 @@ class MyRobot(object):
             self.sensorThread.stop()
             self.sensorThread.join(2000)
 
-        GPIO.cleanup()
+# GPIO.cleanup() Do not cleanup, otherwise button will not work any more when coming back
+# from remote execution
         Tools.delay(2000)  # avoid "sys.excepthook is missing"
 
     def isButtonDown(self):

@@ -19,9 +19,11 @@ History:
 V1.00 - Jul 2015: - First public release
 V1.01 - Oct 2015: - Fixed: Robot replaced by RobotInstance.getRobot()
 V1.02 - Dec 2015: - Adapted to new Display class API
+V1.03 - Jan 2016: - Minor changes in doc
+V1.04 - Apr 2016: - Adapted to support new firmware option (Standalone mode)
 '''
 
-BRICKGATE_VERSION = "1.03 - Jan 2016"
+BRICKGATE_VERSION = "1.04 - April 2016"
 
 # Enable very verbose debugging infos to stdout
 DEBUG = False

@@ -354,6 +354,7 @@ def onButtonEvent(event):
     if event == BUTTON_PRESSED:
         isLongPressed = False
     elif event == BUTTON_LONGPRESSED:
+        print "Long pressed"
         isLongPressed = True
         disconnect()
     elif event == BUTTON_RELEASED:

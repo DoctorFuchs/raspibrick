@@ -70,6 +70,7 @@ class UltrasonicSensor():
         # Determine echo pulse length
         start = time.time()
         count = start
+        end = time.time()
 
         # Wait max 1 s for HIGH signal
         while GPIO.input(SharedConstants.P_TRIG_ECHO) == GPIO.LOW and count - start < 1:
@@ -78,6 +79,7 @@ class UltrasonicSensor():
             Tools.debug("Timeout while waiting for echo going HIGH")
             return -1 # error
 
+        start = count
         # Wait  for LOW signal
         elapsed = 0
         while GPIO.input(SharedConstants.P_TRIG_ECHO) == GPIO.HIGH:

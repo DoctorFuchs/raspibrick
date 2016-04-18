@@ -20,9 +20,9 @@ gear.forward()
 while not isEscapeHit():
     d = us.getValue()
     show(d)
-    if d < 19:
+    if d < 9:
         gear.backward()
-    elif d > 21:
+    elif d > 11:
         gear.forward() 
     else:
         gear.stop()  
