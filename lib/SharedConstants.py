@@ -39,10 +39,11 @@ V1.29 - Mar 2016: - Added: Escape into SELF/AUTO mode
 V1.30 - Mar 2016: - Changed SELF mode to use buzzer/led to show IP
 V1.31 - Apr 2016: - Fixed: startApp now checks standalone or Pi2Go mode
                   - Fixed: Error in Ultrasonic.py reporting too large distance
+V1.32 - May 2016: - New Linux installations: SoX, DHT driver from Adafruit, 1-Wire driver (kernel)
 '''
 
-VERSION = "1.31 - Apri 2016"
-DISPLAYED_VERSION = "131"  # displayed n.nn
+VERSION = "1.32 - May 2016"
+DISPLAYED_VERSION = "132"  # displayed n.nn
 
 DEBUG = False
 

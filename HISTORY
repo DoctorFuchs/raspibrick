@@ -15,3 +15,4 @@ V1.28 - Feb 2016: - Fixed: Inhibit repeat same text in Display
 V1.29 - Mar 2016: - Added: Escape into SELF/APLU mode
 V1.30 - Apr 2016: - Added: Bluetooth Support (RFComm server)
 V1.31 - Apr 2016: - Fixed: startApp now checks stanalone or Pi2Go mode
+V1.32 - May 2016: - New Linux installations: SoX, DHT driver from Adafruit, 1-Wire driver (kernel)

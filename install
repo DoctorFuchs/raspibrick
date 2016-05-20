@@ -96,6 +96,10 @@ chmod +x /home/pi/bluetooth-server/start-server
 chmod +x /home/pi/bluetooth-server/stop-server
 chmod +x /home/pi/bluetooth-server/bluepy2.7
 
+echo ------ Installing 1-Wire driver ------ 
+echo -e "\ndtoverlay=w1-gpio,gpiopin=4\n" | sudo tee /boot/config.txt -a
+
+
 echo ------ Installing autostart ------ 
 sudo update-rc.d RaspiBrickStart defaults
 
