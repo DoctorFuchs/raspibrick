@@ -1,7 +1,7 @@
 #! /bin/sh
 # Install script for RaspiBrick
 
-echo ------ Running RaspiBrick installation. Version 2.0 - April 14, 2016
+echo ------ Running RaspiBrick installation. Version 1.6 - June 7, 2016
 
 if [ "$1" = "update" ]
   then
@@ -68,6 +68,10 @@ sudo cp -f /home/pi/install/pyrun /usr/bin
 chmod +x /home/pi/install/rmon
 sudo cp /home/pi/install/rmon /usr/bin
 
+# Disable screen blanking in LXDE with directly connected screen
+sudo mv /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.origin
+sudo cp /home/pi/install/lightdm.conf /etc/lightdm
+
 chmod +x /home/pi/install/update-raspibrick
 sudo cp /home/pi/install/update-raspibrick /usr/bin
 
@@ -89,16 +93,13 @@ cp /home/pi/install/jars/* /home/pi/raspibrick/jars
 cp /home/pi/install/lib/* /home/pi/raspibrick/lib
 cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
+cp /home/pi/install/Fonts/*.* /home/pi/Fonts
 
 echo ------- Bluetooth server ------------------
 cp /home/pi/install/bluetooth-server/* /home/pi/bluetooth-server
 chmod +x /home/pi/bluetooth-server/start-server
 chmod +x /home/pi/bluetooth-server/stop-server
 chmod +x /home/pi/bluetooth-server/bluepy2.7
-
-echo ------ Installing 1-Wire driver ------ 
-echo -e "\ndtoverlay=w1-gpio,gpiopin=4\n" | sudo tee /boot/config.txt -a
-
 
 echo ------ Installing autostart ------ 
 sudo update-rc.d RaspiBrickStart defaults
