@@ -6,7 +6,8 @@ The installation is completely automated. See
 
 http://www.aplu.ch/raspibrick-install
 
-for more information (under development, German version only).
+for more information
+
 
 
 
