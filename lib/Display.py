@@ -190,7 +190,7 @@ class Display():
         may be stopped by calling stopBlinker().
         @param speed: the speed number of blinking operations per sec (default: 1)
         @param blocking: if True, the method blocks until the blinker has finished; otherwise
-         it returns immediately (default: False)
+        it returns immediately (default: False)
         '''
         if not self.available:
             return

@@ -332,14 +332,13 @@ class DgTell1():
 
     def showBlinker(self, text, dp = [0, 0, 0, 0], count = 3, speed = 1, blocking = False):
         '''
-        Shows a ticker text that scroll to the left until the last 4 characters are displayed. The method blocks
-        until the ticker thread is successfully started and isTickerAlive() returns True.
+        Shows a blinking text for the given number of times and blinking speed.
         @param text: the text to display, if short than 4 characters, scrolling is disabled
-        @param count: the number of repetitions (default: 2). For count = 0, infinite duration,
+        @param count: the number of repetitions (default: 3). For count = 0, infinite duration,
         may be stopped by calling stopBlinker().
         @param speed: the speed number of blinking operations per sec (default: 1)
         @param blocking: if True, the method blocks until the blinker has finished; otherwise
-         it returns immediately (default: False)
+        it returns immediately (default: False)
         '''
         if not self._isReady:
             return

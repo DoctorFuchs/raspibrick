@@ -1,19 +1,37 @@
 #! /bin/sh
+# Starting Python scripts from remote SSH command
 
-case "$(pidof python2.7 | wc -w)" in
+if [ $# -eq 0 ]; then
+# No arguments provided. Starting /home/pi/scripts/MyApp.py
+    case "$(pidof python2.7 | wc -w)" in
 
-0)  echo "Standalone mode. Starting program..."
-    pyrun /home/pi/scripts/MyApp.py 2>&1
-    ;;
-1)  echo "Standalone mode. Other program running. Killing..."
-    rkill
-    echo "Starting program..."
-    pyrun /home/pi/scripts/MyApp.py 2>&1
-    ;;
-*)  echo "Pi2Go mode. Starting program by firmware..."
-    pyrun /home/pi/raspibrick/KillIdleProc.py
-    ;;
-esac
+    0)  echo "Starting program"
+        pyrun /home/pi/scripts/MyApp.py 2>&1
+        ;;
+    1)  echo "Other program running. Killing..."
+        rkill
+        echo "Starting program..."
+        pyrun /home/pi/scripts/MyApp.py 2>&1
+        ;;
+    *)  echo "Pi2Go mode. Starting program by firmware..."
+        pyrun /home/pi/raspibrick/KillIdleProc.py
+        ;;
+    esac
+else
+# Command line argument provided. Starting script with given absolute path
+    case "$(pidof python2.7 | wc -w)" in
+
+    0)  echo "Starting program..."
+        sudo python $1 2>&1
+        ;;
+    *)  echo "Other program running. Killing..."
+        sudo pkill python
+        echo "Starting program..."
+        sudo python $1 2>&1
+        ;;
+    esac
+fi
+
 
 
 

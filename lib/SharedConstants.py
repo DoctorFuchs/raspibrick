@@ -40,10 +40,15 @@ V1.30 - Mar 2016: - Changed SELF mode to use buzzer/led to show IP
 V1.31 - Apr 2016: - Fixed: startApp now checks standalone or Pi2Go mode
                   - Fixed: Error in Ultrasonic.py reporting too large distance
 V1.32 - May 2016: - New Linux installations: SoX, DHT driver from Adafruit, 1-Wire driver (kernel)
+V1.33 - May 2016: - Patched Scratch image to avoid popup dialog when remote sensor is enabled,
+                  - Screen blanking for console disabled
+                  - Login shell over serial disabled (in raspi-config)
+                  - OLED driver Adafruit_Python_SSD1306
+V1.34 - Jun 2016: - startApp modified to accept fully qualified path to script
 '''
 
-VERSION = "1.32 - May 2016"
-DISPLAYED_VERSION = "132"  # displayed n.nn
+VERSION = "1.34 - Jun 2016"
+DISPLAYED_VERSION = "134"  # displayed n.nn
 
 DEBUG = False
 

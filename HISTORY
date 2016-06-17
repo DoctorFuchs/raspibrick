@@ -22,5 +22,5 @@ V1.33 - Jun 2016: - Patched Scratch image to avoid popup dialog when remote sens
                   - OLED driver Adafruit_Python_SSD1306
                   - Screen blanking in GUI (LXDE) disabled
                   - Fonts folder added
-
+V1.34 - Jun 2016: - startApp modified to accept fully qualified path to script
 
