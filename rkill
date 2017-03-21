@@ -1,4 +1,8 @@
 #! /bin/sh
 
 sudo pkill python
-pyrun /home/pi/raspibrick/ResetLED.py
+
+if [ -f /home/pi/raspibrick/ResetLED.py  ]
+then
+    pyrun /home/pi/raspibrick/ResetLED.py
+fi

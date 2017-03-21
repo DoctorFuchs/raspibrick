@@ -38,7 +38,7 @@ fi
 # make Bluetooth discoverable
 sudo hciconfig hci0 piscan
 # start Bluetooth RFComm server
-/home/pi/bluetooth-server/start-server &
+#/home/pi/bluetooth-server/start-server &
 
 # check if data file is present
 file2="/mnt/recovery/brickgate.data"
