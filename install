@@ -46,6 +46,9 @@ if [ "$1" != "update" ]
     echo ------ Installing python-dev ------ 
     sudo apt-get install python-dev
 
+    echo ------ Installing Java WebStart support ------ 
+    sudo apt-get install icedtea-netx
+
     echo ------ Installing pyqt4 software ------ 
     sudo apt-get install python-qt4
 
@@ -113,7 +116,7 @@ cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
 cp /home/pi/install/Fonts/*.* /home/pi/Fonts
 cp /home/pi/install/Pictures/*.* /home/pi/Pictures
-cp -r /home/pi/install/Music/*.* /home/pi/Music
+cp -R /home/pi/install/Music/*.* /home/pi/Music
 cp /home/pi/install/rpi-tutorial/*.* /home/pi/rpi-tutorial
 cp /home/pi/install/mygeany/*.* /home/pi/mygeany
 cp /home/pi/install/mygeany/gpanel/*.* /home/pi/mygeany/gpanel
