@@ -1,7 +1,7 @@
 #! /bin/sh
 # Install script for RaspiBrick
 
-echo ------ Running RaspiBrick installation. Version 1.6 - June 7, 2016
+echo ------ Running RaspiBrick installation. Version 1.7 - March 26, 2017
 
 if [ "$1" = "update" ]
   then
@@ -17,6 +17,8 @@ set -x
 sudo rm -rf /home/pi/raspibrick
 sudo rm -rf /home/pi/programs
 sudo rm -rf /home/pi/scripts
+sudo rm -rf /home/pi/mygeany
+sudo rm -rf /home/pi/rpi-tutorial
 
 echo ------ Creating directories ------ 
 mkdir /home/pi/raspibrick
@@ -25,23 +27,33 @@ mkdir /home/pi/raspibrick/lib
 mkdir /home/pi/raspibrick/res
 mkdir /home/pi/programs
 mkdir /home/pi/scripts
-mkdir /home/pi/bluetooth-server
-
+mkdir /home/pi/mygeany
+mkdir /home/pi/mygeany/gpanel
+mkdir /home/pi/rpi-tutorial
 
 if [ "$1" != "update" ]
   then
-    echo ------ Patching OS for fast SSH login
-    sudo sed -i 's|files mdns4_minimal \\[NOTFOUND=return\\] dns mdns4|files mdns4_minimal \\[NOTFOUND=return\\] dns|' /etc/nsswitch.conf
-
-    echo ------ Installing Linux software ------ 
-    sudo apt-get install i2c-tools
-    sudo apt-get install python-smbus
-
     echo ------ Installing Bluetooth software ------ 
     sudo apt-get install bluetooth
     sudo apt-get install bluez-tools
     sudo apt-get install python-bluez    
     sudo sdptool add SP
+
+    echo ------ Installing sox software ------ 
+    sudo apt-get install sox
+    sudo apt-get install libsox-fmt-mp3 
+
+    echo ------ Installing python-dev ------ 
+    sudo apt-get install python-dev
+
+    echo ------ Installing pyqt4 software ------ 
+    sudo apt-get install python-qt4
+
+    echo ------ Installing sqlite software ------ 
+    sudo apt-get install sqlite3
+
+    echo ------ Installing sqlitebrowser software ------ 
+    sudo apt-get install sqlitebrowser
 
 fi
 
@@ -50,7 +62,13 @@ sudo cp /home/pi/install/modules /etc/modules
 sudo cp /home/pi/install/bashrc-root /root/.bashrc
 sudo cp /home/pi/install/bashrc-pi /home/pi/.bashrc
 sudo cp /home/pi/install/sudoers /etc
-sudo cp /home/pi/install/bluetooth.service /lib/systemd/system
+sudo cp /home/pi/install/logo/raspibrick.png /usr/share/pixel-wallpaper
+
+# for camera support:
+sudo cp /home/pi/install/mjpg-streamer/mjpg_streamer /usr/local/bin
+sudo cp /home/pi/install/mjpg-streamer/output_http.so /usr/local/lib
+sudo cp /home/pi/install/mjpg-streamer/input_file.so /usr/local/lib
+sudo cp -r /home/pi/install/mjpg-streamer/www /usr/local/www
 
 chmod +x /home/pi/install/jrun
 sudo cp /home/pi/install/jrun /usr/bin
@@ -94,12 +112,11 @@ cp /home/pi/install/lib/* /home/pi/raspibrick/lib
 cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
 cp /home/pi/install/Fonts/*.* /home/pi/Fonts
-
-echo ------- Bluetooth server ------------------
-cp /home/pi/install/bluetooth-server/* /home/pi/bluetooth-server
-chmod +x /home/pi/bluetooth-server/start-server
-chmod +x /home/pi/bluetooth-server/stop-server
-chmod +x /home/pi/bluetooth-server/bluepy2.7
+cp /home/pi/install/Pictures/*.* /home/pi/Pictures
+cp -r /home/pi/install/Music/*.* /home/pi/Music
+cp /home/pi/install/rpi-tutorial/*.* /home/pi/rpi-tutorial
+cp /home/pi/install/mygeany/*.* /home/pi/mygeany
+cp /home/pi/install/mygeany/gpanel/*.* /home/pi/mygeany/gpanel
 
 echo ------ Installing autostart ------ 
 sudo update-rc.d RaspiBrickStart defaults

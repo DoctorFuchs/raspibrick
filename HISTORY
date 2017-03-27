@@ -27,5 +27,6 @@ V1.35 - Oct 2016: - Geany, PyQT4 installed, new sudirectory rpi-tutorial,
                     in Pictures: einstein.ppm
 V1.36 - Mar 2017: - Updates: RaspiBrick libraries, TigerJython
                   - Bluetooth server no longer started at boot time
+V1.37 - Mar 2017: - Adapted to new NOOPs release
  
 

@@ -1,4 +1,0 @@
-#! /bin/sh
-# stop server
-
-sudo pkill bluepy2.7
