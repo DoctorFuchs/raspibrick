@@ -46,9 +46,6 @@ if [ "$1" != "update" ]
     echo ------ Installing python-dev ------ 
     sudo apt-get install python-dev
 
-    echo ------ Installing Java WebStart support ------ 
-    sudo apt-get install icedtea-netx
-
     echo ------ Installing pyqt4 software ------ 
     sudo apt-get install python-qt4
 
