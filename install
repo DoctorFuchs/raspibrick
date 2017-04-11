@@ -30,13 +30,19 @@ mkdir /home/pi/scripts
 mkdir /home/pi/mygeany
 mkdir /home/pi/mygeany/gpanel
 mkdir /home/pi/rpi-tutorial
+mkdir /home/pi/Fonts
 
 if [ "$1" != "update" ]
   then
     echo ------ Installing Bluetooth software ------ 
     sudo apt-get install bluetooth
     sudo apt-get install bluez-tools
-    sudo apt-get install python-bluez    
+    sudo apt-get install python-bluez
+
+    # Put Bluetooth daemon in compatibility mode    
+    sudo cp /home/pi/install/dbus-org.bluez.service /etc/systemd/system
+    sudo systemctl daemon-reload
+    sudo service bluetooth restart
     sudo sdptool add SP
 
     echo ------ Installing sox software ------ 
@@ -45,6 +51,9 @@ if [ "$1" != "update" ]
 
     echo ------ Installing python-dev ------ 
     sudo apt-get install python-dev
+
+    echo ------ Installing python-imaging ------ 
+    sudo apt-get install python-imaging
 
     echo ------ Installing pyqt4 software ------ 
     sudo apt-get install python-qt4
@@ -55,9 +64,13 @@ if [ "$1" != "update" ]
     echo ------ Installing sqlitebrowser software ------ 
     sudo apt-get install sqlitebrowser
 
+    echo ------ Installing puTTY ------ 
+    sudo apt-get install putty
+
 fi
 
 echo ------ Copying files ------ 
+sudo cp /home/pi/install/cmdline.txt /boot/cmdline.txt
 sudo cp /home/pi/install/modules /etc/modules
 sudo cp /home/pi/install/bashrc-root /root/.bashrc
 sudo cp /home/pi/install/bashrc-pi /home/pi/.bashrc
@@ -108,7 +121,7 @@ cp /home/pi/install/rename-host /home/pi/raspibrick
 cp -r /home/pi/install/programs/* /home/pi/programs
 cp -r /home/pi/install/scripts/* /home/pi/scripts
 cp /home/pi/install/jars/* /home/pi/raspibrick/jars
-cp /home/pi/install/lib/* /home/pi/raspibrick/lib
+cp -R /home/pi/install/lib/* /home/pi/raspibrick/lib
 cp /home/pi/install/res/* /home/pi/raspibrick/res
 cp /home/pi/install/*.py /home/pi/raspibrick
 cp /home/pi/install/Fonts/*.* /home/pi/Fonts

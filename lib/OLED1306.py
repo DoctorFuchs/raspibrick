@@ -5,13 +5,14 @@
 
 import SSD1306
 import RPi.GPIO as GPIO
+import smbus
+
 
 import os, time
 from threading import Thread
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-
 class OLED1306():
     '''
     Creates a display instances with given OLED display type (128x32 or 128x64, black & white).
@@ -22,6 +23,14 @@ class OLED1306():
     otherwise the background is black and the text  is white (default)
     '''
     def __init__(self, bkImagePath = None, type = 64, inverse = False):
+        bus = smbus.SMBus(1) 
+        i2c_address = 0x3C
+        try:
+            bus.read_word_data(i2c_address, 0)
+        except:
+            self._isAvailable = False
+            return
+        self._isAvailable = True
         if type == 32:
             # 128x32 display with hardware I2C:
             self.disp = SSD1306.SSD1306_128_32(rst = None, gpio = GPIO)
@@ -180,7 +189,10 @@ class OLED1306():
         '''
         Repaints the screen (background image and text buffer).
         '''
-        maxNum = max(self.textBuf.keys())
+        if len(self.textBuf) == 0:
+            maxNum = 0
+        else:
+	    maxNum = max(self.textBuf.keys())
         # Clear display
         if self.inverse:
             self.draw.rectangle((0, 0, self.width, self.height), outline = 0, fill = 255) # White
@@ -261,12 +273,12 @@ class OLED1306():
         self.inverse = inverse
         self.repaint()
         
-    def setBlinking(self, count = 3, offTime = 1, onTime = 1, blocking = False):
+    def startBlinker(self, count = 3, offTime = 1000, onTime = 1000, blocking = False):
         '''
         Blicks the entire screen for given number of times (off-on periods). 
         @param count: the number of blinking (default: 3)
-        @param offTime: the time the display is erased (in s)
-        @param onTime: the time the display is shown (in s)
+        @param offTime: the time the display is erased (in ms, default: 1000)
+        @param onTime: the time the display is shown (in ms, default: 1000)
         @param blocking: if True, the function blocks until the blinking is finished; otherwise
         it returns immediately
         '''
@@ -286,7 +298,7 @@ class OLED1306():
             self.blinkerThread.stop()
             self.blinkerThread = None
 
-    def isBlinkerAlive(self):
+    def isBlinking(self):
         '''
         @return: True, if the blinker is displaying; otherwise False
         '''
@@ -294,7 +306,13 @@ class OLED1306():
         if self.blinkerThread == None:
             return False
         return self.blinkerThread.isAlive
-    
+
+    def isDeviceAvailable(self):
+        '''
+        Returns True, if the device is detected on the I2C bus;
+        otherwise returns False
+        '''
+        return self._isAvailable
                                
 # ------------------- class BlinkerThread ----------------------
 class BlinkerThread(Thread):
@@ -312,18 +330,19 @@ class BlinkerThread(Thread):
 
     def run(self):
         nb = 0
+        time.sleep(1)
         self.isRunning = True
         while self.isRunning:
             self.display.erase()
             startTime = time.time()
-            while time.time() - startTime < self.offTime and self.isRunning:
+            while time.time() - startTime < self.offTime / 1000 and self.isRunning:
                 time.sleep(0.001)
             if not self.isRunning:
                 break
             nb += 1
             self.display.repaint()
             startTime = time.time()
-            while time.time() - startTime < self.onTime and self.isRunning:
+            while time.time() - startTime < self.onTime / 1000 and self.isRunning:
                 time.sleep(0.001)
             if not self.isRunning:
                 break

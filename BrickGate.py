@@ -10,6 +10,13 @@ def debug(msg):
     if BrickGateProperties.DEBUG:
         print "BG debug-> " + msg
 
+def showOled(text, lineNum, fontSize, indent, clear = False):
+    if oled == None:
+        return
+    if clear:
+        oled.clear()
+    oled.setText(text, lineNum, fontSize, indent)
+
 # Response
 class Error():
     OK = "0"
@@ -77,6 +84,9 @@ class SocketHandler(Thread):
         robot.exit()
         delay(2000)
         print "Client disconnected. Waiting for next client..."
+        showOled("Client disconnected", 0, 12, 0, True)
+        showOled("Waiting for next", 2, 12, 0, False) 
+        showOled("connecting client...", 3, 12, 0, False)
         flasher = Flasher(led, [0, 100, 0])
         flasher.start()
         display.showText("HOLd")
@@ -169,7 +179,7 @@ class SocketHandler(Thread):
                 reply = Reply.NO_SUCH_METHOD
 
         # ------------------- device 'gear' or 'uss' ---------------
-        elif device == "gear" or  device == "uss" or device == "cam":
+        elif device == "gear" or  device == "uss" or device == "cam" or device == "beeper" or device == "oled":
             if method == "create":
                 if not device in devices:
                     if device == "gear":
@@ -178,8 +188,15 @@ class SocketHandler(Thread):
                         devices[device] = UltrasonicSensor()
                     elif device == "cam":
                         devices[device] = Camera()
+                    elif device == "beeper":
+                        devices[device] = Beeper(int(param1))
+                    elif device == "oled":
+                        devices[device] = OLED1306()
                 else:
-                    pass # already created
+                    if device == "oled":
+                        devices[device].clear()
+                        devices[device].setFontSize(10)
+                        devices[device].setInverse(False)
             else:
                 if not device in devices:
                     reply = Reply.DEVICE_NOT_CREATED
@@ -354,14 +371,11 @@ def onButtonEvent(event):
     if event == BUTTON_PRESSED:
         isLongPressed = False
     elif event == BUTTON_LONGPRESSED:
-        print "Long pressed"
         isLongPressed = True
         disconnect()
     elif event == BUTTON_RELEASED:
         if not isLongPressed:
-            if isConnected:
-                print "Button clicked while connected"
-            else:
+            if not isConnected:
                 javaApp = "/home/pi/programs/MyApp.jar"
                 if os.path.isfile(javaApp):
                     javaRunner = JavaRunner(javaApp)
@@ -425,6 +439,8 @@ isButtonEnabled = False
 SharedConstants.BLINK_CONNECT_DISCONNECT = False
 SharedConstants.PLAY_CONNECT_DISCONNECT = False
 robot = Robot()
+oled = robot.oled
+Beeper().beep(2)
 Led.clearAll()
 led = Led(LED_LEFT)
 flasher = Flasher(led, [0, 100, 0])
@@ -451,24 +467,33 @@ display.showText("HOLd")
 flasher.start()
 isButtonEnabled = True
 print "Waiting for a connecting client..."
+showOled("Waiting for", 0, 12, 0, True)
+showOled("connecting client...", 1, 12, 0, False)
 while True:
     # wait to accept a connection - blocking call
     Tools.debug("Calling blocking accept()...")
     conn, addr = serverSocket.accept()
     print "Connected with client at " + addr[0]
     if terminateServer:
+        showOled("Exiting", 2, 10, 0, True)
+        showOled("BrickGate server", 4, 12, 0, False)
         break
+    showOled("Connected to", 2, 12, 0, False)
+    showOled(addr[0], 3, 12, 0, False)
     if isConnected:  # Accept only one connection
         continue
     flasher.stop()
     display.showText("Conn")
     Tools.delay(1500)
+    if oled != None:
+        oled.clear()
     display.clear()
     isConnected = True
     devices.clear()
     socketHandler = SocketHandler(conn)
     socketHandler.setDaemon(True)  # necessary to terminate it at program termination
     socketHandler.start()
+Beeper().beep(1)
 display.clear()
 flasher.stop()
 blinkRed(led, 2)

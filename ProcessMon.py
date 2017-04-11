@@ -4,62 +4,23 @@
 from raspibrick import *
 import os, subprocess
 import RPi.GPIO as GPIO
+from OLED1306 import OLED1306
+
+def showOled(text, lineNum, fontSize, indent, clear = False):
+    if oled == None:
+        return
+    if clear:
+        oled.clear()
+    oled.setText(text, lineNum, fontSize, indent)
 
 unit = 100
-
-morse = {
-'a':'.-'   , 'b':'-...' , 'c':'-.-.' , 'd':'-..'  , 'e':'.'    ,
-'f':'..-.' , 'g':'--.'  , 'h':'....' , 'i':'..'   , 'j':'.---' ,
-'k':'-.-'  , 'l':'.-..' , 'm':'--'   , 'n':'-.'   , 'o':'---'  ,
-'p':'.--.' , 'q':'--.-' , 'r':'.-.'  , 's':'...'  , 't':'-'    ,
-'u':'..-'  , 'v':'...-' , 'w':'.--'  , 'x':'-..-' , 'y':'-.--' ,
-'z':'--..' , '1':'.----', '2':'..---', '3':'...--', '4':'....-',
-'5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.',
-'0':'-----', '-':'-....-', '?':'..--..', ',':'--..--', ':':'---...',
-'=':'-...-'}
-
-def emitDot():
-    buzz(True)
-    Tools.delay(unit)
-    buzz(False)
-
-def emitDash():
-    buzz(True)
-    Tools.delay(3 * unit)
-    buzz(False)
-
-def transmit(text):
-    for c in text:
-        if c == " ":
-            Tools.delay(7 * unit)
-        else:
-            c = c.lower()
-            if c in morse:
-                k = morse[c]
-                for x in k:
-                    if x == '.':
-                        emitDot()
-                    else:
-                        emitDash()
-                    Tools.delay(unit)
-            Tools.delay(3 * unit)
-
-def buzz(on):
-    if on:
-        GPIO.output(SharedConstants.P_BUZZER, GPIO.HIGH)
-    else:
-        GPIO.output(SharedConstants.P_BUZZER, GPIO.LOW)
-
-def playIP(ip):
-    transmit(ip)
 
 # ------------------------- main ------------------------------------
 print "ProcessMon " + SharedConstants.VERSION + " starting"
 Tools.delay(1000)  # Wait until raspi is up
-print "Check button"
+print "Check Pi2Go or Standalone mode..."
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-GPIO.setup(SharedConstants.P_BUZZER, GPIO.OUT)
 GPIO.setup(SharedConstants.P_BUTTON, GPIO.OUT)
 GPIO.output(SharedConstants.P_BUTTON, GPIO.HIGH)  # to ensure it is HIGH
 GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
@@ -70,37 +31,8 @@ Tools.delay(1000)
 # that standalone mode is requested if the pin is LOW (because of pull-down)
 # if the pin is HIGH (Pi2Go present), the P_BUTTON must be LOW to escape (held down
 # when Pi2Go boots to manually escape to standalone mode)
-if  GPIO.input(SharedConstants.P_BATTERY_MONITOR) == GPIO.LOW \
-        or  GPIO.input(SharedConstants.P_BUTTON) == GPIO.LOW:
-    if GPIO.input(SharedConstants.P_BATTERY_MONITOR) == GPIO.LOW:
-        print "Pin 18 LOW (open). Escaping to standalone mode"
-    else:
-        if GPIO.input(SharedConstants.P_BUTTTON) == GPIO.LOW:
-            print "Pin 16 LOW (button pressed). Escaping to standalone mode"
-    robot = Robot()
-    ipAddr = robot.getIPAddresses()
-    print "Got IP addresses:", ipAddr
-    ip = ""
-    for addr in ipAddr:
-        if addr != '127.0.0.1':
-            ip += addr
-            ip += "    "
-    if ip == "":
-        ip = "0.0.0.0    "
-    ip = ip.replace(".", "-")
-    display = Display()
-    if display.isAvailable():
-        display.showTicker("x" + ip, 1, 1)
-    idx = ip.rfind('-')
-    lastNb = ip[idx + 1:].strip()
-    playIP("ip " + lastNb)
-    while display.isTickerAlive():
-        time.sleep(0.1)
-    if display.isAvailable():
-        display.showText("donE")
-        Tools.delay(2000)
-        display.clear()
-    robot.exit()
+if  GPIO.input(SharedConstants.P_BATTERY_MONITOR) == GPIO.LOW:
+    print "Pin 18 LOW (open). Escaping to standalone mode"
     GPIO.cleanup()
     Tools.delay(2000)
     sys.exit(0)
@@ -113,8 +45,9 @@ if os.path.isfile(fname):
     print "Update requested"
     robot = Robot()
     display = Display()
-    led = Led(1)
     display.showText("UPE ")
+    showOled("Update requested", 0, 15, 0, True)
+    led = Led(1)
     for i in range(3):
         led.setColor(0, 0, 0)
         Tools.delay(500)
@@ -123,8 +56,11 @@ if os.path.isfile(fname):
     subprocess.call("sudo update-raspibrick", shell = True)
     os.remove(fname)
     display.showText("boot")
+    showOled("Booting now...", 0, 15, 0, True)
     Tools.delay(3000)
     display.clear()
+    if oled != None:
+        oled.clear()
     led.setColor(10, 0, 0)
     print "Update done. Shutting down now"
     Tools.delay(2000)
@@ -132,6 +68,15 @@ if os.path.isfile(fname):
 else:
     isRunning = True
     isFirst = True
+    oled = OLED1306("/home/pi/Pictures/pi2go.ppm")
+    if not oled.isDeviceAvailable():
+        oled = None
+    if oled != None:
+        oled.setText("Welcome", 0, 15, 58) 
+        oled.setText("to the", 1, 15, 80) 
+        oled.setText("Pi2Go", 2, 15, 80) 
+        Tools.delay(4000)
+        oled.setBkImage(None)
     while isRunning:
         print "Spawning IdleProc..."
         if isFirst:
@@ -143,6 +88,7 @@ else:
         rc = subprocess.call(["pyrun", "/home/pi/raspibrick/IdleProcess.py", arg])
         print "Returning from IdleProc with exit code:", rc
         if rc == 1 or rc > 10:
+            showOled("Starting program", 3, 12, 0, True)
             pythonApp = "/home/pi/scripts/MyApp.py"
             if os.path.isfile(pythonApp):
                print "Spawning user app:", pythonApp
@@ -153,6 +99,10 @@ else:
                print "No Python app found to execute"
         elif rc == 2:
             print "Spawning BrickGate server..."
+            if oled != None:
+	        showOled("Starting", 2, 10, 0, True)
+                showOled("BrickGate server", 4, 12, 0, False)
+                Tools.delay(2000)
             rc = subprocess.call(["pyrun", "/home/pi/raspibrick/BrickGate.py"])
             print "Returning from BrickGate with exit code:", rc
         elif rc == 3:
@@ -162,6 +112,7 @@ else:
     robot = Robot()
     display = Display()
     display.showBlinker("8YE", count = 2, speed = 2, blocking = True)
+    showOled("Goodbye...", 0, 15, 0, True) 
     led = Led(1)
     led.setColor(20, 0, 0)
     Tools.delay(2000)

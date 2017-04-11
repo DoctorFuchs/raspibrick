@@ -23,6 +23,9 @@ from InfraredSensor import InfraredSensor
 from UltrasonicSensor import UltrasonicSensor
 from LightSensor import LightSensor
 from RobotContext import RobotContext
+from Beeper import Beeper
+from soundplayer import SoundPlayer
+from OLED1306 import OLED1306
 from Obstacle import Obstacle
 from Target import Target
 from Torch import Torch

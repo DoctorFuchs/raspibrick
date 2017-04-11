@@ -25,6 +25,7 @@ from Display import Display
 from DgTell import DgTell
 from DgTell1 import DgTell1
 from Disp4tronix import Disp4tronix
+from OLED1306 import OLED1306
 from SensorThread import SensorThread
 from Led import Led
 from PCA9685 import PWM
@@ -113,10 +114,13 @@ def _onXButtonEvent(event):
 
 def _onButtonEvent(channel):
     # switch may bounce: down-up-up, down-up-down, down-down-up etc. in fast sequence
+    global _isBtnHit, _buttonThread, _inCallback
+    if _inCallback:
+        return # inhibit reentrance
+    _inCallback = True
     if not _isButtonEnabled:
         Tools.debug("Button event detected, but button disabled")
         return
-    global _isBtnHit, _buttonThread
     try:
         if GPIO.input(SharedConstants.P_BUTTON) == GPIO.LOW:
             if _buttonThread == None: # down-down is suppressed
@@ -136,6 +140,7 @@ def _onButtonEvent(channel):
                     _buttonListener(SharedConstants.BUTTON_RELEASED)
     except:  # NoneType error when program is already terminated
         pass
+    _inCallback = False
 
 def _onBatteryDown(channel):
     Tools.debug("onBatteryDown event on channel " + str(channel))
@@ -144,6 +149,7 @@ def _onBatteryDown(channel):
 
 # --------------------------- Global variables ------------------------
 _buttonThread = None
+_inCallback = False
 _clickThread = None
 _doubleClickTime = SharedConstants.BUTTON_DOUBLECLICK_TIME
 _buttonListener = None
@@ -226,45 +232,41 @@ class MyRobot(object):
         GPIO.setup(SharedConstants.P_BATTERY_MONITOR, GPIO.IN, GPIO.PUD_UP)
         GPIO.add_event_detect(SharedConstants.P_BATTERY_MONITOR, GPIO.RISING, _onBatteryDown)
 
+      
         Tools.debug("Trying to detect I2C bus")
-        isSMBusAvailable = True
-        self._bus = None
-        try:
-            if GPIO.RPI_REVISION > 1:
-                self._bus = smbus.SMBus(1) # For revision 2 Raspberry Pi
-                Tools.debug("Found SMBus for revision 2")
-            else:
-                self._bus = smbus.SMBus(0) # For revision 1 Raspberry Pi
-                Tools.debug("Found SMBus for revision 1")
-        except:
-            print "No SMBus found on this robot device."
-            isSMBusAvailable = False
+        self._bus = smbus.SMBus(1) # For revision 2 Raspberry Pi
+        Tools.debug("Found SMBus for revision 2")
 
         # I2C PWM chip PCM9685 for LEDs and servos
-        if isSMBusAvailable:
-            self.pwm = PWM(self._bus, SharedConstants.PWM_I2C_ADDRESS)
-            self.pwm.setFreq(SharedConstants.PWM_FREQ)
+        self.pwm = PWM(self._bus, SharedConstants.PWM_I2C_ADDRESS)
+        self.pwm.setFreq(SharedConstants.PWM_FREQ)
+        self.isPCA9685Available = self.pwm._isAvailable
+        if self.isPCA9685Available:
             # clear all LEDs
             for id in range(3):
                 self.pwm.setDuty(3 * id, 0)
                 self.pwm.setDuty(3 * id + 1, 0)
                 self.pwm.setDuty(3 * id + 2, 0)
-
         # I2C analog extender chip
-        if isSMBusAvailable:
-            Tools.debug("Trying to detect PCF8591P I2C expander")
-            channel = 0
-            try:
-                self._bus.write_byte(SharedConstants.ADC_I2C_ADDRESS, channel)
-                self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS) # ignore reply
-                data = self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS)
-                Tools.debug("Found PCF8591P I2C expander")
-            except:
-                Tools.debug("PCF8591P I2C expander not found")
+        Tools.debug("Trying to detect PCF8591P I2C expander")
+        channel = 0
+        try:
+            self._bus.write_byte(SharedConstants.ADC_I2C_ADDRESS, channel)
+            self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS) # ignore reply
+            data = self._bus.read_byte(SharedConstants.ADC_I2C_ADDRESS)
+            Tools.debug("Found PCF8591P I2C expander")
+        except:
+            Tools.debug("PCF8591P I2C expander not found")
 
-        Tools.debug("Trying to detect 7-segment display")
-        if isSMBusAvailable:
-            self.displayType = "none"
+        self.displayType = "none"
+        Tools.debug("Trying to detect OLED display")
+        self.oled = OLED1306()
+        if self.oled.isDeviceAvailable():
+            self.displayType= "oled"
+        else:
+            Tools.debug("'oled' display not found")
+            self.oled = None
+            Tools.debug("Trying to detect 7-segment display")
             try:
                 addr = 0x20
                 rc = self._bus.read_byte_data(addr, 0)
@@ -282,24 +284,24 @@ class MyRobot(object):
                     self.displayType = "4tronix"
                 except:
                     Tools.debug("'4tronix' display not found")
-                if self.displayType == "none":
-                    try:
-                        addr = 0x24
-                        data = [0] * 4
-                        self._bus.write_i2c_block_data(addr, data[0], data[1:])  # trying to clear display
-                        self.displayType = "didel"
-                    except:
-                        Tools.debug("'didel' display not found")
+            if self.displayType == "none":
+                try:
+                    addr = 0x24  # old dgTell from didel
+                    data = [0] * 4
+                    self._bus.write_i2c_block_data(addr, data[0], data[1:])  # trying to clear display
+                    self.displayType = "didel"
+                except:
+                    Tools.debug("'didel (old type)' display not found")
 
-            Tools.debug("Display type '" + self.displayType + "'")
+        Tools.debug("Display type '" + self.displayType + "'")
 
-            # Initializing (clear) display, if available
-            if self.displayType == "4tronix":
-                Disp4tronix().clear()
-            if self.displayType == "didel":
-                DgTell().clear()
-            if self.displayType == "didel1":
-                DgTell1().clear()
+        # Initializing (clear) display, if available
+        if self.displayType == "4tronix":
+            Disp4tronix().clear()
+        elif self.displayType == "didel":
+            DgTell().clear()
+        elif self.displayType == "didel1":
+            DgTell1().clear()
 
         GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
         # Establish event recognition from button event
@@ -339,16 +341,18 @@ class MyRobot(object):
         if display != None:
             display.stopTicker()
             display.clear()
-
-        Led.clearAll()
+   
+        if self.isPCA9685Available:
+            Led.clearAll()
         MyRobot.closeSound()
 
         if self.sensorThread != None:
             self.sensorThread.stop()
             self.sensorThread.join(2000)
 
-# GPIO.cleanup() Do not cleanup, otherwise button will not work any more when coming back
-# from remote execution
+#       GPIO.cleanup() 
+# Do not cleanup, otherwise button will not work any more when coming back from remote execution
+
         Tools.delay(2000)  # avoid "sys.excepthook is missing"
 
     def isButtonDown(self):

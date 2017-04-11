@@ -1,6 +1,6 @@
 # BrickGateProperties.py
 
-# For Py2Go (full model)
+# For Pi2Go (full model)
 
 '''
  This software is part of the brickgate application.
@@ -21,9 +21,10 @@ V1.01 - Oct 2015: - Fixed: Robot replaced by RobotInstance.getRobot()
 V1.02 - Dec 2015: - Adapted to new Display class API
 V1.03 - Jan 2016: - Minor changes in doc
 V1.04 - Apr 2016: - Adapted to support new firmware option (Standalone mode)
+V1.05 - Apr 2017: - Added: Support for Oled, Beeper
 '''
 
-BRICKGATE_VERSION = "1.04 - April 2016"
+BRICKGATE_VERSION = "1.05 - April 2017"
 
 # Enable very verbose debugging infos to stdout
 DEBUG = False

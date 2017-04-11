@@ -44,10 +44,19 @@ V1.33 - May 2016: - Patched Scratch image to avoid popup dialog when remote sens
                   - Screen blanking for console disabled
                   - Login shell over serial disabled (in raspi-config)
                   - OLED driver Adafruit_Python_SSD1306
+V1.34 - Jun 2016: - startApp modified to accept fully qualified path to script
+V1.35 - Oct 2016: - Geany, PyQT4 installed, new sudirectory rpi-tutorial, 
+                    in Pictures: einstein.ppm
+V1.36 - Apr 2017: - Updates: RaspiBrick libraries, TigerJython
+                  - Morse announcement removed in Pi2Go startup
+                  - Support for OLED display in Pi2Go mode
+                  - Bluetooth server no longer started at boot time
+                  - Adapted to new NOOPs release
+
 '''
 
-VERSION = "1.33 - May 2016"
-DISPLAYED_VERSION = "133"  # displayed n.nn
+VERSION = "1.36 - Apr 2017"
+DISPLAYED_VERSION = "136"  # displayed n.nn
 
 DEBUG = False
 
@@ -69,9 +78,6 @@ P_LINE_RIGHT = 15
 
 # Pushbutton pin
 P_BUTTON = 16
-
-# Buzzer pin
-P_BUZZER = 22
 
 # Ultrasonic pin
 P_TRIG_ECHO = 8

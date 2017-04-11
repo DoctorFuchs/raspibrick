@@ -1,11 +1,12 @@
 # PCA9685.py
 # ============================================================================
-# Most code from Adafruit PCA9685 16-Channel PWM Servo Driver, 
+# Most code from Adafruit PCA9685 16-Channel PWM Servo Driver
 # with thanks to the author
 # ============================================================================
 
 import time
 import math
+from Tools import Tools
 
 class PWM:
     _mode_adr              = 0x00
@@ -21,13 +22,16 @@ class PWM:
         '''
         self.bus = bus
         self.address = address
+        self._isAvailable = True
         self._writeByte(self._mode_adr, 0x00)
 
     def setFreq(self, freq):
         '''
         Sets the PWM frequency. The value is stored in the device.
-        @param freq: the frequency in Hz (approx.)
+        @param freq: the frequency in Hz (approx. in range 16 - 1500 Hz)
         '''
+        if not self._isAvailable:
+            return
         prescaleValue = 25000000.0    # 25MHz
         prescaleValue /= 4096.0       # 12-bit
         prescaleValue /= float(freq)
@@ -36,8 +40,8 @@ class PWM:
         oldmode = self._readByte(self._mode_adr)
         if oldmode == None:
             return
-        newmode = (oldmode & 0x7F) | 0x10
-        self._writeByte(self._mode_adr, newmode)
+        newmode = (oldmode & 0x7F) | 0x10  # sleep
+        self._writeByte(self._mode_adr, newmode)  # goto sleep
         self._writeByte(self._prescale_adr, int(math.floor(prescale)))
         self._writeByte(self._mode_adr, oldmode)
         time.sleep(0.005)
@@ -47,22 +51,27 @@ class PWM:
         '''
         Sets a single PWM channel. The value is stored in the device.
         @param channel: one of the channels 0..15
-        @param duty: the duty cycle 0..100
+        @param duty: the duty cycle 0..4095 (included)
         '''
-        data = int(duty * 4996 / 100) # 0..4096 (included)
-        self._writeByte(self._base_adr_low + 4 * channel, data & 0xFF)
-        self._writeByte(self._base_adr_high + 4 * channel, data >> 8)
+        if not self._isAvailable:
+            return
+        duty = int(duty)
+        duty = max(0, duty)
+        duty = min(4095, duty)
+        self._writeByte(self._base_adr_low + 4 * channel, duty & 0xFF)
+        self._writeByte(self._base_adr_high + 4 * channel, duty >> 8)
 
     def _writeByte(self, reg, value):
         try:
             self.bus.write_byte_data(self.address, reg, value)
         except:
-            print "Error while writing to I2C device"
+            Tools.debug("Error while writing to I2C device at address: " + str(self.address))
+            self._isAvailable = False
 
     def _readByte(self, reg):
         try:
             result = self.bus.read_byte_data(self.address, reg)
             return result
         except:
-            print "Error while reading from I2C device"
+            Tools.debug("Error while reading from I2C device at address: " + str(self.address))
             return None

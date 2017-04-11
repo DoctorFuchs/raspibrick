@@ -21,6 +21,13 @@ import thread
 
 from raspibrick import *
 
+def showOled(text, lineNum, fontSize, indent, clear = False):
+    if robot.displayType != "oled":
+        return
+    if clear:
+        robot.oled.clear()
+    robot.oled.setText(text, lineNum, fontSize, indent)
+
 def blinker(nb):
     for i in range(nb):
         led.setColor(0, 0, 0)
@@ -35,10 +42,17 @@ def showAppInfo(forceUpdate):
     global oldText
     if nbProg > 0:
         text = "P" + str(progID) + "-" + str(nbProg)
+        text1 = "P" + str(progID) + " of " + str(nbProg)
     else:
         text = "P0-0"
+        text1 = "No program"
     if oldText != text or forceUpdate:
         display.showText(text)
+        showOled(text1, 0, 15, 0, True)
+        if nbProg > 0:
+            showOled("Click to execute pgm", 2, 10, 0, False)
+            showOled("DClick to select next pgm", 3, 10, 0, False)
+        showOled("LPress to start BrickGate", 4, 10, 0, False)
         oldText = text
 
 def showIPAddress():
@@ -47,16 +61,26 @@ def showIPAddress():
     for addr in ipAddr:
         if addr != '127.0.0.1':
             ip += addr
-            ip += "    "
-    ip = ip.replace(".", "-")
-    display.showTicker("x" + ip, 1, 1, True)
+            ip += "   "
+    ipx = ip.replace(".", "-")
+    display.showTicker("x" + ipx, 1, 1, True)
+    if robot.displayType == "oled":
+        if ip == "":
+            showOled("Current IP address", 0, 10, 0, True)
+            showOled("0.0.0.0", 1, 15, 0)
+        else:
+            showOled("Current IP address:", 0, 10, 0, True)
+            msg = ip.split("   ")
+            for i in range (len(msg)):
+                showOled(msg[i], i + 1, 15, 0)
+        Tools.delay(3000)
     showAppInfo(True)
 
 def updateAppFiles():
-#    print "updatAppFiles()"
-    global nbProg, progID
+    global nbProg, progID, showUpdateInfo
+    Tools.debug("Calling updatAppFiles()")
     if inCallback:
- #       print "updateAppFiles() returned because inCallback = True"
+        Tools.debug("updateAppFiles() returned because inCallback = True")
         return
 
     # Check if MyApp.py has changed using time stamp
@@ -68,16 +92,21 @@ def updateAppFiles():
         showAppInfo(False)
         return
 
-    if os.path.isfile(file0) and int(os.path.getmtime(file0)) != 0:
-#        print "Update needed"
-        display.showText("P---")
-        Tools.delay(2000)
+    if os.path.isfile(file0) and int(os.path.getmtime(file0)) != 0: # file exists and time of modificaton not zero
+        Tools.debug("Update needed")
+        if showUpdateInfo:
+	    display.showText("P---")
+            showOled("New program", 0, 12, 0, True)
+            showOled("detected", 1, 12, 0, False)
+            Tools.delay(3000)  # if download and execute, the process is killed here
+        showUpdateInfo = True         
         for i in reversed(range(1, 9)):
             file_old = SharedConstants.APP_PATH + "_" + str(i) + ".py"
             file_new = SharedConstants.APP_PATH + "_" + str(i + 1) + ".py"
             copyFile(file_old, file_new)
         copyFile(file0, file1)
-        os.utime(file0, (0, 0))  # set to zero
+        Tools.debug("Set timestamp to zero")
+        os.utime(file0, (0, 0))  # set time of modification to zero
         nbProg = getNbProg()
         progID = 1
         showAppInfo(True)
@@ -124,7 +153,7 @@ def onButtonEvent(event):
             showAppInfo(True)
             inCallback = False
             return
-        if ir_right.getValue() == 1:
+        if ir_center.getValue() == 1:
             showIPAddress()
             inCallback = False
             return
@@ -142,6 +171,8 @@ def onButtonEvent(event):
         if nbProg > 0 and ir_center.getValue() == 1:
 #            print "delete all"
             display.showText("dEL")
+            showOled("All programs", 0, 15, 0, True)
+            showOled("deleted", 1, 15, 0, False)
             time.sleep(1)
             try:
                 for i in range(1, nbProg + 1):
@@ -152,7 +183,6 @@ def onButtonEvent(event):
                 pass
             nbProg = 0
             progID = 0
-            display.showText("P0-0")
             inCallback = False
             return
         if progID == nbProg:
@@ -173,6 +203,8 @@ def onButtonEvent(event):
             if not isShutdownPending:
                 isShutdownPending = True
                 display.showText("oooo")
+                showOled("Shutdown", 0, 15, 0, True)
+                showOled("Are you sure?", 1, 10, 1, False)
                 led.setColor(100, 0, 0)
         else:  # starting BrickGate
             isShutdownPending = False
@@ -182,6 +214,9 @@ def onButtonEvent(event):
 
 def firstDuty():
     display.showText("E" + SharedConstants.DISPLAYED_VERSION, 0, [0, 1, 0])
+    showOled("Starting RaspiBrick", 0, 10, 0)
+    showOled("V" + SharedConstants.VERSION, 1, 15, 0) 
+    showOled("Searching access point", 2, 10, 0)
     Tools.delay(4000)
     display.showText("AP--")
     count = 0
@@ -205,6 +240,14 @@ def firstDuty():
         led.setColor(10, 10, 0)
     else:
         led.setColor(0, 20, 0)
+
+    if ip == "":
+        showOled("Got IP address", 2, 10, 0)
+        showOled("0.0.0.0", 3, 15, 0)
+    else:
+        showOled("Got IP address:", 2, 10, 0)
+        showOled(ip, 3, 15, 0)
+ 
     if display.isAvailable():
         if not isInterrupted and display.isAvailable():
             if ip == "":
@@ -216,6 +259,8 @@ def firstDuty():
             display.stopTicker()
     else:
         Tools.delay(3000)
+    Beeper().beep(2)
+
 
 def getConfigEntry(section, key):
     config = ConfigParser.ConfigParser()
@@ -252,7 +297,6 @@ def blinkLed():
         Tools.delay(200)
 
 print "IdleProcess starting"
-
 rc = 0
 robot = Robot()
 display = Display()
@@ -265,6 +309,7 @@ isInterrupted = False
 nbProg = getNbProg()
 progID = 0
 oldText = ""
+ir_center = InfraredSensor(IR_CENTER)
 if sys.argv[1] == "isFirst":
 #    print "isFirst = True"
     firstDuty()
@@ -283,9 +328,15 @@ else:
 
 isAlive = True
 led.setColor(0, 0, 50) # Announce, we are running
-showAppInfo(True)
-ir_center = InfraredSensor(IR_CENTER)
-ir_right = InfraredSensor(IR_RIGHT)
+
+# Check if returning from execution of new downloaded file
+file0 = SharedConstants.APP_PATH + ".py"
+if os.path.isfile(file0) and int(os.path.getmtime(file0)) != 0: # file exists and time of modificaton not zero->update needed
+   showUpdateInfo = False
+else:
+   showUpdateInfo = True
+   showAppInfo(True)
+
 isShutdownPending = False
 while isAlive:
     updateAppFiles()
@@ -293,6 +344,8 @@ while isAlive:
     while time.time() - startTime < 2 and isAlive:
         time.sleep(0.1)
 display.clear()
+if robot.oled != None:
+    robot.oled.clear()
 led.setColor(0, 0, 0)
 Tools.delay(1000)
 print "Returning to parent process with rc:", rc

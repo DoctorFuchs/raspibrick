@@ -25,8 +25,9 @@ V1.33 - Jun 2016: - Patched Scratch image to avoid popup dialog when remote sens
 V1.34 - Jun 2016: - startApp modified to accept fully qualified path to script
 V1.35 - Oct 2016: - Geany, PyQT4 installed, new sudirectory rpi-tutorial, 
                     in Pictures: einstein.ppm
-V1.36 - Mar 2017: - Updates: RaspiBrick libraries, TigerJython
+V1.36 - Apr 2017: - Adapted to new NOOPs release
+                  - Updates: RaspiBrick libraries, TigerJython
                   - Bluetooth server no longer started at boot time
-V1.37 - Mar 2017: - Adapted to new NOOPs release
+                 
  
 
