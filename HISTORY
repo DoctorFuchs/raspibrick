@@ -28,6 +28,8 @@ V1.35 - Oct 2016: - Geany, PyQT4 installed, new sudirectory rpi-tutorial,
 V1.36 - Apr 2017: - Adapted to new NOOPs release
                   - Updates: RaspiBrick libraries, TigerJython
                   - Bluetooth server no longer started at boot time
+V1.36a - Apr 2017: - Added: Script remotedev to install minimum support for
+                    remote development with TigerJython
                  
  
 

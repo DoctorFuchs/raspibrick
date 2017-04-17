@@ -1,0 +1,21 @@
+# remotedev
+
+# Display commands
+set -x
+
+chmod +x install/rkill
+chmod +x install/pyrun
+chmod +x install/startApp
+
+sudo cp install/rkill /usr/bin
+sudo cp install/pyrun /usr/bin
+sudo cp install/startApp /usr/bin
+
+mkdir /home/pi/raspibrick
+mkdir /home/pi/raspibrick/lib
+mkdir /home/pi/scripts
+mkdir /home/pi/Fonts
+
+cp -R /home/pi/install/lib/* /home/pi/raspibrick/lib
+cp /home/pi/install/Fonts/*.* /home/pi/Fonts
+

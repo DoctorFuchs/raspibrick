@@ -1,6 +1,6 @@
 #! /bin/sh
 # Autostart script for RaspiBrick
-# Version Aug. 27, 2015
+# Version April. 12, 2017
 
 set -x
 
