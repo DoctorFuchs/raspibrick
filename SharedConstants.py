@@ -52,11 +52,12 @@ V1.36 - Apr 2017: - Updates: RaspiBrick libraries, TigerJython
                   - Support for OLED display in Pi2Go mode
                   - Bluetooth server no longer started at boot time
                   - Adapted to new NOOPs release
+V1.37 - May 2017: - OLED1306 thread-safe now
 
 '''
 
-VERSION = "1.36 - Apr 2017"
-DISPLAYED_VERSION = "136"  # displayed n.nn
+VERSION = "1.37 - May 2017"
+DISPLAYED_VERSION = "137"  # displayed n.nn
 
 DEBUG = False
 

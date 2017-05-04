@@ -13,15 +13,19 @@ from threading import Thread
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
+from threading import RLock
+
 class OLED1306():
     '''
     Creates a display instances with given OLED display type (128x32 or 128x64, black & white).
     with standard font from font file /usr/share/fonts/truetype/freefont/FreeSans.ttf.
+    All public methods (except ctor and blinker methods) are thread-safe (locked by a static RLock.
     @param imagePath: the path to the PPM image file used as background (must have size 128x32 or 128x64 resp.)
     @param type: 32 or 64 defining 128x32 or 128x64 bit resolution (default: 64)
     @param inverse: if True, the background is white and the text is black; 
     otherwise the background is black and the text  is white (default)
     '''
+    _lock = RLock() # Use reentrant lock
     def __init__(self, bkImagePath = None, type = 64, inverse = False):
         bus = smbus.SMBus(1) 
         i2c_address = 0x3C
@@ -83,10 +87,12 @@ class OLED1306():
         @param enable: if True, the display is slightly dimmed; 
         otherwise it is set to full contrast
         '''
+        OLED1306._lock.acquire()
         if enable:
             self.disp.set_contrast(0)
         else:
             self.disp.set_contrast(255)
+        OLED1306._lock.release()
         
     def setBkImage(self, bkImagePath):
         '''
@@ -100,23 +106,28 @@ class OLED1306():
         @ttfFile: the path to the font file (only TTF fonts supported)
         @fontSize: the font size (default: 10)
         '''
+        OLED1306._lock.acquire()
         self.ttfFile = ttfFile
         self.ttfFileStandard = ttfFile
         self.fontSize = fontSize
         self.font = ImageFont.truetype(ttfFile, fontSize)
+        OLED1306._lock.release()
 
     def setFontSize(self, fontSize):
         '''
         Sets a new font size of current font.
         @fontSize: the new font size
         '''
+        OLED1306._lock.acquire()
         self.font = ImageFont.truetype(self.ttfFile, fontSize)
         self.fontSize = fontSize
+        OLED1306._lock.release()
 
     def clear(self):
         '''
         Erases the display and clears the text buffer.
         '''
+        OLED1306._lock.acquire()
         if self.inverse:
             self.draw.rectangle((0, 0, self.width, self.height), outline = 0, fill = 255)
         else:
@@ -126,17 +137,20 @@ class OLED1306():
         self.textBuf = {}
         self.cursor = [0, 0]
         self.scroll = False
+        OLED1306._lock.release()
         
     def erase(self):
         '''
         Erases the display without clearing the text buffer.
         '''
+        OLED1306._lock.acquire()
         if self.inverse:
             self.draw.rectangle((0, 0, self.width, self.height), outline = 0, fill = 255)
         else:
             self.draw.rectangle((0, 0, self.width, self.height), outline = 0, fill = 0)
         self.disp.image(self.image)
         self.disp.display()
+        OLED1306._lock.release()
                     
     def setText(self, text, lineNum = 0, fontSize = None, indent = 0):
         '''
@@ -153,6 +167,7 @@ class OLED1306():
         @param fontSize: the size of the font (default: None, set to current font size)
         @indent: the line indent in pixels (default: 0)
         '''
+        OLED1306._lock.acquire()
         if "\n" not in text:
             self._setLine(text, lineNum, fontSize, indent)
         else:
@@ -161,6 +176,7 @@ class OLED1306():
             for line in lines:
                 self._setLine(line, nb, fontSize, indent)
                 nb += 1
+        OLED1306._lock.release()
     
     def _setLine(self, text, lineNum, fontSize, indent):
         if text == "":
@@ -182,17 +198,20 @@ class OLED1306():
         Returns the height of one line.
         @return: line spacing in pixels
         '''
+        OLED1306._lock.acquire()
         charWidthDummy, charHeight = self.draw.textsize('I', font = self.font)
+        OLED1306._lock.release()
         return charHeight
 
     def repaint(self):
         '''
         Repaints the screen (background image and text buffer).
         '''
+        OLED1306._lock.acquire()
         if len(self.textBuf) == 0:
             maxNum = 0
         else:
-	    maxNum = max(self.textBuf.keys())
+            maxNum = max(self.textBuf.keys())
         # Clear display
         if self.inverse:
             self.draw.rectangle((0, 0, self.width, self.height), outline = 0, fill = 255) # White
@@ -227,6 +246,7 @@ class OLED1306():
         # Renders the current image buffer.
         self.disp.image(self.image)
         self.disp.display()
+        OLED1306._lock.release()
 
     def showImage(self, imagePath):  
         '''
@@ -234,9 +254,11 @@ class OLED1306():
         or 128x64 for display type 64).
         @param imagePath: the path to the PPM image file
         '''
+        OLED1306._lock.acquire()
         picture = Image.open(imagePath).convert('1')
         self.disp.image(picture)
         self.disp.display()
+        OLED1306._lock.release()
         
     def println(self, text):
         '''
@@ -244,6 +266,7 @@ class OLED1306():
         Sets the cursor at the beginning of next line.
         @param text: the text to display
         '''
+        OLED1306._lock.acquire()
         charWidthDummy, charHeight = self.draw.textsize('I', font = self.font)
         nbLines = int(self.type / (charHeight))
     
@@ -256,22 +279,27 @@ class OLED1306():
             for i in range(nbLines - 1):
                 self.textBuf[i] = self.textBuf[i + 1]
             self.setText(text, nbLines - 1)    
+        OLED1306._lock.release()
         
     def setNumberOfLines(self, nbLines):
         '''
         Sets the current font size to a maximum to show the given number of lines.
         @param: the number of lines to display
         '''
+        OLED1306._lock.acquire()
         fontSize = int(self.type / nbLines) + 1
         self.setFontSize(fontSize)
+        OLED1306._lock.release()
         
     def setInverse(self, inverse):
         '''
         @param inverse: if True, the background is white and the text is black; 
         otherwise the background is black and the text  is white (default)
         '''
+        OLED1306._lock.acquire()
         self.inverse = inverse
         self.repaint()
+        OLED1306._lock.release()
         
     def startBlinker(self, count = 3, offTime = 1000, onTime = 1000, blocking = False):
         '''
@@ -286,7 +314,7 @@ class OLED1306():
             self.stopBlinker()
         self.blinkerThread = BlinkerThread(self, count, offTime, onTime)
         if blocking:
-            while self.isBlinkerAlive():
+            while self.isBlinking():
                 continue
                              
     def stopBlinker(self):
@@ -326,7 +354,7 @@ class BlinkerThread(Thread):
         self.isAlive = True
         self.start()
         while not self.isRunning:
-            continue
+            time.sleep(0.1)
 
     def run(self):
         nb = 0
@@ -352,6 +380,4 @@ class BlinkerThread(Thread):
 
     def stop(self):
         self.isRunning = False
-        while self.isAlive: # Wait until thread is finished
-            continue
                                                                                          

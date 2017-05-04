@@ -11,7 +11,7 @@ if [ $# -eq 0 ]; then
         rkill
         pyrun /home/pi/scripts/MyApp.py 2>&1
         ;;
-    *)  echo "Pi2Go mode. Starting program by firmware..."
+    *)  echo "Starting program by firmware..."
         pyrun /home/pi/raspibrick/KillIdleProc.py
         ;;
     esac
