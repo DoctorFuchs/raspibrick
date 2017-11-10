@@ -31,6 +31,6 @@ V1.36 - Apr 2017: - Adapted to new NOOPs release
                   - Added: Script remotedev to install minimum support for
                     remote development with TigerJython
 V1.37 - May 2017: - OLED1306 thread-safe now
-                 
+V1.38 - Nov 2017: - Added: TM1637.py                 
  
 

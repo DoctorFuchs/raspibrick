@@ -53,11 +53,11 @@ V1.36 - Apr 2017: - Updates: RaspiBrick libraries, TigerJython
                   - Bluetooth server no longer started at boot time
                   - Adapted to new NOOPs release
 V1.37 - May 2017: - OLED1306 thread-safe now
-
+V1.38 - Nov 2017: - Added: TM1637.py
 '''
 
-VERSION = "1.37 - May 2017"
-DISPLAYED_VERSION = "137"  # displayed n.nn
+VERSION = "1.38 - Nov 2017"
+DISPLAYED_VERSION = "138"  # displayed n.nn
 
 DEBUG = False
 
