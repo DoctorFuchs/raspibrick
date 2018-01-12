@@ -55,10 +55,12 @@ V1.36 - Apr 2017: - Updates: RaspiBrick libraries, TigerJython
 V1.37 - May 2017: - OLED1306 thread-safe now
 V1.38 - Nov 2017: - Added: TM1637.py
 V1.39 - Jan 2018: - Added: MQTT modules (from paho)
+V1.40 - Jan 2018: - Update: autostart.sh to perform autostart
+                    of /home/pi/autostart.py from ProcessMon now
 '''
 
-VERSION = "1.39 - Jan 2018"
-DISPLAYED_VERSION = "139"  # displayed n.nn
+VERSION = "1.40 - Jan 2018"
+DISPLAYED_VERSION = "140"  # displayed n.nn
 
 DEBUG = False
 

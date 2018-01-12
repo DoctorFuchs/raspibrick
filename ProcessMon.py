@@ -18,6 +18,12 @@ unit = 100
 # ------------------------- main ------------------------------------
 print "ProcessMon " + SharedConstants.VERSION + " starting"
 Tools.delay(1000)  # Wait until raspi is up
+fname = "/home/pi/scripts/autostart.py"
+if os.path.isfile(fname):
+     print "Found:", fname, "and run it now..."
+     subprocess.Popen(["pyrun",  fname])
+     sys.exit(0)
+
 print "Check Pi2Go or Standalone mode..."
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -26,9 +32,11 @@ GPIO.output(SharedConstants.P_BUTTON, GPIO.HIGH)  # to ensure it is HIGH
 GPIO.setup(SharedConstants.P_BUTTON, GPIO.IN, GPIO.PUD_UP)
 GPIO.setup(SharedConstants.P_BATTERY_MONITOR, GPIO.IN, GPIO.PUD_DOWN)
 Tools.delay(1000)
-# Check if standalone mode is requested:
-# If Pi2Go is available, the P_BATTERY_MONITOR is HIGH, despite of PULL-DOWN resistance
-# If LOW, an open pin is assumed (standalone mode)
+# Check if standalone mode is requested
+# if Pi2Go is available, the P_BATTERY_MONITOR is HIGH, assumes
+# that standalone mode is requested if the pin is LOW (because of pull-down)
+# if the pin is HIGH (Pi2Go present), the P_BUTTON must be LOW to escape (held down
+# when Pi2Go boots to manually escape to standalone mode)
 if  GPIO.input(SharedConstants.P_BATTERY_MONITOR) == GPIO.LOW:
     print "Pin 18 LOW (open). Escaping to standalone mode"
     GPIO.cleanup()
