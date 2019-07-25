@@ -51,13 +51,17 @@ V1.36 - Apr 2017: - Updates: RaspiBrick libraries, TigerJython
                   - Morse announcement removed in Pi2Go startup
                   - Support for OLED display in Pi2Go mode
                   - Bluetooth server no longer started at boot time
-                  - Adapted to new NOOPs release
+                  - Adapted to new NOOBS release
 V1.37 - May 2017: - OLED1306 thread-safe now
 V1.38 - Nov 2017: - Added: TM1637.py
+V1.39 - Jan 2018: - Added: MQTT modules (from paho)
+V1.40 - Jan 2018: - Update: autostart.sh to perform autostart
+                    of /home/pi/autostart.py from ProcessMon now
+V2.00 - Jul 2019: - New NOOBS release (for RPi3+ and RPi4)
 '''
 
-VERSION = "1.38 - Nov 2017"
-DISPLAYED_VERSION = "138"  # displayed n.nn
+VERSION = "2.00 - July 2019"
+DISPLAYED_VERSION = "200"  # displayed n.nn
 
 DEBUG = False
 

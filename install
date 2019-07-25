@@ -75,7 +75,7 @@ sudo cp /home/pi/install/modules /etc/modules
 sudo cp /home/pi/install/bashrc-root /root/.bashrc
 sudo cp /home/pi/install/bashrc-pi /home/pi/.bashrc
 sudo cp /home/pi/install/sudoers /etc
-sudo cp /home/pi/install/logo/raspibrick.png /usr/share/pixel-wallpaper
+sudo cp /home/pi/install/logo/raspibrick.png /usr/share/rpd-wallpaper
 
 # for camera support:
 sudo cp /home/pi/install/mjpg-streamer/mjpg_streamer /usr/local/bin

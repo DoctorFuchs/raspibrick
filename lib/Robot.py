@@ -34,6 +34,9 @@ from subprocess import Popen, PIPE
 import re
 import smbus
 import pygame
+import fcntl
+import struct
+import socket
 
 # --------------------------- class ButtonThread ------------
 class ButtonThread(Thread):
@@ -492,11 +495,18 @@ class MyRobot(object):
         '''
         @return:  List of all IP addresses of machine
         '''
-        p = Popen(["ifconfig"], stdout = PIPE)
-        ifc_resp = p.communicate()
-        patt = re.compile(r'inet\s*\w*\S*:\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-        resp = patt.findall(ifc_resp[0])
-        return resp
+        ip = []
+        ifname = "wlan0"
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            ip.append(socket.inet_ntoa(fcntl.ioctl(s.fileno(),
+                     0x8915,  # SIOCGIFADDR
+                     struct.pack('256s', ifname[:15]))[20:24]))
+        except:
+            pass
+        print "Got IP address:", ip
+        return ip
+
 
     @staticmethod
     def initSound(soundFile, volume):
