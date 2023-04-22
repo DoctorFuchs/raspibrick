@@ -14,10 +14,10 @@ def readData(port = 0):
     data = data >> 2
     return data
 
-print "starting..."
+print("starting...")
 bus = smbus.SMBus(1) 
 while True:
     v = readData()
-    print "data:", v
+    print("data:", v)
     time.sleep(1)
 

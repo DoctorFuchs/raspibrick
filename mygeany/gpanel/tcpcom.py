@@ -13,7 +13,7 @@
  '''
 
 from threading import Thread
-import thread
+import _thread
 import socket
 import time
 import sys
@@ -62,22 +62,22 @@ class TCPServer(Thread):
         try:
             self.serverSocket.bind((HOSTNAME, self.port))
         except socket.error as msg:
-            print "Fatal error while creating TCPServer: Bind failed.", msg[0], msg[1]
+            print("Fatal error while creating TCPServer: Bind failed.", msg[0], msg[1])
             sys.exit()
         try:    
             self.serverSocket.listen(10)
         except:
-            print "Fatal error while creating TCPServer: Port", self.port, "already in use"
+            print("Fatal error while creating TCPServer: Port", self.port, "already in use")
             try:
                 self.stateChanged(TCPServer.PORT_IN_USE, str(self.port))
-            except Exception, e:
-               print "Caught exception in TCPServer.PORT_IN_USE:", e
+            except Exception as e:
+               print("Caught exception in TCPServer.PORT_IN_USE:", e)
             sys.exit()
 
         try:
             self.stateChanged(TCPServer.LISTENING, str(self.port))
-        except Exception, e:
-            print "Caught exception in TCPServer.LISTENING:", e
+        except Exception as e:
+            print("Caught exception in TCPServer.LISTENING:", e)
 
         self.isServerRunning = True
                 
@@ -102,15 +102,15 @@ class TCPServer(Thread):
             self.socketHandler.start()
             try: 
                 self.stateChanged(TCPServer.CONNECTED, self.addr[0])
-            except Exception, e:
-                print "Caught exception in TCPServer.CONNECTED:", e
+            except Exception as e:
+                print("Caught exception in TCPServer.CONNECTED:", e)
         self.conn.close()
         self.serverSocket.close()
         self.isClientConnected = False
         try:
             self.stateChanged(TCPServer.TERMINATED, "")
-        except Exception, e:
-            print "Caught exception in TCPServer.TERMINATED:", e
+        except Exception as e:
+            print("Caught exception in TCPServer.TERMINATED:", e)
         self.isServerRunning = False
         TCPServer.debug("TCPServer thread terminated")
 
@@ -141,8 +141,8 @@ class TCPServer(Thread):
             self.isClientConnected = False
             try:
                 self.stateChanged(TCPServer.LISTENING, str(self.port))
-            except Exception, e:
-                print "Caught exception in TCPServer.LISTENING:", e
+            except Exception as e:
+                print("Caught exception in TCPServer.LISTENING:", e)
             TCPServer.debug("Shutdown socket now")
             try:
                 self.conn.shutdown(socket.SHUT_RDWR)
@@ -182,7 +182,7 @@ class TCPServer(Thread):
     @staticmethod
     def debug(msg):
         if TCPServer.isVerbose:
-            print "   TCPServer-> " + msg
+            print("   TCPServer-> " + msg)
  
     @staticmethod
     def getVersion():
@@ -222,8 +222,8 @@ class ServerHandler(Thread):
                 for i in range(len(junk) - 1):
                     try:
                         self.server.stateChanged(TCPServer.MESSAGE, junk[i])
-                    except Exception, e:
-                        print "Caught exception in TCPServer.MESSAGE:", e
+                    except Exception as e:
+                        print("Caught exception in TCPServer.MESSAGE:", e)
         except:  # May happen if client peer is resetted
             TCPServer.debug("Exception from blocking conn.recv(), Msg: " + str(sys.exc_info()[0]) + \
               " at line # " +  str(sys.exc_info()[-1].tb_lineno))
@@ -314,8 +314,8 @@ class TCPClient():
             timeout = None
         try:
             self.stateChanged(TCPClient.CONNECTING, self.ipAddress + ":" + str(self.port))
-        except Exception, e:
-            print "Caught exception in TCPClient.CONNECTING:", e
+        except Exception as e:
+            print("Caught exception in TCPClient.CONNECTING:", e)
         try:
             self.isClientConnecting = True
             host = (self.ipAddress, self.port)
@@ -329,8 +329,8 @@ class TCPClient():
             self.isClientConnecting = False
             try:
                 self.stateChanged(TCPClient.CONNECTION_FAILED, self.ipAddress + ":" + str(self.port))
-            except Exception, e:
-                print "Caught exception in TCPClient.CONNECTION_FAILED:", e
+            except Exception as e:
+                print("Caught exception in TCPClient.CONNECTION_FAILED:", e)
             TCPClient.debug("Connection failed.")
             return False
         ClientHandler(self)
@@ -345,14 +345,14 @@ class TCPClient():
             TCPClient.debug("Connection refused")
             try:
                 self.stateChanged(TCPClient.SERVER_OCCUPIED, self.ipAddress + ":" + str(self.port))
-            except Exception, e:
-                print "Caught exception in TCPClient.SERVER_OCCUPIED:", e
+            except Exception as e:
+                print("Caught exception in TCPClient.SERVER_OCCUPIED:", e)
             return False
 
         try:
             self.stateChanged(TCPClient.CONNECTED, self.ipAddress + ":" + str(self.port))
-        except Exception, e:
-            print "Caught exception in TCPClient.CONNECTED:", e
+        except Exception as e:
+            print("Caught exception in TCPClient.CONNECTED:", e)
         TCPClient.debug("Successfully connected")
         return True
 
@@ -389,7 +389,7 @@ class TCPClient():
     @staticmethod
     def debug(msg):
         if TCPClient.isVerbose:
-            print "   TCPClient-> " + msg
+            print("   TCPClient-> " + msg)
 
     @staticmethod
     def getVersion():
@@ -416,8 +416,8 @@ class ClientHandler(Thread):
                 for i in range(len(junk) - 1):
                     try:
                         self.client.stateChanged(TCPClient.MESSAGE, junk[i])
-                    except Exception, e:
-                        print "Caught exception in TCPClient.MESSAGE:", e
+                    except Exception as e:
+                        print("Caught exception in TCPClient.MESSAGE:", e)
             except:    
                 TCPClient.debug("Exception in readResponse() Msg: " + str(sys.exc_info()[0]) + \
                   " at line # " +  str(sys.exc_info()[-1].tb_lineno))
@@ -426,8 +426,8 @@ class ClientHandler(Thread):
                 break
         try:
             self.client.stateChanged(TCPClient.DISCONNECTED, "")
-        except Exception, e:
-            print "Caught exception in TCPClient.DISCONNECTED:", e
+        except Exception as e:
+            print("Caught exception in TCPClient.DISCONNECTED:", e)
         TCPClient.debug("ClientHandler thread terminated")
 
     def readResponse(self):

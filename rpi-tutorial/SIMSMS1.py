@@ -21,15 +21,15 @@ time.sleep(3)
 ser.write('AT+CMGDA="DEL ALL"\r') # delete all SMS
 time.sleep(3)
 reply = ser.read(ser.inWaiting()) # Clean buf
-print "Listening for incomming SMS..."
+print("Listening for incomming SMS...")
 while True:
     reply = ser.read(ser.inWaiting())
     if reply != "":
         ser.write("AT+CMGR=1\r") 
         time.sleep(3)
         reply = ser.read(ser.inWaiting())
-        print "SMS received. Content:"
-        print reply
+        print("SMS received. Content:")
+        print(reply)
         if "getStatus" in reply:
             t = str(datetime.datetime.now())
             if GPIO.input(P_BUTTON) == GPIO.HIGH:
@@ -39,7 +39,7 @@ while True:
             ser.write('AT+CMGS="+41764331356"\r')
             time.sleep(1)
             msg = "Sending status at " + t + ":--" + state
-            print "Sending SMS with status info:" + msg
+            print("Sending SMS with status info:" + msg)
             ser.write(msg + chr(26))
         time.sleep(3)
         ser.write('AT+CMGDA="DEL ALL"\r') # delete all

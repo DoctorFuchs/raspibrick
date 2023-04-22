@@ -12,7 +12,7 @@ control_byte = 0x00                                                             
 t = 0
 while True:
     data = bus.read_byte_data(i2c_address, control_byte)
-    print t, "s:", data
+    print(t, "s:", data)
 #    ps.showText("%4d" %data) # xxx
     t += 0.1
     time.sleep(0.1)

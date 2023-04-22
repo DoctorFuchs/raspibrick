@@ -16,7 +16,7 @@ def readData(port = 0):
     data = data >> 2
     return data
 
-print "starting..."
+print("starting...")
 bus = smbus.SMBus(1) 
 
 state = "DARK"
@@ -24,9 +24,9 @@ while True:
     v = readData(1)  # adapt to your ADC (0 or 1)
     if v >= TRIGGER_LEVEL and state == "DARK":
        state = "BRIGHT"
-       print "BRIGHT event"
+       print("BRIGHT event")
     if v < TRIGGER_LEVEL and state == "BRIGHT":
        state = "DARK"
-       print "DARK event"
+       print("DARK event")
 
 

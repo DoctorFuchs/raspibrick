@@ -14,13 +14,13 @@ def readData(port = 0):
     data = data >> 2
     return data
 
-print "starting..."
+print("starting...")
 bus = smbus.SMBus(1) 
 
 while True:
     v = readData(1)  # adapt to your ADC (0 or 1)
     T = v / 3.1
-    print "T = %4.1f centigrades" %T    
+    print("T = %4.1f centigrades" %T)    
     time.sleep(1)
 
 

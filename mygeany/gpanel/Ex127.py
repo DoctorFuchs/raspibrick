@@ -4,20 +4,20 @@ makeGPanel()
 setPenColor("white")
 
 setXORMode()  
-print "draw"
+print("draw")
 line(0.1, 0.1, 0.9, 0.9)
 time.sleep(3)
-print "redraw"
+print("redraw")
 line(0.1, 0.1, 0.9, 0.9)
 time.sleep(3)
 
 
 setPenColor("black")
 setPaintMode()  
-print "draw"
+print("draw")
 line(0.1, 0.1, 0.9, 0.9)
 time.sleep(3)
-print "redraw"
+print("redraw")
 line(0.1, 0.1, 0.9, 0.9)
 time.sleep(3)
 

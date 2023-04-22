@@ -28,12 +28,12 @@ def setColor(r, g, b):
     pwmG.ChangeDutyCycle(int(g / 255 * 100))
     pwmB.ChangeDutyCycle(int(b / 255 * 100))
     
-print "starting"
+print("starting")
 setup()
 while True:
     r = random.randint(0, 255)
     g = random.randint(0, 255)
     b = random.randint(0, 255)
-    print r, g, b
+    print(r, g, b)
     setColor(r, g, b)
     time.sleep(0.2)

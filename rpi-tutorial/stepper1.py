@@ -38,9 +38,9 @@ def setStepper(in1, in2, in3, in4):
 setup()
 # 512 steps for 360 degrees, adapt to your motor
 while True:
-    print "forward"
+    print("forward")
     for i in range(256):
         forwardStep() 
-    print "backward"
+    print("backward")
     for i in range(256):
         backwardStep() 

@@ -14,7 +14,7 @@ for addr in ipAddr:
 ip = ip.replace(".", "-")
 
 if display.isAvailable():
-    print "IP address:", ip
+    print(("IP address:", ip))
     display.showTicker("x" + ip, 2, 1)
     while display.isTickerAlive():
         Tools.delay(100)

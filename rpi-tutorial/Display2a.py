@@ -18,7 +18,7 @@ def setValue(val, digit):
 
 i2c_address = 0x20
 
-print "starting"
+print("starting")
 bus = SMBus(1) # For revision 2 Raspberry Pi
 setup()
 word = [118, 119, 56, 63]  # HALO

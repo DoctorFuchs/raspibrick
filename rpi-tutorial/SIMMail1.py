@@ -30,7 +30,7 @@ def sendMail(subject, text, img = None):
     msg.attach(tmpmsg)
     if img != None:
         if not os.path.exists(img):
-            print "File", img, "does not exist." 
+            print("File", img, "does not exist.") 
         else:
             fp = open(img, 'rb')
             img = MIMEImage(fp.read())  # included in mail, not as attachment
@@ -46,7 +46,7 @@ def sendMail(subject, text, img = None):
     print("Mail successfully sent.")
 
 setup()
-print "Waiting for button event..."
+print("Waiting for button event...")
 while True:
     if GPIO.input(P_BUTTON) == GPIO.LOW:
         t = str(datetime.datetime.now())

@@ -25,7 +25,7 @@ class ClickThread(Thread):
 
     def run(self):
         if DEBUG:
-            print "===>ClickThread started"
+            print("===>ClickThread started")
         global clickThread
         self.isRunning = True
         startTime = time.time()
@@ -37,7 +37,7 @@ class ClickThread(Thread):
             clickThread = None
         self.isRunning  = False
         if DEBUG:
-            print "===>ClickThread terminated"
+            print("===>ClickThread terminated")
 
     def stop(self):
         self.isRunning = False
@@ -49,7 +49,7 @@ class ButtonThread(Thread):
 
     def run(self):
         if DEBUG:
-            print "===>ButtonThread started"
+            print("===>ButtonThread started")
         self.isRunning = True
         startTime = time.time()
         while self.isRunning and (time.time() - startTime < BUTTON_LONGPRESS_DURATION):
@@ -58,7 +58,7 @@ class ButtonThread(Thread):
             if buttonListener != None:
                 buttonListener(BUTTON_LONGPRESSED)
         if DEBUG:
-            print "===>ButtonThread terminated"
+            print("===>ButtonThread terminated")
 
     def stop(self):
         self.isRunning = False
@@ -105,7 +105,7 @@ def onButtonEvent(channel):
     if GPIO.input(buttonPin) == GPIO.LOW:
         if buttonThread == None: # down-down is suppressed
             if DEBUG:
-                print "->ButtonDown"
+                print("->ButtonDown")
             buttonThread = ButtonThread()
             buttonThread.start()
             if buttonListener != None:
@@ -113,7 +113,7 @@ def onButtonEvent(channel):
     else:
         if buttonThread != None: # up-up is suppressed
             if DEBUG:
-                print "->ButtonUp"
+                print("->ButtonUp")
             buttonThread.stop()
             buttonThread.join(200) # wait until finished
             buttonThread = None

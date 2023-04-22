@@ -10,7 +10,7 @@ IP_PORT = 22000
 
 def debug(text):
     if VERBOSE:
-        print "Debug:---", text
+        print("Debug:---", text)
 
 # ---------------------- class SocketHandler ------------------------
 class SocketHandler(Thread):
@@ -38,14 +38,14 @@ class SocketHandler(Thread):
             if not rc:
                 isRunning = False
         conn.close()
-        print "Client disconnected. Waiting for next client..."
+        print("Client disconnected. Waiting for next client...")
         isConnected = False
         debug("SocketHandler terminated")
 
     def executeCommand(self, cmd):
         debug("Calling executeCommand() with  cmd: " + cmd)
         if cmd == "go":
-            print "Taking snapshot and transfer to client..."
+            print("Taking snapshot and transfer to client...")
             jpg = camera.captureJPEG(640, 480)
             return self.sendData(jpg)
         if cmd == "disconnect":
@@ -69,16 +69,16 @@ HOSTNAME = "" # Symbolic name meaning all available interfaces
 try:
     serverSocket.bind((HOSTNAME, IP_PORT))
 except socket.error as msg:
-    print "Bind failed", msg[0], msg[1]
+    print("Bind failed", msg[0], msg[1])
     sys.exit()
 serverSocket.listen(10)
 
-print "Waiting for a connecting client..."
+print("Waiting for a connecting client...")
 isConnected = False
 while True:
     debug("Calling blocking accept()...")
     conn, addr = serverSocket.accept()
-    print "Connected with client at " + addr[0]
+    print("Connected with client at " + addr[0])
     isConnected = True
     socketHandler = SocketHandler(conn)
     # necessary to terminate it at program termination:
@@ -86,6 +86,6 @@ while True:
     socketHandler.start()
     t = 0
     while isConnected:
-        print "Camera ready at", t, "s"
+        print("Camera ready at", t, "s")
         time.sleep(10)
         t += 10

@@ -9,7 +9,7 @@ debug = False
 class Beeper():
     def __init__(self, pin):
         if debug:
-            print "Creating Beeper"
+            print("Creating Beeper")
         self._pin = pin
         self._beeperThread = None
         GPIO.setmode(GPIO.BOARD)
@@ -28,7 +28,7 @@ class Beeper():
          it returns immediately (default: False)
         '''
         if debug:
-            print "Starting beeper with params", onTime, offTime, count, blocking
+            print("Starting beeper with params", onTime, offTime, count, blocking)
         if self._beeperThread != None:
             self.stop()
         self._beeperThread = BeeperThread(self, onTime, offTime, count)

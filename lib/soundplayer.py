@@ -1,6 +1,6 @@
 # soundplayer.py
 
-import thread
+import _thread
 import os
 import time
 import sys
@@ -29,7 +29,7 @@ class SoundPlayer:
         if blocking:
             SoundPlayer._emit(frequencies, duration, device)
         else:
-            thread.start_new_thread(SoundPlayer._emit, (frequencies, duration, device))
+            _thread.start_new_thread(SoundPlayer._emit, (frequencies, duration, device))
 
     @staticmethod
     def isPlaying():
@@ -80,7 +80,7 @@ class SoundPlayer:
         if blocking:
             self._run(cmd)
         else:
-            thread.start_new_thread(SoundPlayer._run, (cmd,))
+            _thread.start_new_thread(SoundPlayer._run, (cmd,))
     
     @staticmethod
     def stop():
@@ -88,7 +88,7 @@ class SoundPlayer:
         Stops playing.
         '''
         cmd = "sudo killall -9 play"
-        thread.start_new_thread(SoundPlayer._run, (cmd,))
+        _thread.start_new_thread(SoundPlayer._run, (cmd,))
         time.sleep(0.5)  # Wait until process is killed
 
     @staticmethod
@@ -97,7 +97,7 @@ class SoundPlayer:
         Pauses playing momentarily.
         '''
         cmd = "sudo pkill -STOP play"
-        thread.start_new_thread(SoundPlayer._run, (cmd,))
+        _thread.start_new_thread(SoundPlayer._run, (cmd,))
 
     @staticmethod
     def resume():
@@ -105,6 +105,6 @@ class SoundPlayer:
         Resumes playing (after it has been stopped).
         '''
         cmd = "sudo pkill -CONT play"
-        thread.start_new_thread(SoundPlayer._run, (cmd,))
+        _thread.start_new_thread(SoundPlayer._run, (cmd,))
         
     

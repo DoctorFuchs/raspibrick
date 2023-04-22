@@ -41,6 +41,6 @@ while True:
     # simpletest.py and the read_adc function for more information.
     # Value will be a signed 12 or 16 bit integer value (depending on the ADC
     # precision, ADS1015 = 12-bit or ADS1115 = 16-bit).
-    print('Channel 0 minus 1: {0}'.format(value))
+    print(('Channel 0 minus 1: {0}'.format(value)))
     # Pause for half a second.
     time.sleep(0.5)

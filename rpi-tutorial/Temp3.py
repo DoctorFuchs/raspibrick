@@ -19,10 +19,10 @@ def readTemp():
         temp = hiByte * 16 + loByte / 16.0 # scale
     return round(temp, 1)
 
-print "starting..."
+print("starting...")
 bus = smbus.SMBus(1) 
 while True:
     t = readTemp()
-    print "T =", t, "centigrades"  
+    print("T =", t, "centigrades")  
     time.sleep(1)
 

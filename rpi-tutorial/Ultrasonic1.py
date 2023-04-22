@@ -34,11 +34,11 @@ def getDistance(timeoutCount  = 10000):
     distance = int(distance * 100 + 0.5) / 100.0
     return distance
 
-print "starting..."
+print("starting...")
 setup()
 while True:
     d = getDistance()
-    print "d =", d
+    print("d =", d)
     time.sleep(0.1)
     
 

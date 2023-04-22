@@ -16,15 +16,15 @@ def showOled(text, lineNum, fontSize, indent, clear = False):
 unit = 100
 
 # ------------------------- main ------------------------------------
-print "ProcessMon " + SharedConstants.VERSION + " starting"
+print("ProcessMon " + SharedConstants.VERSION + " starting")
 Tools.delay(1000)  # Wait until raspi is up
 fname = "/home/pi/scripts/autostart.py"
 if os.path.isfile(fname):
-     print "Found:", fname, "and run it now..."
+     print("Found:", fname, "and run it now...")
      subprocess.Popen(["pyrun",  fname])
      sys.exit(0)
 
-print "Check Pi2Go or Standalone mode..."
+print("Check Pi2Go or Standalone mode...")
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.setup(SharedConstants.P_BUTTON, GPIO.OUT)
@@ -38,17 +38,17 @@ Tools.delay(1000)
 # if the pin is HIGH (Pi2Go present), the P_BUTTON must be LOW to escape (held down
 # when Pi2Go boots to manually escape to standalone mode)
 if  GPIO.input(SharedConstants.P_BATTERY_MONITOR) == GPIO.LOW:
-    print "Pin 18 LOW (open). Escaping to standalone mode"
+    print("Pin 18 LOW (open). Escaping to standalone mode")
     GPIO.cleanup()
     Tools.delay(2000)
     sys.exit(0)
 else:
-    print "Pi2Go mode assumed."
+    print("Pi2Go mode assumed.")
 
 # Check if update requested
 fname = "/mnt/recovery/raspibrick-update.requested"
 if os.path.isfile(fname):
-    print "Update requested"
+    print("Update requested")
     robot = Robot()
     display = Display()
     display.showText("UPE ")
@@ -68,7 +68,7 @@ if os.path.isfile(fname):
     if oled != None:
         oled.clear()
     led.setColor(10, 0, 0)
-    print "Update done. Shutting down now"
+    print("Update done. Shutting down now")
     Tools.delay(2000)
     os.system("sudo shutdown -r now")
 else:
@@ -84,7 +84,7 @@ else:
         Tools.delay(4000)
         oled.setBkImage(None)
     while isRunning:
-        print "Spawning IdleProc..."
+        print("Spawning IdleProc...")
         if isFirst:
             arg = "isFirst"
             isFirst = False
@@ -92,29 +92,29 @@ else:
             arg = "isNotFirst"
         # Blocking call
         rc = subprocess.call(["pyrun", "/home/pi/raspibrick/IdleProcess.py", arg])
-        print "Returning from IdleProc with exit code:", rc
+        print("Returning from IdleProc with exit code:", rc)
         if rc == 1 or rc > 10:
             showOled("Starting program", 3, 12, 0, True)
             pythonApp = "/home/pi/scripts/MyApp.py"
             if os.path.isfile(pythonApp):
-               print "Spawning user app:", pythonApp
+               print("Spawning user app:", pythonApp)
                rc = subprocess.call(["pyrun", pythonApp])
                # return value not used yet
-               print "Returning from MyApp with exit code:", rc
+               print("Returning from MyApp with exit code:", rc)
             else:
-               print "No Python app found to execute"
+               print("No Python app found to execute")
         elif rc == 2:
-            print "Spawning BrickGate server..."
+            print("Spawning BrickGate server...")
             if oled != None:
 	        showOled("Starting", 2, 10, 0, True)
                 showOled("BrickGate server", 4, 12, 0, False)
                 Tools.delay(2000)
             rc = subprocess.call(["pyrun", "/home/pi/raspibrick/BrickGate.py"])
-            print "Returning from BrickGate with exit code:", rc
+            print("Returning from BrickGate with exit code:", rc)
         elif rc == 3:
-            print "Shutting down now..."
+            print("Shutting down now...")
             isRunning = False
-    print "Shutdown process starting..."
+    print("Shutdown process starting...")
     robot = Robot()
     display = Display()
     display.showBlinker("8YE", count = 2, speed = 2, blocking = True)

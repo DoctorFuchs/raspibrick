@@ -1,4 +1,4 @@
-from __future__ import division
+
 from gpanel import *
 
 # source: Swiss Federal Statistical Office, STAT-TAB

@@ -13,9 +13,9 @@ Class that represents a motor.
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
-import SharedConstants
-from RobotInstance import RobotInstance
+from .Tools import Tools
+from . import SharedConstants
+from .RobotInstance import RobotInstance
 
 # ------------------------   Class MotorState  ----------------------------------------------
 class MotorState():

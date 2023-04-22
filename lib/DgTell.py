@@ -64,7 +64,7 @@ class DgTell():
     @staticmethod
     def debug(msg):
         if DgTell.DEBUG:
-            print "DgTell debug->", msg
+            print("DgTell debug->", msg)
 
     @staticmethod
     def getVersion():
@@ -216,7 +216,7 @@ class DgTell():
                 DgTell.debug("bus.write_i2c_byte_data(" + str(self.i2c_address) + "," + str(data[0]) + "," + str(data[1]) + ")")
                 self._bus.write_byte_data(self.i2c_address, data[0], data[1])
                 DgTell.delay(10)
-            except IOError, err:
+            except IOError as err:
                 raise Exception("DgTell.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
         elif len(data) == 4:
             for v in data:
@@ -226,7 +226,7 @@ class DgTell():
                 DgTell.debug("bus.write_i2c_block_data(" + str(self.i2c_address) + "," + str(data[0]) + "," + str(data[1:]) + ")")
                 self._bus.write_i2c_block_data(self.i2c_address, data[0], data[1:])
                 DgTell.delay(10)
-            except IOError, err:
+            except IOError as err:
                 raise Exception("DgTell.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
         elif len(data) == 5:
             for v in data:
@@ -236,7 +236,7 @@ class DgTell():
                 DgTell.debug("bus.write_i2c_block_data(" + str(self.i2c_address) + "," + str(data[0]) + "," + str(data[1:]) + ")")
                 self._bus.write_i2c_block_data(self.i2c_address, data[0], data[1:])
                 DgTell.delay(10)
-            except IOError, err:
+            except IOError as err:
                 raise Exception("DgTell.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
         else:
             raise Exception("DgTell.writeData(). Wrong parameter list/tuple length")

@@ -13,7 +13,7 @@ def setup():
     GPIO.setup(P_LED, GPIO.OUT)
     GPIO.output(P_LED, GPIO.LOW) # Turn off LED
 
-print "starting..."
+print("starting...")
 setup()
 isLedOn = False
 isButtonPressed = False

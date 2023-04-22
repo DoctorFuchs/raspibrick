@@ -8,12 +8,12 @@ def setup():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(P_LED, GPIO.OUT)
 
-print "blinking now"
+print("blinking now")
 setup()
 while True:
     GPIO.output(P_LED, GPIO.HIGH)
-    print "on"
+    print("on")
     time.sleep(0.1)
     GPIO.output(P_LED, GPIO.LOW)
-    print "off"
+    print("off")
     time.sleep(0.1)

@@ -1,8 +1,8 @@
 # SensorThread.py
 
 from threading import Thread
-from Tools import *
-import SharedConstants
+from .Tools import *
+from . import SharedConstants
 
 class SensorThread(Thread):
     def __init__(self):

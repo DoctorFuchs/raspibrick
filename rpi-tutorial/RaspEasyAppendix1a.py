@@ -124,4 +124,4 @@ while not isExiting:
 
 worker.kill()        
 GPIO.cleanup() 
-print "Programm terminated"
+print("Programm terminated")

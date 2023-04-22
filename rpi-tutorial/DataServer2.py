@@ -9,18 +9,18 @@ P_BUTTON = 24 # adapt to your wiring
 
 def onStateChanged(state, msg):
     if state == "LISTENING":
-        print "Server:-- Listening..."
+        print("Server:-- Listening...")
     elif state == "CONNECTED":
-        print "Server:-- Connected to", msg
+        print("Server:-- Connected to", msg)
     elif state == "MESSAGE":
-        print "Server:-- Message received:", msg
+        print("Server:-- Message received:", msg)
         if msg == "go":
             if GPIO.input(P_BUTTON) == GPIO.LOW:
                 reply = "Button pressed"
             else:
                 reply = "Button released"
             server.sendMessage(reply)
-            print "Server:-- Sending message:", reply
+            print("Server:-- Sending message:", reply)
 
 def setup():
     GPIO.setmode(GPIO.BOARD)

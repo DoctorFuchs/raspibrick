@@ -15,11 +15,11 @@ setup()
 SoundPlayer.playTone(1000, 5, False, 0)
 while SoundPlayer.isPlaying():
     GPIO.output(P_LED, GPIO.HIGH)
-    print "on"
+    print("on")
     time.sleep(0.5)
     GPIO.output(P_LED, GPIO.LOW)
-    print "off"
+    print("off")
     time.sleep(0.5)
 
-print "done"
+print("done")
     

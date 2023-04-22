@@ -16,17 +16,17 @@ setup()
 count = 0
 isCounting = False
 isRunButtonPressed = False
-print "Stopped"
+print("Stopped")
 isExiting = False
 while not isExiting:
     if GPIO.input(RUN_BUTTON) == GPIO.HIGH and not isRunButtonPressed:
         isRunButtonPressed = True
         if not isCounting:
             isCounting = True
-            print "Counting..."
+            print("Counting...")
         else:
             isCounting = False
-            print "Stopped"
+            print("Stopped")
         time.sleep(0.1)
     elif GPIO.input(RUN_BUTTON) == GPIO.LOW and isRunButtonPressed:
         isRunButtonPressed = False
@@ -34,11 +34,11 @@ while not isExiting:
 
     if isCounting:
         count += 1
-        print count
+        print(count)
         time.sleep(0.01)
 
     if GPIO.input(EXIT_BUTTON) == GPIO.HIGH:
         isExiting = True
  
 GPIO.cleanup()        
-print "Programm terminated"
+print("Programm terminated")

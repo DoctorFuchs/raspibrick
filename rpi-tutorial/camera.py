@@ -1,7 +1,7 @@
 # camera.java
 
 import picamera
-import StringIO
+import io
 
 def captureJPEG(width, height):
     '''
@@ -12,7 +12,7 @@ def captureJPEG(width, height):
     return: the image in JPEG format (as string); None, if the capture fails
     '''
     camera = picamera.PiCamera()
-    imageData = StringIO.StringIO()
+    imageData = io.StringIO()
     w = int(width)
     h = int(height)
 

@@ -30,7 +30,7 @@ ps = Py7Seg() # xxx
 t = 0
 while True:
     v = adc.getValue()
-    print t, "s:", w
+    print(t, "s:", w)
     w = "%4.3f" %v
     ps.showText(w[0] + w[2] + w[3] + w[4], dp = [0, 0, 1]) # xxx
     t += 0.1

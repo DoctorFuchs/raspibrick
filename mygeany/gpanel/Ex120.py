@@ -1,7 +1,7 @@
 from gpanel import *
 import math
 import time
-import thread, sys
+import _thread, sys
 
 
 def onClose():
@@ -27,5 +27,5 @@ p = GPanel()
 p.setUserCoords(-1, 11, -1.2, 1.2)
 p.addCloseListener(onClose)
 T = 2
-thread.start_new_thread(measure, ())
+_thread.start_new_thread(measure, ())
 p.keep()

@@ -29,25 +29,25 @@ nbSongs = 4
 songID = 0
 p = SoundPlayer("/home/pi/songs/song" + str(songID) + ".mp3", 1)        
 p.play()
-print "playing, song ID", songID
+print("playing, song ID", songID)
 state = "PLAYING"
 
 while True:
     if GPIO.input(P_PAUSE) == GPIO.LOW and state == "PLAYING":
         state = "PAUSED"
-        print "playing->paused"
+        print("playing->paused")
         p.pause()
     elif GPIO.input(P_PLAY) == GPIO.LOW and state == "STOPPED":
         state = "PLAYING"
-        print "stopped->playing, song ID", songID
+        print("stopped->playing, song ID", songID)
         p.play()
     elif GPIO.input(P_PLAY) == GPIO.LOW and state == "PAUSED":
         state = "PLAYING"
-        print "paused->playing"
+        print("paused->playing")
         p.resume()
     elif GPIO.input(P_STOP) == GPIO.LOW and (state == "PAUSED" or state == "PLAYING"):
         state = "STOPPED"
-        print "paused/playing->stopped"
+        print("paused/playing->stopped")
         p.stop()
     elif (GPIO.input(P_SELECT) == GPIO.LOW and state == "STOPPED") \
           or (state == "PLAYING" and not p.isPlaying()):
@@ -55,7 +55,7 @@ while True:
         if songID == nbSongs:
             songID = 0
         p = SoundPlayer("/home/pi/songs/song" + str(songID) + ".mp3", 1)
-        print "stopped->playing, song ID", songID
+        print("stopped->playing, song ID", songID)
         p.play()
         state = "PLAYING"
     time.sleep(0.1) # Do not waste processor time    

@@ -28,15 +28,15 @@ def readData(port = 0):
 oled = OLED1306()
 bus = smbus.SMBus(1) 
 oled.setText("Resetting modem...")
-print "Resetting modem..."
+print("Resetting modem...")
 resetModem()
 ser = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 5)
 if not isReady(ser):
-    print "Modem not ready."
+    print("Modem not ready.")
     oled.setText("Modem not ready.")
     sys.exit(0)
 
-print "Connecting to GSM net..."
+print("Connecting to GSM net...")
 oled.setText("Connecting to GSM net...")
 connectGSM(ser, APN)
 while True:
@@ -49,16 +49,16 @@ while True:
     v = readData(1)
     y = v / 3.1
     y = "%4.1f" %y
-    print "t = ", t, ":-- T =", y, "centigrades" 
+    print("t = ", t, ":-- T =", y, "centigrades") 
     oled.setText("At = " + str(t), 0)
     oled.setText("T = " + y + " centigrades", 1)
-    print "Sending HTTP request..."
+    print("Sending HTTP request...")
     reply = connectTCP(ser, HOST, PORT)
     if "CONNECT OK" not in reply:
-        print "Connection failed"
+        print("Connection failed")
         sys.exit(0)
     sendHTTPRequest(ser, HOST, "/insert.php?x=" + x + "&y=" + y) 
-    print "Closing. Waiting for next transfer"
+    print("Closing. Waiting for next transfer")
     closeTCP(ser)
     isRunning = True
     while time.time() - startTime < 60:

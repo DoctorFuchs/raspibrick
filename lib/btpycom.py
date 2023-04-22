@@ -11,7 +11,7 @@ Dependencies: Widcomm packages (Bluez)
 '''
 
 from threading import Thread
-import thread
+import _thread
 import socket
 import time
 import sys
@@ -60,13 +60,13 @@ class BTServer(Thread):
         try:
              self.serverSocket.bind(("", PORT_ANY))
         except socket.error as msg:
-            print "Fatal error while creating BTServer: Bind failed.", msg[0], msg[1]
+            print("Fatal error while creating BTServer: Bind failed.", msg[0], msg[1])
             sys.exit()
         BTServer.debug("Socket bind successful ")
         try:    
             self.serverSocket.listen(1)
         except:
-            print "Fatal error while BTServer enters listening mode."
+            print("Fatal error while BTServer enters listening mode.")
             sys.exit()
 
         BTServer.debug("Socket listening engaged.")
@@ -81,8 +81,8 @@ class BTServer(Thread):
         BTServer.debug("Bluetooth server listening at channel " + str(self.port))
         try:
             self.stateChanged(BTServer.LISTENING, str(self.port))
-        except Exception, e:
-            print "Caught exception in BTServer.LISTENING:", e
+        except Exception as e:
+            print("Caught exception in BTServer.LISTENING:", e)
 
         self.serverSocket.settimeout(30)
         self.isServerRunning = True
@@ -113,16 +113,16 @@ class BTServer(Thread):
             self.socketHandler.start()
             try: 
                 self.stateChanged(BTServer.CONNECTED, self.clientInfo)
-            except Exception, e:
-                print "Caught exception in BTServer.CONNECTED:", e
+            except Exception as e:
+                print("Caught exception in BTServer.CONNECTED:", e)
         if self.clientSocket != None:        
             self.clientSocket.close()
         self.serverSocket.close()
         self.isClientConnected = False
         try:
             self.stateChanged(BTServer.TERMINATED, "")
-        except Exception, e:
-            print "Caught exception in BTServer.TERMINATED:", e
+        except Exception as e:
+            print("Caught exception in BTServer.TERMINATED:", e)
         self.isServerRunning = False
         BTServer.debug("BTServer thread terminated")
 
@@ -136,8 +136,8 @@ class BTServer(Thread):
             self.isClientConnected = False
             try:
                 self.stateChanged(BTServer.LISTENING, str(self.port))
-            except Exception, e:
-                print "Caught exception in BTServer.LISTENING:", e
+            except Exception as e:
+                print("Caught exception in BTServer.LISTENING:", e)
             BTServer.debug("Close client socket now")
             self.clientSocket.close()
         
@@ -177,7 +177,7 @@ class BTServer(Thread):
     @staticmethod
     def debug(msg):
         if BTServer.isVerbose:
-            print "   BTServer-> " + msg
+            print("   BTServer-> " + msg)
  
     @staticmethod
     def getVersion():
@@ -211,8 +211,8 @@ class ServerHandler(Thread):
                             if len(junk[i]) > 0:
                                 try:
                                     self.server.stateChanged(BTServer.MESSAGE, str(junk[i]))
-                                except Exception, e:
-                                    print "Caught exception in BTServer.MESSAGE:", e
+                                except Exception as e:
+                                    print("Caught exception in BTServer.MESSAGE:", e)
                             else:
                                 BTServer.debug("Got empty message as EOT")
                                 BTServer.debug("ServerHandler thread terminated")
@@ -293,8 +293,8 @@ class BTClient():
         maxNbRetries = 10   
         try:
             self.stateChanged(BTClient.CONNECTING, serverInfo)
-        except Exception, e:
-            print "Caught exception in BTClient.CONNECTING:", e
+        except Exception as e:
+            print("Caught exception in BTClient.CONNECTING:", e)
         nbRetries = 0
         startTime = time.time()
         rc = False
@@ -310,16 +310,16 @@ class BTClient():
             self.isClientConnected = True
             try:
                 self.stateChanged(BTClient.CONNECTED, serverInfo )
-            except Exception, e:
-                print "Caught exception in BTClient.CONNECTED:", e
+            except Exception as e:
+                print("Caught exception in BTClient.CONNECTED:", e)
             ClientHandler(self) 
         else:
             BTClient.debug("Connection failed")
             self.isClientConnected = False
             try:
                self.stateChanged(BTClient.CONNECTION_FAILED, serverInfo)
-            except Exception, e:
-               print "Caught exception in BTClient.CONNECTION_FAILED:", e
+            except Exception as e:
+               print("Caught exception in BTClient.CONNECTION_FAILED:", e)
         return rc 
 
     def _connect(self, serverInfo):
@@ -418,8 +418,8 @@ class BTClient():
         self.clientSocket.close()
         try:
             self.stateChanged(BTClient.DISCONNECTED, "")
-        except Exception, e:
-            print "Caught exception in BTClient.DISCONNECTED:", e
+        except Exception as e:
+            print("Caught exception in BTClient.DISCONNECTED:", e)
         self.inCallback = False
         
     def isConnected(self):
@@ -444,7 +444,7 @@ class BTClient():
     @staticmethod
     def debug(msg):
         if BTClient.isVerbose:
-            print "   BTClient-> " + msg
+            print("   BTClient-> " + msg)
 
     @staticmethod
     def getVersion():
@@ -479,8 +479,8 @@ class ClientHandler(Thread):
                             if len(junk[i]) > 0:
                                 try:
                                     self.client.stateChanged(BTServer.MESSAGE, str(junk[i]))
-                                except Exception, e:
-                                    print "Caught exception in BTClient.MESSAGE:", e
+                                except Exception as e:
+                                    print("Caught exception in BTClient.MESSAGE:", e)
                         inBlock = False
                         data = bytearray(junk[len(junk) - 1])  # remaining bytes        
         except:  # Happens if client is disconnecting

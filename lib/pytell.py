@@ -66,7 +66,7 @@ class PyTell():
     @staticmethod
     def debug(msg):
         if PyTell.DEBUG:
-            print "PyTell debug->", msg
+            print("PyTell debug->", msg)
 
     @staticmethod
     def getVersion():
@@ -203,7 +203,7 @@ class PyTell():
             cmd = 1 # Segment mode
             PyTell.debug("bus.write_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(data) + ")")
             self._bus.write_block_data(self.i2c_address, cmd, data)
-        except IOError, err:
+        except IOError as err:
             raise Exception("PyTell.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
 
     def clear(self):

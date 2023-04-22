@@ -15,6 +15,6 @@ while True:
     data = bus.read_byte_data(i2c_address, 0) # use CH0
     u = data / 255 * 5
     d = int(m / (u - b))
-    print "d =" ,d, "cm"
+    print("d =" ,d, "cm")
     ps.showText("%4d" %d) # xxx
     time.sleep(0.1)

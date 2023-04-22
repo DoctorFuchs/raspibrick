@@ -20,5 +20,5 @@ bus = smbus.SMBus(1)
 
 while True:
     v = readData(1)  # adapt to your ADC (0 or 1)
-    print v
+    print(v)
 

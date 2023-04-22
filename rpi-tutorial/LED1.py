@@ -15,8 +15,8 @@ def beep(n):
         GPIO.output(P_LED, GPIO.LOW)
         time.sleep(0.1)
 
-print "beeping now"
+print("beeping now")
 setup()
 beep(10)
 GPIO.cleanup()
-print "done"
+print("done")

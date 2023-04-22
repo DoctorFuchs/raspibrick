@@ -14,9 +14,9 @@ Class that represents an active buzzer on some GPIO port.
  However the use of the code is entirely your responsibility.
 '''
 
-import SharedConstants
-from RobotInstance import RobotInstance
-from Tools import Tools
+from . import SharedConstants
+from .RobotInstance import RobotInstance
+from .Tools import Tools
 from threading import Thread
 import RPi.GPIO as GPIO
 import time

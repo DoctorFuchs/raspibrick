@@ -15,7 +15,7 @@ def setup():
 
 def debug(text):
     if VERBOSE:
-        print "Debug:---", text
+        print("Debug:---", text)
 
 # ---------------------- class SocketHandler ------------------------
 class SocketHandler(Thread):
@@ -40,7 +40,7 @@ class SocketHandler(Thread):
                 break
             self.executeCommand(cmd)
         conn.close()
-        print "Client disconnected. Waiting for next client..."
+        print("Client disconnected. Waiting for next client...")
         isConnected = False
         debug("SocketHandler terminated")
 
@@ -51,7 +51,7 @@ class SocketHandler(Thread):
                 state = "Button pressed"
             else:
                 state = "Button released"
-            print "Reporting current state:", state
+            print("Reporting current state:", state)
             self.conn.sendall(state + "\0")
 # ----------------- End of SocketHandler -----------------------
 
@@ -64,16 +64,16 @@ HOSTNAME = "" # Symbolic name meaning all available interfaces
 try:
     serverSocket.bind((HOSTNAME, IP_PORT))
 except socket.error as msg:
-    print "Bind failed", msg[0], msg[1]
+    print("Bind failed", msg[0], msg[1])
     sys.exit()
 serverSocket.listen(10)
 
-print "Waiting for a connecting client..."
+print("Waiting for a connecting client...")
 isConnected = False
 while True:
     debug("Calling blocking accept()...")
     conn, addr = serverSocket.accept()
-    print "Connected with client at " + addr[0]
+    print("Connected with client at " + addr[0])
     isConnected = True
     socketHandler = SocketHandler(conn)
     # necessary to terminate it at program termination:
@@ -81,6 +81,6 @@ while True:
     socketHandler.start()
     t = 0
     while isConnected:
-        print "Server connected at", t, "s"
+        print("Server connected at", t, "s")
         time.sleep(10)
         t += 10

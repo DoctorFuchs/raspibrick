@@ -37,7 +37,7 @@ def getDistance(timeoutCount  = 10000):
     distance = int(distance * 100 + 0.5) / 100.0
     return distance
 
-print "starting..."
+print("starting...")
 oled = OLED1306()
 oled.setFontSize(50)
 setup()

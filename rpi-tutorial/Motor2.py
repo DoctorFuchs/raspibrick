@@ -30,17 +30,17 @@ def setup():
     pwm2 = GPIO.PWM(P_MOTA2, fPWM)
     pwm2.start(0)
     
-print "starting"
+print("starting")
 setup()
 for speed in range(10, 101, 10):
-    print "forward with speed", speed
+    print("forward with speed", speed)
     forward(speed)
     time.sleep(2)
 for speed in range(10, 101, 10):
-    print "backward with speed", speed
+    print("backward with speed", speed)
     backward(speed)
     time.sleep(2)
-print "stopping"
+print("stopping")
 stop()
 GPIO.cleanup()    
-print "done"
+print("done")

@@ -1,4 +1,4 @@
-from __future__ import division
+
 from gpanel import *
 
 z = [9.6, 18.3, 29.0, 47.2, 71.1, 119.1, 174.6, 257.3, 350.7, 441.0, 513.3, 

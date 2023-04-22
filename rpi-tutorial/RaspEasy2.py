@@ -9,10 +9,10 @@ def setup():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(P_BUTTON, GPIO.IN)
 
-print "starting..."
+print("starting...")
 setup()
 count = 0
 while True:
     if GPIO.input(P_BUTTON) == GPIO.HIGH:
         count += 1
-        print count
+        print(count)

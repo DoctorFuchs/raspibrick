@@ -17,7 +17,7 @@ while True:
         h = "--.-"
     else:
         h = "%2.1f" %hum
-    print "Temperature", t, "Humitity", h
+    print("Temperature", t, "Humitity", h)
     ps.showText("t" + t[0] + t[1] + t[3], dp = [1, 0, 0]) # xxx 
     time.sleep(3)    
     ps.showText("h" + h[0] + h[1] + h[3], dp = [1, 0, 0]) # xxx    

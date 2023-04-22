@@ -22,7 +22,7 @@ class ClickThread(Thread):
 
     def run(self):
         if Button.DEBUG:
-            print "===>ClickThread started"
+            print("===>ClickThread started")
         self.isRunning = True
         startTime = time.time()
         while self.isRunning and (time.time() - startTime < BUTTON_DOUBLECLICK_TIME):
@@ -33,7 +33,7 @@ class ClickThread(Thread):
             self.button.clickThread = None
         self.isRunning  = False
         if Button.DEBUG:
-            print "===>ClickThread terminated"
+            print("===>ClickThread terminated")
 
     def stop(self):
         self.isRunning = False
@@ -47,7 +47,7 @@ class ButtonThread(Thread):
 
     def run(self):
         if Button.DEBUG:
-            print "===>ButtonThread started"
+            print("===>ButtonThread started")
         self.isRunning = True
         startTime = time.time()
         while self.isRunning and (time.time() - startTime < BUTTON_LONGPRESS_DURATION):
@@ -56,7 +56,7 @@ class ButtonThread(Thread):
             if self.button.buttonListener != None:
                 self.button.buttonListener(self.button, BUTTON_LONGPRESSED)
         if Button.DEBUG:
-            print "===>ButtonThread terminated"
+            print("===>ButtonThread terminated")
 
     def stop(self):
         self.isRunning = False
@@ -109,7 +109,7 @@ class Button():
         if GPIO.input(self.buttonPin) == GPIO.LOW:
             if self.buttonThread == None: # down-down is suppressed
                 if Button.DEBUG:
-                    print "->ButtonDown"
+                    print("->ButtonDown")
                 self.buttonThread = ButtonThread(self)
                 self.buttonThread.start()
                 if self.buttonListener != None:
@@ -117,7 +117,7 @@ class Button():
         else:
             if self.buttonThread != None: # up-up is suppressed
                 if Button.DEBUG:
-                    print "->ButtonUp"
+                    print("->ButtonUp")
                 self.buttonThread.stop()
                 self.buttonThread.join(200) # wait until finished
                 self.buttonThread = None

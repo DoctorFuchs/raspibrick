@@ -13,9 +13,9 @@ Class that represents a light sensor.
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
-from RobotInstance import RobotInstance
-import SharedConstants
+from .Tools import Tools
+from .RobotInstance import RobotInstance
+from . import SharedConstants
 
 class LightSensor():
     '''

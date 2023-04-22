@@ -14,7 +14,7 @@ Helper class with some useful static methods.
  '''
 
 import time
-import SharedConstants
+from . import SharedConstants
 
 class Tools():
     '''
@@ -23,7 +23,7 @@ class Tools():
     @staticmethod
     def debug(text):
         if SharedConstants.DEBUG:
-            print "Tools debug->", text
+            print("Tools debug->", text)
 
     @staticmethod
     def delay(interval):

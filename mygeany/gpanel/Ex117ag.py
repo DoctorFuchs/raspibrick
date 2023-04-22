@@ -1,7 +1,7 @@
 from gpanel import *
 
 def onMousePressed(x, y):
-    print "press event at", x, y
+    print("press event at", x, y)
     if isLeftMouseButton():
         setPenColor("red")
     else:

@@ -8,9 +8,9 @@ port = "/dev/ttyAMA0"  # Raspberry Pi 2
 def parseGPS(data):
     if data[0:6] == "$GPGGA":
         s = data.split(",")
-        print s[7]
+        print(s[7])
         if s[7] == '0':
-            print "no satellite data available"
+            print("no satellite data available")
             return        
         time = s[1][0:2] + ":" + s[1][2:4] + ":" + s[1][4:6]
         lat = decode(s[2])
@@ -19,8 +19,8 @@ def parseGPS(data):
         dirLon = s[5]
         alt = s[9] + " m"
         sat = s[7]
-        print "Time(UTC): %s-- Latitude: %s(%s)-- Longitude:%s(%s)\
--- Altitute:%s--(%s satellites)" %(time, lat, dirLat, lon, dirLon, alt, sat) 
+        print("Time(UTC): %s-- Latitude: %s(%s)-- Longitude:%s(%s)\
+-- Altitute:%s--(%s satellites)" %(time, lat, dirLat, lon, dirLon, alt, sat)) 
 
 def decode(coord):
     # DDDMM.MMMMM -> DD deg MM.MMMMM min

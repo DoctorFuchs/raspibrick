@@ -30,14 +30,14 @@ setup()
 btnReady = True
 count = 0
 oldCount = 0
-print "starting..."
+print("starting...")
 isExiting = False
 while not isExiting:
     if count != oldCount:
         oldCount = count
-        print count
+        print(count)
     time.sleep(0.001)
 
 GPIO.cleanup()        
-print "Programm terminated"
+print("Programm terminated")
 

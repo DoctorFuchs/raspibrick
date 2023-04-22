@@ -7,5 +7,5 @@ robot = Robot()
 Led.clearAll()
 robot.exit()
 GPIO.cleanup()
-print "Reset done"
+print("Reset done")
 

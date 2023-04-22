@@ -14,13 +14,13 @@ def setup():
     pwm = GPIO.PWM(P_LED, fPWM)
     pwm.start(0)
     
-print "starting"
+print("starting")
 setup()
 duty = 0
 isIncreasing = True
 while True:
     pwm.ChangeDutyCycle(duty)
-    print "D =", duty, "%"
+    print("D =", duty, "%")
     if isIncreasing:
         duty += 10
     else:

@@ -13,7 +13,7 @@ def setup():
     GPIO.setup(P_BUTTON, GPIO.IN)
     GPIO.setup(P_LED, GPIO.OUT)
 
-print "starting..."
+print("starting...")
 setup()
 while True:
     if GPIO.input(P_BUTTON) == GPIO.HIGH:

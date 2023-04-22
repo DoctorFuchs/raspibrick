@@ -22,7 +22,7 @@ class WorkerThread(Thread):
                 time.sleep(0.1)
             else: 
                 count += 1
-                print count
+                print(count)
                 time.sleep(0.01)
 
     def kill(self):
@@ -42,7 +42,7 @@ def setup():
 setup()
 isPaused = True
 isRunButtonPressed = False
-print "Stopped"
+print("Stopped")
 isExiting = False
 worker = WorkerThread()
 while not isExiting:
@@ -51,11 +51,11 @@ while not isExiting:
         if isPaused:    
             isPaused = False
             worker.resume()
-            print "Working..."
+            print("Working...")
         else:
             isPaused = True
             worker.hold()
-            print "Paused"
+            print("Paused")
     elif GPIO.input(RUN_BUTTON) == GPIO.LOW and isRunButtonPressed:
         isRunButtonPressed = False
 
@@ -66,4 +66,4 @@ while not isExiting:
 
 worker.kill()        
 GPIO.cleanup() 
-print "Programm terminated"
+print("Programm terminated")

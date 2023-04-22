@@ -67,7 +67,7 @@ class Py7Seg():
     @staticmethod
     def debug(msg):
         if Py7Seg.DEBUG:
-            print "Py7Seg debug->", msg
+            print("Py7Seg debug->", msg)
 
     @staticmethod
     def getVersion():
@@ -187,7 +187,7 @@ class Py7Seg():
             cmd = 1 # start with digit 1
             Py7Seg.debug("bus.write_i2c_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(data) + ")")
             self._bus.write_i2c_block_data(self.i2c_address, cmd, data)
-        except IOError, err:
+        except IOError as err:
             raise Exception("Py7Seg.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
 
     def clear(self):

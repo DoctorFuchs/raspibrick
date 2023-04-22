@@ -24,15 +24,15 @@ def setup():
     GPIO.setup(P_MOTA1, GPIO.OUT)
     GPIO.setup(P_MOTA2, GPIO.OUT)
     
-print "starting"
+print("starting")
 setup()
 while True:
-    print "forward"
+    print("forward")
     forward()
     time.sleep(2)
-    print "backward"
+    print("backward")
     backward()
     time.sleep(2)
-    print "stop"
+    print("stop")
     stop()
     time.sleep(2)

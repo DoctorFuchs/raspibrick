@@ -25,9 +25,9 @@ beeper.start(0, 0)
 while True:
     v = readData()
     u = v / 1023.0 * 5
-    print u
+    print(u)
     d = int(m / (u - b))
-    print "d =" ,d, "cm"
+    print("d =" ,d, "cm")
     if d > 0 and d < 50:
         ps.showText("%4d" %d)
         beeper.setOnOffTime(0.05, 0.01 * d)

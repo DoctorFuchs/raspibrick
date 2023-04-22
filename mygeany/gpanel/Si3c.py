@@ -1,4 +1,4 @@
-from __future__ import division
+
 from gpanel import *
 import random
 
@@ -68,11 +68,11 @@ females_all = females_yes + females_no
 males_all = males_yes + males_no
 n = females_all + males_all  # all
 p = (females_yes + males_yes) / n  # probability of yes for all
-print "Facebook yes (all):", round(100 * p, 1), "%"
+print("Facebook yes (all):", round(100 * p, 1), "%")
 pf = females_yes / females_all
-print "Facebook yes (females):", round(100 * pf, 1), "%"
+print("Facebook yes (females):", round(100 * pf, 1), "%")
 pm = males_yes / males_all
-print "Facebook yes (males:)", round(100 * pm, 1), "%"
+print("Facebook yes (males:)", round(100 * pm, 1), "%")
 
 makeGPanel(-1, 11, -250, 2750)
 title("Chi-square test, use of Facebook")
@@ -90,10 +90,10 @@ showDistribution()
 s = showLimit(0.95)
 
 c = chisquare(females_yes, females_no, males_yes, males_no)
-print "critical value:", s
-print "observed:", c,
+print("critical value:", s)
+print("observed:", c, end=' ')
 if c <= s:
-   print "- the same behavior"
+   print("- the same behavior")
 else:
-   print "- not the same behavior"
+   print("- not the same behavior")
 keep()

@@ -13,8 +13,8 @@ Class that represents a LED pair.
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
-from RobotInstance import RobotInstance
+from .Tools import Tools
+from .RobotInstance import RobotInstance
 import time
 from threading import Thread
 '''

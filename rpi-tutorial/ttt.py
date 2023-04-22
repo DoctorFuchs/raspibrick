@@ -15,28 +15,28 @@ PORT = 80
 SERIAL_PORT = "/dev/ttyS0"    # Raspberry Pi 3
 table = "data01"
 
-print "Resetting modem..."
+print("Resetting modem...")
 resetModem()
 ser = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 5)
 if not isReady(ser):
-    print "Modem not ready."
+    print("Modem not ready.")
     sys.exit(0)
 
-print "Connecting to GSM net..."
+print("Connecting to GSM net...")
 connectGSM(ser, APN)
 x = 0
 dx = 5
 while x <= 100:
     y = f(x)
-    print x, y
-    print "Sending HTTP request..."
+    print(x, y)
+    print("Sending HTTP request...")
     reply = connectTCP(ser, HOST, PORT)
     if "CONNECT OK" not in reply:
-        print "Connection failed"
+        print("Connection failed")
         sys.exit(0)
-    print "Sending HTTPRequest..."    
+    print("Sending HTTPRequest...")    
     sendHTTPRequest(ser, HOST, "/insert.php?table=" + table + "&x=" + str(x) + "&y=" + str(y)) 
-    print "Closing. Waiting for next transfer"
+    print("Closing. Waiting for next transfer")
     closeTCP(ser)
     x += dx
     time.sleep(dx)

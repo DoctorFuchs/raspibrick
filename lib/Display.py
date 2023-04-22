@@ -28,11 +28,11 @@ The 7 segments have the following binary values
 The decimal points use value 128 with digit 1, 2 or 3
 '''
 
-from Disp4tronix import Disp4tronix
-from DgTell import DgTell
-from DgTell1 import DgTell1
-from RobotInstance import RobotInstance
-from Tools import *
+from .Disp4tronix import Disp4tronix
+from .DgTell import DgTell
+from .DgTell1 import DgTell1
+from .RobotInstance import RobotInstance
+from .Tools import *
 
 # ------------------------   Class Display  -------------------------------------------
 class Display():

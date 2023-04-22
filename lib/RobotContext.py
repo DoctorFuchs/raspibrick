@@ -5,9 +5,9 @@ Dummy class to make RaspiBrick source compatible with RaspiSim. All methods are 
 '''
 
 
-from Obstacle import Obstacle
-from Target import Target
-from Torch import Torch
+from .Obstacle import Obstacle
+from .Target import Target
+from .Torch import Torch
 
 class RobotContext():
     '''

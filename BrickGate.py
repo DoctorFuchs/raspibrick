@@ -8,7 +8,7 @@ import os, subprocess
 
 def debug(msg):
     if BrickGateProperties.DEBUG:
-        print "BG debug-> " + msg
+        print("BG debug-> " + msg)
 
 def showOled(text, lineNum, fontSize, indent, clear = False):
     if oled == None:
@@ -50,10 +50,10 @@ class JavaRunner(Thread):
 
     def run(self):
         robot.isButtonHit()  # dummy call to reset buttonHit flag
-        print "Spawning user app " + self.app
+        print("Spawning user app " + self.app)
         rc = subprocess.call(["sudo", "java", "-jar", self.app])
         # return value not used yet
-        print "Returning from MyApp with exit code:", rc
+        print("Returning from MyApp with exit code:", rc)
 
 # ---------------------- class SocketHandler ------------------------
 class SocketHandler(Thread):
@@ -83,7 +83,7 @@ class SocketHandler(Thread):
         conn.close()
         robot.exit()
         delay(2000)
-        print "Client disconnected. Waiting for next client..."
+        print("Client disconnected. Waiting for next client...")
         showOled("Client disconnected", 0, 12, 0, True)
         showOled("Waiting for next", 2, 12, 0, False) 
         showOled("connecting client...", 3, 12, 0, False)
@@ -169,7 +169,7 @@ class SocketHandler(Thread):
                 if len(devices) == 0:
                     reply = "NO DEVICES"
                 else:
-                    reply = ", ".join(devices.keys())
+                    reply = ", ".join(list(devices.keys()))
             elif method == "isButtonHit":
                 if robot.isButtonHit():
                     reply = "1"
@@ -271,7 +271,7 @@ class SocketHandler(Thread):
         self.conn.sendall(img)
 
     def showError(self, msg1, msg2):
-        print "Error #" + msg1 + " : " + msg2
+        print("Error #" + msg1 + " : " + msg2)
         display.showText("E" + msg1, [0, 1, 1])
 
 def dispatchDisplay(device, method, param1, param2, param3, param4, param5):
@@ -380,7 +380,7 @@ def onButtonEvent(event):
                 if os.path.isfile(javaApp):
                     javaRunner = JavaRunner(javaApp)
                 else:
-                    print "No Java app found to execute"
+                    print("No Java app found to execute")
 # ---------------------- class Flasher ------------------------------
 class Flasher(Thread):
     def __init__(self, led, color):
@@ -434,7 +434,7 @@ def disconnect():
 
 
 # ====================== Main ======================================
-print "Brickgate server V" + BrickGateProperties.BRICKGATE_VERSION + " starting"
+print("Brickgate server V" + BrickGateProperties.BRICKGATE_VERSION + " starting")
 isButtonEnabled = False
 SharedConstants.BLINK_CONNECT_DISCONNECT = False
 SharedConstants.PLAY_CONNECT_DISCONNECT = False
@@ -459,21 +459,21 @@ HOSTNAME = "" # Symbolic name meaning all available interfaces
 try:
     serverSocket.bind((HOSTNAME, BrickGateProperties.IP_PORT))
 except socket.error as msg:
-    print "Bind failed", msg[0], msg[1]
+    print("Bind failed", msg[0], msg[1])
     sys.exit()
 serverSocket.listen(10)
 terminateServer = False
 display.showText("HOLd")
 flasher.start()
 isButtonEnabled = True
-print "Waiting for a connecting client..."
+print("Waiting for a connecting client...")
 showOled("Waiting for", 0, 12, 0, True)
 showOled("connecting client...", 1, 12, 0, False)
 while True:
     # wait to accept a connection - blocking call
     Tools.debug("Calling blocking accept()...")
     conn, addr = serverSocket.accept()
-    print "Connected with client at " + addr[0]
+    print("Connected with client at " + addr[0])
     if terminateServer:
         showOled("Exiting", 2, 10, 0, True)
         showOled("BrickGate server", 4, 12, 0, False)
@@ -498,5 +498,5 @@ display.clear()
 flasher.stop()
 blinkRed(led, 2)
 serverSocket.close()
-print "BrickGate terminated"
+print("BrickGate terminated")
 

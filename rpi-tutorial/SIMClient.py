@@ -18,23 +18,23 @@ def setup():
     GPIO.setup(P_BUTTON, GPIO.IN, GPIO.PUD_UP)
 
 setup()
-print "Resetting modem..."
+print("Resetting modem...")
 resetModem()
 ser = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 5)
 if not isReady(ser):
-    print "Modem not ready."
+    print("Modem not ready.")
     sys.exit(0)
     
-print "Connecting to GSM net..."
+print("Connecting to GSM net...")
 connectGSM(ser, APN)
 
-print "Connecting to TCP server..."
+print("Connecting to TCP server...")
 reply = connectTCP(ser, HOST, PORT)
 if "CONNECT OK" not in reply:
-    print "Connection failed"
+    print("Connection failed")
     sys.exit(0)
 
-print "Connection established. Sending data..."
+print("Connection established. Sending data...")
 while True:
     if GPIO.input(P_BUTTON) == GPIO.LOW:
         msg = "Button pressed"

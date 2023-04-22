@@ -16,15 +16,15 @@ def setup():
 def onButtonEvent(button, event):
     global isRunning
     if event == BUTTON_PRESSED:
-        print "pressed"
+        print("pressed")
     elif event == BUTTON_RELEASED:
-        print "released"
+        print("released")
     elif event == BUTTON_LONGPRESSED:
-       print "long pressed"
+       print("long pressed")
     elif event == BUTTON_CLICKED:
-        print "clicked"
+        print("clicked")
     elif event == BUTTON_DOUBLECLICKED:
-        print "double clicked"
+        print("double clicked")
         isRunning = False
        
 setup()
@@ -35,4 +35,4 @@ while isRunning:
     GPIO.output(P_LED, GPIO.LOW)    
     time.sleep(0.1)
 GPIO.cleanup()
-print "all done"
+print("all done")

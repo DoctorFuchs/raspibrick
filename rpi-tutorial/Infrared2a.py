@@ -21,7 +21,7 @@ while True:
     data = bus.read_byte_data(i2c_address, 0) # use CH0
     u = data / 255.0 * 5
     d = int(m / (u - b))
-    print "d =" ,d, "cm"
+    print("d =" ,d, "cm")
     if d > 0 and d < 50:
         ps.showText("%4d" %d) # xxx
     else:

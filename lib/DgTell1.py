@@ -64,7 +64,7 @@ class DgTell1():
     @staticmethod
     def debug(msg):
         if DgTell1.DEBUG:
-            print "DgTell1 debug->", msg
+            print("DgTell1 debug->", msg)
 
     @staticmethod
     def getVersion():
@@ -167,7 +167,7 @@ class DgTell1():
             cmd = 1 # Segment mode
             DgTell1.debug("bus.write_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(data) + ")")
             self._bus.write_block_data(self.i2c_address, cmd, data)
-        except IOError, err:
+        except IOError as err:
             raise Exception("DgTell1.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
 
     def clear(self):
@@ -191,7 +191,7 @@ class DgTell1():
             cmd = 3 # Hex mode
             DgTell1.debug("bus.write_block_data(" + str(self.i2c_address) + "," + str(cmd) + "," + str(high) + "," + str(low) + ")")
             self._bus.write_block_data(self.i2c_address, cmd, [high, low])
-        except IOError, err:
+        except IOError as err:
             raise Exception("DgTell1.writeData(). Can't access device at address 0x%02X" % self.i2c_address)
 
     def showText(self, text, pos = 0, dp = [0, 0, 0, 0]):

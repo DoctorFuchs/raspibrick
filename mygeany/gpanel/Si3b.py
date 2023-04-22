@@ -1,5 +1,5 @@
 
-from __future__ import division
+
 from gpanel import *
 import random
 
@@ -60,7 +60,7 @@ u1 = [0, 112, 128, 97, 103, 88, 72]
 u2 = [0, 112, 108, 97, 113, 88, 82]
 c1 = chisquare(u1)
 c2 = chisquare(u2)
-print "Die with", u1, "Xi-square:", c1, "loaded?", c1 > s
-print "Die with", u2, "Xi-square:", c2, "loaded?", c2 > s
+print("Die with", u1, "Xi-square:", c1, "loaded?", c1 > s)
+print("Die with", u2, "Xi-square:", c2, "loaded?", c2 > s)
 keep()
 

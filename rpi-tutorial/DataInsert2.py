@@ -13,14 +13,14 @@ PORT = 80
 SERIAL_PORT = "/dev/ttyAMA0"  # Raspberry Pi 2
 #SERIAL_PORT = "/dev/ttyS0"    # Raspberry Pi 3
 
-print "Resetting modem..."
+print("Resetting modem...")
 resetModem()
 ser = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 5)
 if not isReady(ser):
-    print "Modem not ready."
+    print("Modem not ready.")
     sys.exit(0)
 
-print "Connecting to GSM net..."
+print("Connecting to GSM net...")
 connectGSM(ser, APN)
 while True:
     startTime = time.time()
@@ -28,14 +28,14 @@ while True:
     x = str(t)
     x = x.replace(" ", "%20") # don't use space in url
     y = random.randint(1, 100)
-    print "data:", x, y
-    print "Sending HTTP request..."
+    print("data:", x, y)
+    print("Sending HTTP request...")
     reply = connectTCP(ser, HOST, PORT)
     if "CONNECT OK" not in reply:
-        print "Connection failed"
+        print("Connection failed")
         sys.exit(0)
     sendHTTPRequest(ser, HOST, "/insert.php?x=" + x + "&y=" + str(y)) 
-    print "Closing. Waiting for next transfer"
+    print("Closing. Waiting for next transfer")
     closeTCP(ser)
     isRunning = True
     while time.time() - startTime < 60:

@@ -23,23 +23,23 @@ def setup():
 def onButtonEvent(button, event):
     global isRunning
     if button == button1:
-        print "event from button1",
+        print("event from button1", end=' ')
     elif button == button2:
-        print "event from button2",
+        print("event from button2", end=' ')
     elif button == button3:
-        print "event from button3",
+        print("event from button3", end=' ')
     elif button== button4:
-        print "event from button4",
+        print("event from button4", end=' ')
     if event == BUTTON_PRESSED:
-        print "pressed"
+        print("pressed")
     elif event == BUTTON_RELEASED:
-        print "released"
+        print("released")
     elif event == BUTTON_LONGPRESSED:
-       print "long pressed"
+       print("long pressed")
     elif event == BUTTON_CLICKED:
-        print "clicked"
+        print("clicked")
     elif event == BUTTON_DOUBLECLICKED:
-        print "double clicked"
+        print("double clicked")
         if button == button1:
             isRunning = False
        
@@ -47,8 +47,8 @@ setup()
 isRunning = True
 count = 0
 while isRunning:
-    print count
+    print(count)
     count += 1
     time.sleep(1)
 GPIO.cleanup()
-print "all done"
+print("all done")

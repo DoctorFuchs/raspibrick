@@ -56,10 +56,10 @@ def transmit(text):
                         dash()
             s(2)
 
-print "starting..."
+print("starting...")
 #oled = OLED1306()
 #oled.setFontSize(16)
 setup()
 transmit("cq de hb9abh")
 GPIO.cleanup()
-print "all done"
+print("all done")

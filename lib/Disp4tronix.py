@@ -34,7 +34,7 @@ may happen when the CPU is highly loaded.
 
 from smbus import *
 import RPi.GPIO as GPIO
-from Tools import *
+from .Tools import *
 from threading import Thread
 
 # ------------------------   Class Display  -------------------------------------------
@@ -100,7 +100,7 @@ class Disp4tronix():
     @staticmethod
     def debug(msg):
         if Disp4tronix.DEBUG:
-            print "Disp4tronix debug->", msg
+            print("Disp4tronix debug->", msg)
 
     @staticmethod
     def getVersion():

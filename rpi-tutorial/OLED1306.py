@@ -29,7 +29,7 @@ class OLED1306():
             # 128x64 display with hardware I2C:
             self.disp = SSD1306.SSD1306_128_64(rst = None, gpio = GPIO)
         else:
-            print "Device type", type, "not supported"
+            print("Device type", type, "not supported")
         self.inverse = inverse
         self.bkImagePath = bkImagePath
         self.type = type    

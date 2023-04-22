@@ -22,7 +22,7 @@ ux = (px - b) / a
 uy = (py - d) / c
 '''
 
-from __future__ import division
+
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -913,7 +913,7 @@ class GPanel(QtGui.QWidget):
     @staticmethod       
     def getRandomX11Color():
         r = random.randint(0, 540)
-        c = x11ColorDict.keys()
+        c = list(x11ColorDict.keys())
         return c[r]
            
 

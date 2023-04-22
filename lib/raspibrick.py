@@ -11,33 +11,33 @@
  However the use of the code is entirely your responsibility.
  '''
 
-import SharedConstants
-from RobotInstance import RobotInstance
-from Robot import Robot
-from Robot import MyRobot
-from Motor import Motor
-from ServoMotor import ServoMotor
-from Gear import Gear
-from Led import Led
-from InfraredSensor import InfraredSensor
-from UltrasonicSensor import UltrasonicSensor
-from LightSensor import LightSensor
-from RobotContext import RobotContext
-from Beeper import Beeper
-from soundplayer import SoundPlayer
-from OLED1306 import OLED1306
-from Obstacle import Obstacle
-from Target import Target
-from Torch import Torch
-from Shadow import Shadow
-from Display import Display
-from DgTell import DgTell
-from DgTell1 import DgTell1
-from Disp4tronix import Disp4tronix
-from tcpcom import *
-from Camera import Camera
-from PCF8591 import ADC
-from Tools import *
+from . import SharedConstants
+from .RobotInstance import RobotInstance
+from .Robot import Robot
+from .Robot import MyRobot
+from .Motor import Motor
+from .ServoMotor import ServoMotor
+from .Gear import Gear
+from .Led import Led
+from .InfraredSensor import InfraredSensor
+from .UltrasonicSensor import UltrasonicSensor
+from .LightSensor import LightSensor
+from .RobotContext import RobotContext
+from .Beeper import Beeper
+from .soundplayer import SoundPlayer
+from .OLED1306 import OLED1306
+from .Obstacle import Obstacle
+from .Target import Target
+from .Torch import Torch
+from .Shadow import Shadow
+from .Display import Display
+from .DgTell import DgTell
+from .DgTell1 import DgTell1
+from .Disp4tronix import Disp4tronix
+from .tcpcom import *
+from .Camera import Camera
+from .PCF8591 import ADC
+from .Tools import *
 import tty
 import termios
 import sys
@@ -99,7 +99,7 @@ def readKey():
         return ch1
     ch3 = getKey()
     if ord(ch3) != 0x31:
-        print "third", ord(ch3)
+        print("third", ord(ch3))
         return chr(0x10 + ord(ch3) - 65)
 
 

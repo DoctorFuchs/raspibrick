@@ -13,10 +13,10 @@ Class that represents a camera attached to servo motor platform.
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
-from RobotInstance import RobotInstance
+from .Tools import Tools
+from .RobotInstance import RobotInstance
 import picamera
-import StringIO
+import io
 
 class Camera():
     '''
@@ -40,7 +40,7 @@ class Camera():
         '''
         self._checkRobot()
         camera = picamera.PiCamera()
-        imageData = StringIO.StringIO()
+        imageData = io.StringIO()
         w = int(width)
         h = int(height)
 

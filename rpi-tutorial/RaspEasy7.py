@@ -4,7 +4,7 @@
 import smbus
 import time
 
-print "starting..."
+print("starting...")
 bus = smbus.SMBus(1) 
 adc_address = 0x48  # ADC0
 # adc_address = 0x4D  # ADC 1
@@ -16,6 +16,6 @@ while True:
     data = ((rd & 0xFF) << 8) | ((rd & 0xFF00) >> 8)
     # Ignores two least significiant bits
     data = data >> 2
-    print "data:", data
+    print("data:", data)
     time.sleep(1)
 

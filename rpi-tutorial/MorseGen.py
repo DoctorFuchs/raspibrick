@@ -54,4 +54,4 @@ def transmit(text):
 setup()
 transmit("cq de hb9abh pse k")
 GPIO.cleanup()
-print "all done"
+print("all done")

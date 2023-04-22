@@ -11,9 +11,9 @@ port = 5000 # IP port
 
 def onStateChanged(state, msg):
     if state == "LISTENING":
-        print "Server:-- Listening..."
+        print("Server:-- Listening...")
     elif state == "CONNECTED":
-        print "Server:-- Connected to", msg
+        print("Server:-- Connected to", msg)
 
 def readData(port = 0):
     if port == 0:
@@ -29,7 +29,7 @@ def setup():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(P_BUTTON, GPIO.IN)
 
-print "starting..."
+print("starting...")
 setup()
 bus = smbus.SMBus(1) 
 server = TCPServer(port, stateChanged = onStateChanged)
@@ -39,4 +39,4 @@ while GPIO.input(P_BUTTON) == GPIO.LOW:
         server.sendMessage(str(v))
         time.sleep(dt)
 server.terminate()
-print "Server terminated"
+print("Server terminated")

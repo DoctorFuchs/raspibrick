@@ -11,7 +11,7 @@ ps = Py7Seg() # xxx
 t = 0
 while True:
     data = adc.read_adc(channel, gain)
-    print t, "s:", data
+    print(t, "s:", data)
     ps.showText("%4d" %data) # xxx
     t += 0.1
     time.sleep(0.1)

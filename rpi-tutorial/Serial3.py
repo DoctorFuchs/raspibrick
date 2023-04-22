@@ -8,4 +8,4 @@ port = "/dev/ttyAMA0"  # Raspberry Pi 2
 ser = serial.Serial(port, baudrate = 9600, timeout = 0.5)
 while True:
     data = ser.readline()
-    print "Data:--", data,
+    print("Data:--", data, end=' ')

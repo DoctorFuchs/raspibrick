@@ -15,9 +15,9 @@ to perform a car-like movement.
  '''
 
 
-from Tools import Tools
-import SharedConstants
-from RobotInstance import RobotInstance
+from .Tools import Tools
+from . import SharedConstants
+from .RobotInstance import RobotInstance
 
 class GearState():
     FORWARD = 0

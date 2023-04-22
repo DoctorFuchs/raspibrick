@@ -13,9 +13,9 @@ Class that represents an ultrasonic sensor.
  However the use of the code is entirely your responsibility.
  '''
 
-import SharedConstants
-from RobotInstance import RobotInstance
-from Tools import Tools
+from . import SharedConstants
+from .RobotInstance import RobotInstance
+from .Tools import Tools
 import RPi.GPIO as GPIO
 import time
 

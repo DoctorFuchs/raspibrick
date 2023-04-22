@@ -10,5 +10,5 @@ SoundPlayer.playTone(800, 0.1, True, dev) # 600 Hz
 SoundPlayer.playTone(600, 0.1, True, dev) # 600 Hz
 time.sleep(1)
 SoundPlayer.playTone([900, 800, 600], 5, True, dev) # 3 tones together
-print "done"
+print("done")
     

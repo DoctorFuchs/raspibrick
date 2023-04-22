@@ -2,7 +2,7 @@
 
 import smbus
 import RPi.GPIO as GPIO
-from Tools import Tools
+from .Tools import Tools
 
 class ADC:
     def __init__(self, channel, address = 0x48):
@@ -21,7 +21,7 @@ class ADC:
                 self._bus = smbus.SMBus(0)  # For revision 1 Raspberry Pi
                 Tools.debug("Found SMBus for revision 1")
         except:
-            print "No SMBus found on this robot device."
+            print("No SMBus found on this robot device.")
             return
         self._isSMBusAvailable = False
         self._address = address

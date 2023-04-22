@@ -45,7 +45,7 @@ time.sleep(1)
 t = 0
 while True:
     temp = getTemperature()
-    print "temp: %4.1f" %(temp)
+    print("temp: %4.1f" %(temp))
     t += 1
     time.sleep(1)
 

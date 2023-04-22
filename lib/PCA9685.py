@@ -6,7 +6,7 @@
 
 import time
 import math
-from Tools import Tools
+from .Tools import Tools
 
 class PWM:
     _mode_adr              = 0x00

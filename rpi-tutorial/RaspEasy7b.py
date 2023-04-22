@@ -16,7 +16,7 @@ def readData(port = 0):
     data = data >> 2
     return data
 
-print "starting..."
+print("starting...")
 oled = OLED1306()
 oled.setFontSize(50)
 #pyTell = PyTell()

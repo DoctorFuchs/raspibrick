@@ -6,13 +6,13 @@ import os, subprocess
 
 fname = "/mnt/recovery/raspibrick-rename.requested"
 if not os.path.isfile(fname):
-    print "RenameHost tag file not found"
+    print("RenameHost tag file not found")
     sys.exit()
 
 fInp = open(fname)
 hostname = fInp.readline()
 fInp.close()
-print "New host name:", hostname
+print("New host name:", hostname)
 robot = Robot()
 display = Display()
 display.showTicker("CHG HOST", 1, 1, True)

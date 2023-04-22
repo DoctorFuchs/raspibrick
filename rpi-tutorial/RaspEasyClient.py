@@ -5,11 +5,11 @@ from tcpcom import TCPClient
 
 def onStateChanged(state, msg):
     if state == "CONNECTING":
-       print "Client:-- Waiting for connection..."
+       print("Client:-- Waiting for connection...")
     elif state == "CONNECTED":
-       print "Client:-- Connection estabished."
+       print("Client:-- Connection estabished.")
     elif state == "MESSAGE":
-       print "Client:-- Received data:", msg
+       print("Client:-- Received data:", msg)
 
 port = 5000 # IP port
 host = "192.168.1.106"

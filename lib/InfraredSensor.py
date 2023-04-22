@@ -13,10 +13,10 @@ Class that represents an infrared sensor.
  However the use of the code is entirely your responsibility.
  '''
 
-from Tools import Tools
+from .Tools import Tools
 import RPi.GPIO as GPIO
-import SharedConstants
-from RobotInstance import RobotInstance
+from . import SharedConstants
+from .RobotInstance import RobotInstance
 
 class InfraredSensor():
     '''

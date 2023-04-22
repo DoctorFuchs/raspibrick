@@ -61,11 +61,11 @@ keep() is blocking and keeps the graphics window open until the close button is 
 Python process terminates.
 '''
 
-from __future__ import division
+
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import thread
+import _thread
 import sys, time, math
 import random
 
@@ -995,7 +995,7 @@ def run(f):
     '''
     Calls f() in a new thread.
     '''
-    thread.start_new_thread(f, ())
+    _thread.start_new_thread(f, ())
 
 
 def getRandomX11Color():
@@ -1964,7 +1964,7 @@ class GPanel(QtGui.QWidget):
         No params: Returns color at current graph cursor position.
         '''
         r, g, b, a = self.getPixelColor(*args)
-        for name, rgb in x11ColorDict.items():
+        for name, rgb in list(x11ColorDict.items()):
             if name[-1] in [str(i) for i in range(10)]:  # skip names with ending number
                 continue
             if " " in name:  # skip names with space
@@ -2448,7 +2448,7 @@ class GPanel(QtGui.QWidget):
         Returns a random X11 color string.
         '''
         r = random.randint(0, 540)
-        c = x11ColorDict.keys()
+        c = list(x11ColorDict.keys())
         return c[r]
 
     @staticmethod

@@ -3,7 +3,7 @@
 # 128x32 or 128x64 resolution.
 # Sits on top of the Adafruit OLED1306 driver class (with thanks to the author)
 
-import SSD1306
+from . import SSD1306
 import RPi.GPIO as GPIO
 import smbus
 
@@ -42,7 +42,7 @@ class OLED1306():
             # 128x64 display with hardware I2C:
             self.disp = SSD1306.SSD1306_128_64(rst = None, gpio = GPIO)
         else:
-            print "Device type", type, "not supported"
+            print("Device type", type, "not supported")
         self.inverse = inverse
         self.bkImagePath = bkImagePath
         self.type = type    

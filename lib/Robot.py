@@ -14,21 +14,21 @@ Abstraction of a robot based on Pi2Go (full version) from 4tronix.
  '''
 
 
-from RobotInstance import RobotInstance
+from .RobotInstance import RobotInstance
 from smbus import SMBus
 import RPi.GPIO as GPIO
 import os, sys
 import time
-from Tools import Tools
-import SharedConstants
-from Display import Display
-from DgTell import DgTell
-from DgTell1 import DgTell1
-from Disp4tronix import Disp4tronix
-from OLED1306 import OLED1306
-from SensorThread import SensorThread
-from Led import Led
-from PCA9685 import PWM
+from .Tools import Tools
+from . import SharedConstants
+from .Display import Display
+from .DgTell import DgTell
+from .DgTell1 import DgTell1
+from .Disp4tronix import Disp4tronix
+from .OLED1306 import OLED1306
+from .SensorThread import SensorThread
+from .Led import Led
+from .PCA9685 import PWM
 from threading import Thread
 from subprocess import Popen, PIPE
 import re
@@ -504,7 +504,7 @@ class MyRobot(object):
                      struct.pack('256s', ifname[:15]))[20:24]))
         except:
             pass
-        print "Got IP address:", ip
+        print("Got IP address:", ip)
         return ip
 
 

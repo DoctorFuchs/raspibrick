@@ -20,10 +20,10 @@ def setup():
 def setDirection(direction):
     duty = a / 180 * direction + b
     pwm.setDuty(channel, duty)
-    print "direction =", direction, "-> duty =", duty
+    print("direction =", direction, "-> duty =", duty)
     time.sleep(0.5) # allow to settle
    
-print "starting"
+print("starting")
 setup()
 channel = 0
 for direction in range(0, 91, 10):
@@ -36,5 +36,5 @@ for direction in range(0, 91, 10):
 direction = 0    
 setDirection(0)    
     
-print "done"
+print("done")
   

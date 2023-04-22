@@ -16,8 +16,8 @@
 
 import os.path
 import shutil
-import ConfigParser
-import thread
+import configparser
+import _thread
 
 from raspibrick import *
 
@@ -36,7 +36,7 @@ def blinker(nb):
         time.sleep(0.2)
 
 def ledBlink(nb):
-    thread.start_new_thread(blinker, (nb,))
+    _thread.start_new_thread(blinker, (nb,))
 
 def showAppInfo(forceUpdate):
     global oldText
@@ -100,7 +100,7 @@ def updateAppFiles():
             showOled("detected", 1, 12, 0, False)
             Tools.delay(3000)  # if download and execute, the process is killed here
         showUpdateInfo = True         
-        for i in reversed(range(1, 9)):
+        for i in reversed(list(range(1, 9))):
             file_old = SharedConstants.APP_PATH + "_" + str(i) + ".py"
             file_new = SharedConstants.APP_PATH + "_" + str(i + 1) + ".py"
             copyFile(file_old, file_new)
@@ -263,7 +263,7 @@ def firstDuty():
 
 
 def getConfigEntry(section, key):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.optionxform = str
     config.read(SharedConstants.CONFIG_FILE)
     try:
@@ -273,7 +273,7 @@ def getConfigEntry(section, key):
     return value
 
 def setConfigEntry(section, key, value):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.optionxform = str
     if not os.path.isfile(SharedConstants.CONFIG_FILE):
         config.add_section(section)
@@ -296,7 +296,7 @@ def blinkLed():
         led.setColor(0, 50, 0)
         Tools.delay(200)
 
-print "IdleProcess starting"
+print("IdleProcess starting")
 rc = 0
 robot = Robot()
 display = Display()
@@ -348,7 +348,7 @@ if robot.oled != None:
     robot.oled.clear()
 led.setColor(0, 0, 0)
 Tools.delay(1000)
-print "Returning to parent process with rc:", rc
+print("Returning to parent process with rc:", rc)
 sys.exit(rc)
 
 

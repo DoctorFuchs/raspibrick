@@ -13,5 +13,5 @@ for x in range(1, 6):
     request = "GET /insert.php?x=" + str(x) + "&y=" + str(y) + \
               " HTTP/1.1\r\nHost: " + host + "\r\n\r\n" 
     s.sendall(request)
-print "Done"
+print("Done")
 

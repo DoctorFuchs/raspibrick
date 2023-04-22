@@ -9,7 +9,7 @@ IP_PORT = 22000
 
 def debug(text):
     if VERBOSE:
-        print "Debug:---", text
+        print("Debug:---", text)
 
 # ------------------------- class Receiver ---------------------------
 class Receiver(Thread):
@@ -40,7 +40,7 @@ class Receiver(Thread):
             except:
                 raise Exception("Exception from blocking sock.recv()")
             data += blk
-        print "Data received:", data
+        print("Data received:", data)
 # ------------------------ End of Receiver ---------------------
 
 def startReceiver():
@@ -80,12 +80,12 @@ isConnected = False
 
 if connect():
     isConnected = True
-    print "Connection established"
+    print("Connection established")
     time.sleep(1)
     while isConnected:
-        print "Sending command: go..."
+        print("Sending command: go...")
         sendCommand("go")
         time.sleep(2)
 else:
-    print "Connection to %s:%d failed" % (IP_ADDRESS, IP_PORT)
-print "done"    
+    print("Connection to %s:%d failed" % (IP_ADDRESS, IP_PORT))
+print("done")    

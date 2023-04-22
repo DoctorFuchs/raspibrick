@@ -12,7 +12,7 @@ def setup():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(P_BUTTON, GPIO.IN)
 
-print "starting..."
+print("starting...")
 oled = OLED1306()
 oled.setFontSize(50)
 #pyTell = PyTell()

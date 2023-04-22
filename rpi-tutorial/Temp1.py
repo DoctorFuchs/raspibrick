@@ -29,7 +29,7 @@ slaveFolders = getSlaveFolders()
 while True:
     # Extract temperature from first slave
     temp = getTemperature(slaveFolders[0])
-    print("T = %6.2f deg" %temp)
+    print(("T = %6.2f deg" %temp))
     w = "%4.1f" %temp
     ps.showText(w[0] + w[1] + w[3] + '#', dp = [0, 1, 0]) # xxx    
     time.sleep(1)

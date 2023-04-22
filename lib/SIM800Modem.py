@@ -9,7 +9,7 @@ P_RESET = 12 # Reset pin
 
 def debug(text):
     if VERBOSE:
-        print "Debug:---", text
+        print("Debug:---", text)
 
 def resetModem():
     debug("Resetting modem...")
@@ -88,7 +88,7 @@ def closeTCP(ser, showResponse = False):
     reply = ser.read(ser.inWaiting())
     debug("closeTCP() retured:\n" + reply)
     if showResponse:
-        print "Server reponse:\n" + reply[(reply.index("SEND OK") + 9):]
+        print("Server reponse:\n" + reply[(reply.index("SEND OK") + 9):])
     time.sleep(2)
     
 def getIPStatus(ser):
